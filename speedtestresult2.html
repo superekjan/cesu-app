@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网络测速结果</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --bg-card-hover: rgba(46, 49, 69, 0.75);
+            --accent-blue: #5b8def;
+            --accent-blue-light: #7ca6f3;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-red: #ef4444;
+            --accent-purple: #9b8bf4;
+            --accent-yellow: #fbbf24;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .wifi-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .wifi-icon-large {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wifi-icon-large svg {
+            width: 28px;
+            height: 28px;
+            fill: var(--accent-blue);
+        }
+
+        .wifi-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .wifi-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .wifi-model {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        /* 问题诊断卡片 */
+        .diagnosis-card {
+            background: var(--bg-card);
+            border-radius: 4px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .diagnosis-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .diagnosis-icon-main {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .diagnosis-icon-main svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--accent-red);
+        }
+
+        .diagnosis-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .diagnosis-status {
+            margin-left: auto;
+            font-size: 12px;
+            color: var(--accent-red);
+            font-weight: 500;
+        }
+
+        .diagnosis-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .diagnosis-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .tag-warning {
+            background: rgba(244, 162, 97, 0.15);
+            color: var(--accent-orange);
+            border: 1px solid rgba(244, 162, 97, 0.2);
+        }
+
+        .tag-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        /* 信息卡片 */
+        .info-card {
+            background: var(--bg-card);
+            border-radius: 4px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title-icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-title-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: url(#titleIconGradient);
+        }
+
+        .signal-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .analysis-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .web-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .connectivity-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .speed-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .devices-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .security-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px 16px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .info-value {
+            font-size: 13px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* 信号强度 */
+        .signal-section {
+            background: var(--bg-card);
+            border-radius: 4px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .signal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .signal-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .signal-value {
+            font-size: 13px;
+            color: var(--accent-green);
+            font-weight: 500;
+        }
+
+        .signal-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        /* WiFi干扰图 */
+        .interference-chart {
+            background: #0d0f1a;
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .chart-title {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-bottom: 12px;
+        }
+
+        .chart-area {
+            height: 120px;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding-bottom: 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .channel-bar {
+            width: 8px;
+            border-radius: 2px 2px 0 0;
+            position: relative;
+        }
+
+        .channel-bar::after {
+            content: attr(data-channel);
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
+            color: var(--text-tertiary);
+        }
+
+        .channel-bar.red { background: linear-gradient(to top, #ef4444, #f87171); }
+        .channel-bar.yellow { background: linear-gradient(to top, #fbbf24, #fcd34d); }
+        .channel-bar.green { background: linear-gradient(to top, #10b981, #34d399); }
+        .channel-bar.blue { background: linear-gradient(to top, #3b82f6, #60a5fa); }
+
+        .signal-curve {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 24px;
+        }
+
+        .signal-curve svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .signal-legend {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: var(--text-tertiary);
+        }
+
+        .legend-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.red { background: #ef4444; }
+        .legend-dot.yellow { background: #fbbf24; }
+        .legend-dot.green { background: #10b981; }
+
+        /* 信道分析 */
+        .channel-analysis {
+            background: var(--bg-card);
+            border-radius: 4px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .analysis-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .analysis-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .channel-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 100px;
+            padding: 0 8px;
+        }
+
+        .freq-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .freq-bar-fill {
+            width: 28px;
+            border-radius: 3px 3px 0 0;
+            transition: all 0.3s ease;
+        }
+
+        .freq-bar-fill.high { background: linear-gradient(to top, #ef4444, #f87171); }
+        .freq-bar-fill.medium { background: linear-gradient(to top, #fbbf24, #fcd34d); }
+        .freq-bar-fill.low { background: linear-gradient(to top, #10b981, #34d399); }
+
+        .freq-label {
+            font-size: 10px;
+            color: var(--text-tertiary);
+        }
+
+        /* 网页体验 */
+        .web-experience {
+            background: var(--bg-card);
+            border-radius: 4px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .web-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .web-score {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .score-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent-orange);
+        }
+
+        .score-unit {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .web-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 连通性测试 */
+        .connectivity-section {
+            background: var(--bg-card);
+            border-radius: 4px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .connectivity-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .ping-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ping-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        .ping-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .ping-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .ping-ip {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .ping-result {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .ping-time {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+
+        .ping-status {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .ping-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        /* 网速测试 */
+        .speed-section {
+            background: var(--bg-card);
+            border-radius: 4px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .speed-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .speed-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .speed-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        .speed-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .speed-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .speed-value span {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            font-weight: 400;
+        }
+
+        /* 在线终端 */
+        .devices-section {
+            background: var(--bg-card);
+            border-radius: 4px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .devices-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .devices-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .devices-count {
+            font-size: 12px;
+            color: var(--accent-blue);
+            font-weight: 500;
+        }
+
+        .device-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .device-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        .device-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(91, 141, 239, 0.15);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .device-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--accent-blue);
+        }
+
+        .device-info {
+            flex: 1;
+        }
+
+        .device-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .device-status {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        /* 安全检测 */
+        .security-section {
+            background: var(--bg-card);
+            border-radius: 4px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .security-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .security-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .security-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        .security-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .security-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--accent-green);
+        }
+
+        .security-text {
+            flex: 1;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .security-status {
+            font-size: 12px;
+            color: var(--accent-green);
+            font-weight: 500;
+        }
+
+        /* 底部信息 */
+        .footer-info {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .footer-text {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-bottom: 4px;
+        }
+
+        .footer-link {
+            font-size: 11px;
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        /* 按钮区域 */
+        .button-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 20px;
+            background: var(--bg-secondary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(270deg, #00c6ff 0%, #0072ff 100%);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(0, 114, 255, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 114, 255, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid rgba(0, 114, 255, 0.5);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* 响应式 */
+        @media (max-width: 480px) {
+            .header {
+                padding: 12px 16px;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .button-section {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-top">
+                <div class="back-btn" onclick="history.back()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                    </svg>
+                </div>
+                <div class="header-title">检测结果</div>
+            </div>
+            <div class="wifi-info">
+                <div class="wifi-icon-large">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
+                    </svg>
+                </div>
+                <div class="wifi-details">
+                    <div class="wifi-name">X-WRT_419E_2.4G</div>
+                    <div class="wifi-model">V2020CA</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- SVG渐变定义 -->
+        <svg width="0" height="0" style="position: absolute;">
+            <defs>
+                <linearGradient id="titleIconGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" style="stop-color:#5b8def;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#4ecdc4;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+        </svg>
+
+        <!-- 主内容 -->
+        <main class="main-content">
+            <!-- 问题诊断 -->
+            <div class="diagnosis-card">
+                <div class="diagnosis-header">
+                    <div class="diagnosis-icon-main">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                        </svg>
+                    </div>
+                    <div class="diagnosis-title">问题诊断</div>
+                    <div class="diagnosis-status">干扰严重</div>
+                </div>
+                <div class="diagnosis-desc">
+                    当前网络存在严重干扰，建议优化路由器位置或更换信道以获得更好的网络体验
+                </div>
+                <div class="diagnosis-tags">
+                    <span class="tag tag-warning">信号干扰</span>
+                    <span class="tag tag-warning">信道拥挤</span>
+                    <span class="tag tag-success">连接正常</span>
+                </div>
+            </div>
+
+            <!-- 基本信息 -->
+            <div class="info-card">
+                <div class="card-title">
+                    <div class="card-title-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                        </svg>
+                    </div>
+                    基本信息
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">WiFi名称</div>
+                        <div class="info-value">Meeting_5G</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">频段</div>
+                        <div class="info-value">5GHz</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">IP地址</div>
+                        <div class="info-value">192.168.31.102</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">MAC地址</div>
+                        <div class="info-value">92:E8:12:01</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">信道</div>
+                        <div class="info-value">161 (80MHz)</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">路由器品牌</div>
+                        <div class="info-value">ZTE Telecom</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 信号强度 -->
+            <div class="signal-section">
+                <div class="signal-header">
+                    <div class="signal-title">
+                        <div class="card-title-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
+                            </svg>
+                        </div>
+                        信号强度
+                    </div>
+                    <div class="signal-value">-37 dBm (信号强)</div>
+                </div>
+                <div class="signal-desc">
+                    当前信号强度良好，但存在干扰问题。建议检查周围是否有其他WiFi设备或电子设备干扰。
+                </div>
+                <div class="interference-chart">
+                    <div class="chart-title">WiFi干扰</div>
+                    <div class="chart-area">
+                        <div class="channel-bar red" style="height: 85%;" data-channel="36"></div>
+                        <div class="channel-bar yellow" style="height: 60%;" data-channel="40"></div>
+                        <div class="channel-bar green" style="height: 30%;" data-channel="44"></div>
+                        <div class="channel-bar blue" style="height: 45%;" data-channel="48"></div>
+                        <div class="channel-bar red" style="height: 90%;" data-channel="52"></div>
+                        <div class="channel-bar yellow" style="height: 55%;" data-channel="56"></div>
+                        <div class="channel-bar green" style="height: 25%;" data-channel="60"></div>
+                        <div class="channel-bar blue" style="height: 70%;" data-channel="64"></div>
+                        <div class="channel-bar red" style="height: 95%;" data-channel="100"></div>
+                        <div class="channel-bar yellow" style="height: 40%;" data-channel="104"></div>
+                        <div class="channel-bar green" style="height: 35%;" data-channel="108"></div>
+                        <div class="channel-bar blue" style="height: 80%;" data-channel="112"></div>
+                    </div>
+                    <div class="signal-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot red"></div>
+                            <span>严重干扰</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot yellow"></div>
+                            <span>轻度干扰</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot green"></div>
+                            <span>无干扰</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 信道分析 -->
+            <div class="channel-analysis">
+                <div class="analysis-title">
+                    <div class="card-title-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+                        </svg>
+                    </div>
+                    信道分析
+                </div>
+                <div class="analysis-desc">
+                    当前信道161干扰严重，建议切换至信道36或40以获得更好的网络体验
+                </div>
+                <div class="channel-bars">
+                    <div class="freq-bar">
+                        <div class="freq-bar-fill high" style="height: 85px;"></div>
+                        <div class="freq-label">36</div>
+                    </div>
+                    <div class="freq-bar">
+                        <div class="freq-bar-fill medium" style="height: 65px;"></div>
+                        <div class="freq-label">40</div>
+                    </div>
+                    <div class="freq-bar">
+                        <div class="freq-bar-fill low" style="height: 35px;"></div>
+                        <div class="freq-label">44</div>
+                    </div>
+                    <div class="freq-bar">
+                        <div class="freq-bar-fill medium" style="height: 55px;"></div>
+                        <div class="freq-label">48</div>
+                    </div>
+                    <div class="freq-bar">
+                        <div class="freq-bar-fill high" style="height: 90px;"></div>
+                        <div class="freq-label">52</div>
+                    </div>
+                    <div class="freq-bar">
+                        <div class="freq-bar-fill medium" style="height: 60px;"></div>
+                        <div class="freq-label">56</div>
+                    </div>
+                    <div class="freq-bar">
+                        <div class="freq-bar-fill low" style="height: 30px;"></div>
+                        <div class="freq-label">149</div>
+                    </div>
+                    <div class="freq-bar">
+                        <div class="freq-bar-fill high" style="height: 95px;"></div>
+                        <div class="freq-label">153</div>
+                    </div>
+                    <div class="freq-bar">
+                        <div class="freq-bar-fill high" style="height: 88px;"></div>
+                        <div class="freq-label">157</div>
+                    </div>
+                    <div class="freq-bar">
+                        <div class="freq-bar-fill high" style="height: 92px;"></div>
+                        <div class="freq-label">161</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 网页体验 -->
+            <div class="web-experience">
+                <div class="web-title">
+                    <div class="card-title-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                        </svg>
+                    </div>
+                    网页体验
+                </div>
+                <div class="web-score">
+                    <span class="score-value">60</span>
+                    <span class="score-unit">分 (满分100分)</span>
+                </div>
+                <div class="web-desc">
+                    网页加载速度较慢，建议优化网络环境。当前网络环境下，网页平均打开时间为2.5秒，影响用户体验。
+                </div>
+            </div>
+
+            <!-- 连通性测试 - 百度 -->
+            <div class="connectivity-section">
+                <div class="connectivity-title">
+                    <div class="card-title-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    连通性测试
+                </div>
+                <div class="ping-list">
+                    <div class="ping-item">
+                        <div class="ping-info">
+                            <div class="ping-name">百度</div>
+                            <div class="ping-ip">IP: 180.97.33.107</div>
+                        </div>
+                        <div class="ping-result">
+                            <div class="ping-time">10.97ms</div>
+                            <div class="ping-status">丢包率0%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ping-desc">
+                    百度服务器响应速度较快，网络连接稳定，适合日常搜索和网页浏览。
+                </div>
+            </div>
+
+            <!-- 连通网关 -->
+            <div class="connectivity-section">
+                <div class="connectivity-title">
+                    <div class="card-title-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    连通网关
+                </div>
+                <div class="ping-list">
+                    <div class="ping-item">
+                        <div class="ping-info">
+                            <div class="ping-name">网关</div>
+                            <div class="ping-ip">IP: 192.168.31.1</div>
+                        </div>
+                        <div class="ping-result">
+                            <div class="ping-time">3.57ms</div>
+                            <div class="ping-status">丢包率0%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ping-desc">
+                    网关响应速度优秀，本地网络连接稳定。如果网关延迟过高，可能是路由器负载过大或存在故障。
+                </div>
+            </div>
+
+            <!-- 网速测试 -->
+            <div class="speed-section">
+                <div class="speed-title">
+                    <div class="card-title-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+                        </svg>
+                    </div>
+                    网速
+                </div>
+                <div class="speed-grid">
+                    <div class="speed-item">
+                        <div class="speed-label">下载速度</div>
+                        <div class="speed-value">45.20 <span>MB/s</span></div>
+                    </div>
+                    <div class="speed-item">
+                        <div class="speed-label">上传速度</div>
+                        <div class="speed-value">23.80 <span>MB/s</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 在线终端 -->
+            <div class="devices-section">
+                <div class="devices-header">
+                    <div class="devices-title">
+                        <div class="card-title-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M4 6h18V4H4c-1.1 0-2 .9-2 2v11H0v3h14v-3H4V6zm19 2h-6c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h6c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1zm-1 9h-4v-7h4v7z"/>
+                            </svg>
+                        </div>
+                        在线终端
+                    </div>
+                    <div class="devices-count">4台</div>
+                </div>
+                <div class="device-list">
+                    <div class="device-item">
+                        <div class="device-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5z"/>
+                            </svg>
+                        </div>
+                        <div class="device-info">
+                            <div class="device-name">MacBook Pro</div>
+                            <div class="device-status">在线 · 5GHz</div>
+                        </div>
+                    </div>
+                    <div class="device-item">
+                        <div class="device-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/>
+                            </svg>
+                        </div>
+                        <div class="device-info">
+                            <div class="device-name">iPhone 14 Pro</div>
+                            <div class="device-status">在线 · 5GHz</div>
+                        </div>
+                    </div>
+                    <div class="device-item">
+                        <div class="device-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                            </svg>
+                        </div>
+                        <div class="device-info">
+                            <div class="device-name">iPad Air</div>
+                            <div class="device-status">在线 · 2.4GHz</div>
+                        </div>
+                    </div>
+                    <div class="device-item">
+                        <div class="device-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6A4.997 4.997 0 0 1 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/>
+                            </svg>
+                        </div>
+                        <div class="device-info">
+                            <div class="device-name">小米智能家居</div>
+                            <div class="device-status">在线 · 2.4GHz</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 安全检测 -->
+            <div class="security-section">
+                <div class="security-title">
+                    <div class="card-title-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                        </svg>
+                    </div>
+                    安全检测
+                </div>
+                <div class="security-list">
+                    <div class="security-item">
+                        <div class="security-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+                            </svg>
+                        </div>
+                        <div class="security-text">未检测到DNS劫持</div>
+                        <div class="security-status">安全</div>
+                    </div>
+                    <div class="security-item">
+                        <div class="security-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+                            </svg>
+                        </div>
+                        <div class="security-text">未检测到ARP攻击</div>
+                        <div class="security-status">安全</div>
+                    </div>
+                    <div class="security-item">
+                        <div class="security-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+                            </svg>
+                        </div>
+                        <div class="security-text">未检测到弱密码风险</div>
+                        <div class="security-status">安全</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部信息 -->
+            <div class="footer-info">
+                <div class="footer-text">检测结果仅供参考，如有疑问请联系网络管理员</div>
+                <a href="#" class="footer-link">查看详细报告 ></a>
+            </div>
+        </main>
+
+        <!-- 按钮 -->
+        <div class="button-section">
+            <button class="btn btn-primary" onclick="goBack()">返回</button>
+            <button class="btn btn-secondary" onclick="retest()">重新检测</button>
+        </div>
+    </div>
+
+    <script>
+        // 返回上一页
+        function goBack() {
+            history.back();
+        }
+
+        // 重新检测
+        function retest() {
+            window.location.href = 'index.html';
+        }
+
+        // 分享结果
+        function shareResult() {
+            alert('分享功能开发中...');
+        }
+    </script>
+</body>
+</html>

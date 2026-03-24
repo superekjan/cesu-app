@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>历史报告</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --bg-card-hover: rgba(46, 49, 69, 0.75);
+            --accent-blue: #5b8def;
+            --accent-blue-light: #7ca6f3;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-purple: #9b8bf4;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .header-subtitle {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-left: auto;
+        }
+
+        /* 主内容 */
+        .main-content {
+            flex: 1;
+            padding: 12px 16px;
+            overflow-y: auto;
+        }
+
+        /* 报告列表 */
+        .report-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .report-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .report-item:hover {
+            border-color: rgba(91, 141, 239, 0.3);
+        }
+
+        .report-item.expanded {
+            border-color: rgba(91, 141, 239, 0.4);
+        }
+
+        /* 报告头部 - 始终显示 */
+        .report-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .report-header:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .report-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: rgba(91, 141, 239, 0.15);
+        }
+
+        .report-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: var(--accent-blue);
+        }
+
+        .report-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .report-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .report-meta {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .report-status {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .report-status.good {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+
+        .report-status.warning {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+        }
+
+        .report-status.error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .expand-icon {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-tertiary);
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .report-item.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        /* 报告详情 - 展开显示 */
+        .report-detail {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .report-item.expanded .report-detail {
+            max-height: 380px;
+        }
+
+        .report-detail-content {
+            padding: 0 16px 16px 16px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        /* 统一数据卡片网格 - 与speedtestresult1.html一致 */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 12px 0;
+        }
+
+        .detail-card {
+            background: var(--bg-card);
+            border-radius: 4px;
+            padding: 12px 14px;
+            border: 1px solid var(--border-subtle);
+            transition: all 0.2s ease;
+        }
+
+        .detail-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+
+        .detail-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .detail-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .detail-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: url(#iconGradient);
+        }
+
+        .signal-icon {
+            position: relative;
+            width: 16px;
+            height: 12px;
+        }
+
+        .signal-icon span {
+            position: absolute;
+            bottom: 0;
+            width: 2.5px;
+            background: linear-gradient(to top, var(--accent-blue), var(--accent-cyan));
+            border-radius: 1px;
+        }
+
+        .signal-icon span:nth-child(1) { left: 0; height: 30%; }
+        .signal-icon span:nth-child(2) { left: 4px; height: 55%; }
+        .signal-icon span:nth-child(3) { left: 8px; height: 80%; }
+        .signal-icon span:nth-child(4) { left: 12px; height: 100%; }
+
+        .interference-icon {
+            display: flex;
+            gap: 2px;
+            align-items: center;
+            width: 16px;
+            height: 16px;
+        }
+
+        .interference-icon span {
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent-blue), var(--accent-cyan));
+            border-radius: 1px;
+        }
+
+        .interference-icon span:nth-child(1) { height: 8px; }
+        .interference-icon span:nth-child(2) { height: 14px; }
+        .interference-icon span:nth-child(3) { height: 10px; }
+
+        .download-icon, .upload-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+        }
+
+        .download-icon svg, .upload-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: url(#iconGradient);
+        }
+
+        .internal-latency-icon svg, .external-latency-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: url(#iconGradient);
+        }
+
+        .detail-value {
+            font-size: 18px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: baseline;
+            gap: 3px;
+        }
+
+        .detail-value .unit {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+        }
+
+        /* 操作按钮 */
+        .detail-actions {
+            display: flex;
+            gap: 10px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .detail-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .detail-btn.primary {
+            background: linear-gradient(270deg, #00c6ff 0%, #0072ff 100%);
+            border: none;
+            color: #fff;
+        }
+
+        .detail-btn.primary:hover {
+            opacity: 0.9;
+        }
+
+        .detail-btn.secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+        }
+
+        .detail-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* 空状态 */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            fill: var(--text-tertiary);
+        }
+
+        .empty-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .empty-btn {
+            padding: 12px 32px;
+            background: linear-gradient(270deg, #00c6ff 0%, #0072ff 100%);
+            border: none;
+            border-radius: 24px;
+            font-size: 14px;
+            color: #fff;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .empty-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 114, 255, 0.3);
+        }
+
+        /* 底部安全区域 */
+        .safe-area-bottom {
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SVG渐变定义 -->
+        <svg width="0" height="0" style="position: absolute;">
+            <defs>
+                <linearGradient id="iconGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+        </svg>
+
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-top">
+                <div class="back-btn" onclick="history.back()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                    </svg>
+                </div>
+                <div class="header-title">历史报告</div>
+                <div class="header-subtitle">共 6 份报告</div>
+            </div>
+        </header>
+
+        <!-- 主内容 -->
+        <main class="main-content">
+            <div class="report-list">
+                <!-- 报告1 -->
+                <div class="report-item" onclick="toggleReport(this)">
+                    <div class="report-header">
+                        <div class="report-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="report-info">
+                            <div class="report-title">网络测速报告</div>
+                            <div class="report-meta">
+                                <span>2024-03-20 14:30</span>
+                                <span class="report-status good">优秀</span>
+                            </div>
+                        </div>
+                        <svg class="expand-icon" viewBox="0 0 24 24">
+                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                        </svg>
+                    </div>
+                    <div class="report-detail">
+                        <div class="report-detail-content">
+                            <div class="detail-grid">
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon signal-icon">
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </div>
+                                        信号强度
+                                    </div>
+                                    <div class="detail-value">
+                                        -50<span class="unit">dBm</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon interference-icon">
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </div>
+                                        Wi-Fi 干扰
+                                    </div>
+                                    <div class="detail-value">较少</div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon download-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                            </svg>
+                                        </div>
+                                        下行网速
+                                    </div>
+                                    <div class="detail-value">
+                                        4.68<span class="unit">MB/s</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon upload-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2v2h14v-2H5z"/>
+                                            </svg>
+                                        </div>
+                                        上行网速
+                                    </div>
+                                    <div class="detail-value">
+                                        4.68<span class="unit">MB/s</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon internal-latency-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+                                            </svg>
+                                        </div>
+                                        内网延迟
+                                    </div>
+                                    <div class="detail-value">
+                                        4<span class="unit">ms</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon external-latency-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h-2V9h6v2h-2v6z"/>
+                                            </svg>
+                                        </div>
+                                        外网延迟
+                                    </div>
+                                    <div class="detail-value">
+                                        10<span class="unit">ms</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="detail-actions">
+                                <button class="detail-btn primary" onclick="event.stopPropagation();shareReport(1)">分享报告</button>
+                                <button class="detail-btn secondary" onclick="event.stopPropagation();deleteReport(1)">删除</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 报告2 -->
+                <div class="report-item" onclick="toggleReport(this)">
+                    <div class="report-header">
+                        <div class="report-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="report-info">
+                            <div class="report-title">网络测速报告</div>
+                            <div class="report-meta">
+                                <span>2024-03-19 10:15</span>
+                                <span class="report-status warning">一般</span>
+                            </div>
+                        </div>
+                        <svg class="expand-icon" viewBox="0 0 24 24">
+                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                        </svg>
+                    </div>
+                    <div class="report-detail">
+                        <div class="report-detail-content">
+                            <div class="detail-grid">
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon signal-icon">
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </div>
+                                        信号强度
+                                    </div>
+                                    <div class="detail-value">
+                                        -65<span class="unit">dBm</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon interference-icon">
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </div>
+                                        Wi-Fi 干扰
+                                    </div>
+                                    <div class="detail-value">3个</div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon download-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                            </svg>
+                                        </div>
+                                        下行网速
+                                    </div>
+                                    <div class="detail-value">
+                                        2.6<span class="unit">MB/s</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon upload-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2v2h14v-2H5z"/>
+                                            </svg>
+                                        </div>
+                                        上行网速
+                                    </div>
+                                    <div class="detail-value">
+                                        1.5<span class="unit">MB/s</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon internal-latency-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+                                            </svg>
+                                        </div>
+                                        内网延迟
+                                    </div>
+                                    <div class="detail-value">
+                                        8<span class="unit">ms</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon external-latency-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h-2V9h6v2h-2v6z"/>
+                                            </svg>
+                                        </div>
+                                        外网延迟
+                                    </div>
+                                    <div class="detail-value">
+                                        25<span class="unit">ms</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="detail-actions">
+                                <button class="detail-btn primary" onclick="event.stopPropagation();shareReport(2)">分享报告</button>
+                                <button class="detail-btn secondary" onclick="event.stopPropagation();deleteReport(2)">删除</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 报告3 -->
+                <div class="report-item" onclick="toggleReport(this)">
+                    <div class="report-header">
+                        <div class="report-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="report-info">
+                            <div class="report-title">网络测速报告</div>
+                            <div class="report-meta">
+                                <span>2024-03-18 16:45</span>
+                                <span class="report-status error">较差</span>
+                            </div>
+                        </div>
+                        <svg class="expand-icon" viewBox="0 0 24 24">
+                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                        </svg>
+                    </div>
+                    <div class="report-detail">
+                        <div class="report-detail-content">
+                            <div class="detail-grid">
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon signal-icon">
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </div>
+                                        信号强度
+                                    </div>
+                                    <div class="detail-value">
+                                        -78<span class="unit">dBm</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon interference-icon">
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </div>
+                                        Wi-Fi 干扰
+                                    </div>
+                                    <div class="detail-value">8个</div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon download-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                            </svg>
+                                        </div>
+                                        下行网速
+                                    </div>
+                                    <div class="detail-value">
+                                        0.5<span class="unit">MB/s</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon upload-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2v2h14v-2H5z"/>
+                                            </svg>
+                                        </div>
+                                        上行网速
+                                    </div>
+                                    <div class="detail-value">
+                                        0.3<span class="unit">MB/s</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon internal-latency-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+                                            </svg>
+                                        </div>
+                                        内网延迟
+                                    </div>
+                                    <div class="detail-value">
+                                        20<span class="unit">ms</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon external-latency-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h-2V9h6v2h-2v6z"/>
+                                            </svg>
+                                        </div>
+                                        外网延迟
+                                    </div>
+                                    <div class="detail-value">
+                                        85<span class="unit">ms</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="detail-actions">
+                                <button class="detail-btn primary" onclick="event.stopPropagation();shareReport(3)">分享报告</button>
+                                <button class="detail-btn secondary" onclick="event.stopPropagation();deleteReport(3)">删除</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 报告4 -->
+                <div class="report-item" onclick="toggleReport(this)">
+                    <div class="report-header">
+                        <div class="report-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="report-info">
+                            <div class="report-title">网络测速报告</div>
+                            <div class="report-meta">
+                                <span>2024-03-15 09:20</span>
+                                <span class="report-status good">良好</span>
+                            </div>
+                        </div>
+                        <svg class="expand-icon" viewBox="0 0 24 24">
+                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                        </svg>
+                    </div>
+                    <div class="report-detail">
+                        <div class="report-detail-content">
+                            <div class="detail-grid">
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon signal-icon">
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </div>
+                                        信号强度
+                                    </div>
+                                    <div class="detail-value">
+                                        -55<span class="unit">dBm</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon interference-icon">
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </div>
+                                        Wi-Fi 干扰
+                                    </div>
+                                    <div class="detail-value">1个</div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon download-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                            </svg>
+                                        </div>
+                                        下行网速
+                                    </div>
+                                    <div class="detail-value">
+                                        4.5<span class="unit">MB/s</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon upload-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2v2h14v-2H5z"/>
+                                            </svg>
+                                        </div>
+                                        上行网速
+                                    </div>
+                                    <div class="detail-value">
+                                        1.9<span class="unit">MB/s</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon internal-latency-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+                                            </svg>
+                                        </div>
+                                        内网延迟
+                                    </div>
+                                    <div class="detail-value">
+                                        6<span class="unit">ms</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon external-latency-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h-2V9h6v2h-2v6z"/>
+                                            </svg>
+                                        </div>
+                                        外网延迟
+                                    </div>
+                                    <div class="detail-value">
+                                        15<span class="unit">ms</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="detail-actions">
+                                <button class="detail-btn primary" onclick="event.stopPropagation();shareReport(4)">分享报告</button>
+                                <button class="detail-btn secondary" onclick="event.stopPropagation();deleteReport(4)">删除</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 报告5 -->
+                <div class="report-item" onclick="toggleReport(this)">
+                    <div class="report-header">
+                        <div class="report-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="report-info">
+                            <div class="report-title">网络测速报告</div>
+                            <div class="report-meta">
+                                <span>2024-03-12 20:00</span>
+                                <span class="report-status good">优秀</span>
+                            </div>
+                        </div>
+                        <svg class="expand-icon" viewBox="0 0 24 24">
+                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                        </svg>
+                    </div>
+                    <div class="report-detail">
+                        <div class="report-detail-content">
+                            <div class="detail-grid">
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon signal-icon">
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </div>
+                                        信号强度
+                                    </div>
+                                    <div class="detail-value">
+                                        -42<span class="unit">dBm</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon interference-icon">
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </div>
+                                        Wi-Fi 干扰
+                                    </div>
+                                    <div class="detail-value">无</div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon download-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                            </svg>
+                                        </div>
+                                        下行网速
+                                    </div>
+                                    <div class="detail-value">
+                                        5.2<span class="unit">MB/s</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon upload-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2v2h14v-2H5z"/>
+                                            </svg>
+                                        </div>
+                                        上行网速
+                                    </div>
+                                    <div class="detail-value">
+                                        2.1<span class="unit">MB/s</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon internal-latency-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+                                            </svg>
+                                        </div>
+                                        内网延迟
+                                    </div>
+                                    <div class="detail-value">
+                                        3<span class="unit">ms</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon external-latency-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h-2V9h6v2h-2v6z"/>
+                                            </svg>
+                                        </div>
+                                        外网延迟
+                                    </div>
+                                    <div class="detail-value">
+                                        8<span class="unit">ms</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="detail-actions">
+                                <button class="detail-btn primary" onclick="event.stopPropagation();shareReport(5)">分享报告</button>
+                                <button class="detail-btn secondary" onclick="event.stopPropagation();deleteReport(5)">删除</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 报告6 -->
+                <div class="report-item" onclick="toggleReport(this)">
+                    <div class="report-header">
+                        <div class="report-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="report-info">
+                            <div class="report-title">网络测速报告</div>
+                            <div class="report-meta">
+                                <span>2024-03-10 11:30</span>
+                                <span class="report-status good">优秀</span>
+                            </div>
+                        </div>
+                        <svg class="expand-icon" viewBox="0 0 24 24">
+                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                        </svg>
+                    </div>
+                    <div class="report-detail">
+                        <div class="report-detail-content">
+                            <div class="detail-grid">
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon signal-icon">
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </div>
+                                        信号强度
+                                    </div>
+                                    <div class="detail-value">
+                                        -48<span class="unit">dBm</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon interference-icon">
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </div>
+                                        Wi-Fi 干扰
+                                    </div>
+                                    <div class="detail-value">2个</div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon download-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                            </svg>
+                                        </div>
+                                        下行网速
+                                    </div>
+                                    <div class="detail-value">
+                                        4.9<span class="unit">MB/s</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon upload-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2v2h14v-2H5z"/>
+                                            </svg>
+                                        </div>
+                                        上行网速
+                                    </div>
+                                    <div class="detail-value">
+                                        2.0<span class="unit">MB/s</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon internal-latency-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+                                            </svg>
+                                        </div>
+                                        内网延迟
+                                    </div>
+                                    <div class="detail-value">
+                                        5<span class="unit">ms</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-card">
+                                    <div class="detail-label">
+                                        <div class="detail-icon external-latency-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h-2V9h6v2h-2v6z"/>
+                                            </svg>
+                                        </div>
+                                        外网延迟
+                                    </div>
+                                    <div class="detail-value">
+                                        12<span class="unit">ms</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="detail-actions">
+                                <button class="detail-btn primary" onclick="event.stopPropagation();shareReport(6)">分享报告</button>
+                                <button class="detail-btn secondary" onclick="event.stopPropagation();deleteReport(6)">删除</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="safe-area-bottom"></div>
+        </main>
+    </div>
+
+    <script>
+        // 展开/收起报告
+        function toggleReport(element) {
+            // 关闭其他已展开的报告
+            document.querySelectorAll('.report-item.expanded').forEach(item => {
+                if (item !== element) {
+                    item.classList.remove('expanded');
+                }
+            });
+            // 切换当前报告
+            element.classList.toggle('expanded');
+        }
+
+        // 分享报告
+        function shareReport(id) {
+            alert('分享报告 #' + id);
+        }
+
+        // 删除报告
+        function deleteReport(id) {
+            if (confirm('确定要删除这份报告吗？')) {
+                alert('报告 #' + id + ' 已删除');
+            }
+        }
+    </script>
+</body>
+</html>

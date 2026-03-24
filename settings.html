@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>设置</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --bg-card-hover: rgba(46, 49, 69, 0.75);
+            --accent-blue: #5b8def;
+            --accent-blue-light: #7ca6f3;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-purple: #9b8bf4;
+            --accent-red: #ef4444;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* 主内容 */
+        .main-content {
+            flex: 1;
+            padding: 16px 20px;
+            overflow-y: auto;
+        }
+
+        /* 设置分组 */
+        .settings-group {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .group-title {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            padding: 16px 16px 8px;
+            font-weight: 500;
+        }
+
+        .settings-list {
+            padding: 0 8px 8px;
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 8px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .settings-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .settings-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            background: rgba(88, 166, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .settings-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--accent-blue);
+        }
+
+        .settings-icon.green {
+            background: rgba(63, 185, 80, 0.15);
+        }
+
+        .settings-icon.green svg {
+            fill: var(--accent-green);
+        }
+
+        .settings-icon.purple {
+            background: rgba(163, 113, 247, 0.15);
+        }
+
+        .settings-icon.purple svg {
+            fill: var(--accent-purple);
+        }
+
+        .settings-icon.red {
+            background: rgba(248, 81, 73, 0.15);
+        }
+
+        .settings-icon.red svg {
+            fill: var(--accent-red);
+        }
+
+        .settings-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .settings-label {
+            font-size: 15px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .settings-desc {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            margin-top: 2px;
+        }
+
+        .settings-value {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-right: 8px;
+        }
+
+        .settings-arrow {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-tertiary);
+        }
+
+        /* 底部安全区域 */
+        .safe-area-bottom {
+            height: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-top">
+                <div class="back-btn" onclick="history.back()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                    </svg>
+                </div>
+                <div class="header-title">设置</div>
+            </div>
+        </header>
+
+        <!-- 主内容 -->
+        <main class="main-content">
+            <!-- 账号设置 -->
+            <div class="settings-group">
+                <div class="group-title">账号设置</div>
+                <div class="settings-list">
+                    <div class="settings-item" onclick="editProfile()">
+                        <div class="settings-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        </div>
+                        <div class="settings-content">
+                            <div class="settings-label">个人资料</div>
+                            <div class="settings-desc">修改头像、昵称等信息</div>
+                        </div>
+                        <svg class="settings-arrow" viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                        </svg>
+                    </div>
+                    <div class="settings-item" onclick="goToAccountBinding()">
+                        <div class="settings-icon green">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M16 1H8C6.34 1 5 2.34 5 4v16c0 1.66 1.34 3 3 3h8c1.66 0 3-1.34 3-3V4c0-1.66-1.34-3-3-3zm-2 20h-4v-1h4v1zm3-3H7V4h10v14z"/>
+                            </svg>
+                        </div>
+                        <div class="settings-content">
+                            <div class="settings-label">账号绑定</div>
+                            <div class="settings-desc">手机号、微信号绑定管理</div>
+                        </div>
+                        <span class="settings-value">已绑定</span>
+                        <svg class="settings-arrow" viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                        </svg>
+                    </div>
+                    <div class="settings-item" onclick="changePassword()">
+                        <div class="settings-icon purple">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                            </svg>
+                        </div>
+                        <div class="settings-content">
+                            <div class="settings-label">修改密码</div>
+                            <div class="settings-desc">定期修改密码保护账号安全</div>
+                        </div>
+                        <svg class="settings-arrow" viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 退出登录 -->
+            <div class="settings-group">
+                <div class="settings-list">
+                    <div class="settings-item" onclick="logout()">
+                        <div class="settings-icon red">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
+                            </svg>
+                        </div>
+                        <div class="settings-content">
+                            <div class="settings-label" style="color: var(--accent-red);">退出登录</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="safe-area-bottom"></div>
+        </main>
+    </div>
+
+    <script>
+        // 编辑个人资料
+        function editProfile() {
+            alert('编辑个人资料');
+        }
+
+        // 账号绑定
+        function goToAccountBinding() {
+            window.location.href = 'account-binding.html';
+        }
+
+        // 修改密码
+        function changePassword() {
+            alert('修改密码');
+        }
+
+        // 退出登录
+        function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                alert('已退出登录');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>

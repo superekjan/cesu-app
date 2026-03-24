@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>积分明细</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --bg-card-hover: rgba(46, 49, 69, 0.75);
+            --accent-blue: #5b8def;
+            --accent-blue-light: #7ca6f3;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-purple: #9b8bf4;
+            --accent-gold: #e3b341;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* 主内容 */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* 积分总览 */
+        .points-overview {
+            background: linear-gradient(135deg, rgba(227, 179, 65, 0.2) 0%, rgba(227, 179, 65, 0.1) 100%);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(227, 179, 65, 0.2);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .points-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .points-value {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 16px;
+        }
+
+        .points-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .points-stat {
+            text-align: center;
+        }
+
+        .points-stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+
+        .points-stat-value.negative {
+            color: var(--accent-red);
+        }
+
+        .points-stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* 筛选标签 */
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .filter-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-tab {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .filter-tab:hover, .filter-tab.active {
+            background: rgba(91, 141, 239, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(91, 141, 239, 0.3);
+        }
+
+        /* 明细列表 */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .history-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .history-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(16, 185, 129, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .history-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: var(--accent-green);
+        }
+
+        .history-icon.negative {
+            background: rgba(248, 81, 73, 0.15);
+        }
+
+        .history-icon.negative svg {
+            fill: var(--accent-red);
+        }
+
+        .history-info {
+            flex: 1;
+        }
+
+        .history-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .history-time {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .history-points {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .history-points.positive {
+            color: var(--accent-green);
+        }
+
+        .history-points.negative {
+            color: var(--accent-red);
+        }
+
+        /* 月份分组 */
+        .month-group {
+            margin-bottom: 20px;
+        }
+
+        .month-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            padding-left: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-top">
+                <div class="back-btn" onclick="history.back()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                    </svg>
+                </div>
+                <div class="header-title">积分明细</div>
+            </div>
+        </header>
+
+        <!-- 主内容 -->
+        <main class="main-content">
+            <!-- 积分总览 -->
+            <div class="points-overview">
+                <div class="points-label">当前积分</div>
+                <div class="points-value">2,580</div>
+                <div class="points-stats">
+                    <div class="points-stat">
+                        <div class="points-stat-value">+350</div>
+                        <div class="points-stat-label">本月获得</div>
+                    </div>
+                    <div class="points-stat">
+                        <div class="points-stat-value negative">-100</div>
+                        <div class="points-stat-label">本月使用</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 筛选 -->
+            <div class="filter-tabs">
+                <div class="filter-tab active" onclick="selectFilter(this, 'all')">全部</div>
+                <div class="filter-tab" onclick="selectFilter(this, 'income')">收入</div>
+                <div class="filter-tab" onclick="selectFilter(this, 'expense')">支出</div>
+            </div>
+
+            <!-- 明细列表 -->
+            <div class="history-list">
+                <!-- 3月 -->
+                <div class="month-group">
+                    <div class="month-title">2024年3月</div>
+                    
+                    <div class="history-item">
+                        <div class="history-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="history-info">
+                            <div class="history-title">每日测速</div>
+                            <div class="history-time">2024-03-20 14:30</div>
+                        </div>
+                        <div class="history-points positive">+10</div>
+                    </div>
+
+                    <div class="history-item">
+                        <div class="history-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
+                            </svg>
+                        </div>
+                        <div class="history-info">
+                            <div class="history-title">WiFi检测</div>
+                            <div class="history-time">2024-03-19 10:15</div>
+                        </div>
+                        <div class="history-points positive">+20</div>
+                    </div>
+
+                    <div class="history-item">
+                        <div class="history-icon negative">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h14v12z"/>
+                            </svg>
+                        </div>
+                        <div class="history-info">
+                            <div class="history-title">兑换商品 - 数据线</div>
+                            <div class="history-time">2024-03-18 16:45</div>
+                        </div>
+                        <div class="history-points negative">-100</div>
+                    </div>
+
+                    <div class="history-item">
+                        <div class="history-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                            </svg>
+                        </div>
+                        <div class="history-info">
+                            <div class="history-title">故障诊断</div>
+                            <div class="history-time">2024-03-15 09:20</div>
+                        </div>
+                        <div class="history-points positive">+30</div>
+                    </div>
+
+                    <div class="history-item">
+                        <div class="history-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/>
+                            </svg>
+                        </div>
+                        <div class="history-info">
+                            <div class="history-title">完成预约服务</div>
+                            <div class="history-time">2024-03-10 14:00</div>
+                        </div>
+                        <div class="history-points positive">+50</div>
+                    </div>
+                </div>
+
+                <!-- 2月 -->
+                <div class="month-group">
+                    <div class="month-title">2024年2月</div>
+                    
+                    <div class="history-item">
+                        <div class="history-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="history-info">
+                            <div class="history-title">每日测速</div>
+                            <div class="history-time">2024-02-28 20:10</div>
+                        </div>
+                        <div class="history-points positive">+10</div>
+                    </div>
+
+                    <div class="history-item">
+                        <div class="history-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+                            </svg>
+                        </div>
+                        <div class="history-info">
+                            <div class="history-title">服务评价</div>
+                            <div class="history-time">2024-02-25 11:30</div>
+                        </div>
+                        <div class="history-points positive">+10</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 筛选
+        function selectFilter(element, filter) {
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            element.classList.add('active');
+        }
+    </script>
+</body>
+</html>

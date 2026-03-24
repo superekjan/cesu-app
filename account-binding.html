@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>账号绑定</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --bg-card-hover: rgba(46, 49, 69, 0.75);
+            --accent-blue: #5b8def;
+            --accent-blue-light: #7ca6f3;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-purple: #9b8bf4;
+            --accent-red: #ef4444;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* 主内容 */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* 绑定状态卡片 */
+        .binding-status {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .status-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            background: rgba(16, 185, 129, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--accent-green);
+        }
+
+        .status-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .status-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* 绑定列表 */
+        .binding-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .binding-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .binding-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(88, 166, 255, 0.15);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .binding-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--accent-blue);
+        }
+
+        .binding-icon.wechat {
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .binding-icon.wechat svg {
+            fill: var(--accent-green);
+        }
+
+        .binding-info {
+            flex: 1;
+        }
+
+        .binding-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .binding-value {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .binding-action {
+            padding: 8px 16px;
+            background: rgba(248, 81, 73, 0.15);
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--accent-red);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .binding-action:hover {
+            background: rgba(248, 81, 73, 0.25);
+        }
+
+        .binding-action.bind {
+            background: rgba(88, 166, 255, 0.15);
+            color: var(--accent-blue);
+        }
+
+        .binding-action.bind:hover {
+            background: rgba(88, 166, 255, 0.25);
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-top">
+                <div class="back-btn" onclick="history.back()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                    </svg>
+                </div>
+                <div class="header-title">账号绑定</div>
+            </div>
+        </header>
+
+        <!-- 主内容 -->
+        <main class="main-content">
+            <!-- 绑定状态 -->
+            <div class="binding-status">
+                <div class="status-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                </div>
+                <div class="status-title">账号绑定正常</div>
+                <div class="status-desc">您的账号已绑定手机和微信</div>
+            </div>
+
+            <!-- 绑定列表 -->
+            <div class="binding-list">
+                <div class="binding-item">
+                    <div class="binding-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                        </svg>
+                    </div>
+                    <div class="binding-info">
+                        <div class="binding-name">手机号码</div>
+                        <div class="binding-value">138****5678</div>
+                    </div>
+                    <button class="binding-action" onclick="unbindPhone()">解绑</button>
+                </div>
+
+                <div class="binding-item">
+                    <div class="binding-icon wechat">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M9.5 4C5.36 4 2 6.69 2 10c0 1.89 1.08 3.56 2.78 4.66L4 17l2.5-1.5c.89.31 1.87.5 2.91.5.38 0 .76-.03 1.12-.08-.26-.64-.41-1.34-.41-2.07 0-2.76 2.69-5 6-5 .46 0 .9.05 1.33.14C16.86 6.06 13.57 4 9.5 4zm-2.7 4.29c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm5.4 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM16 10c-2.76 0-5 1.79-5 4s2.24 4 5 4c.61 0 1.19-.08 1.73-.23L20 19l-.55-1.66C20.42 16.4 21 15.26 21 14c0-2.21-2.24-4-5-4zm-2.5 3c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm5 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1z"/>
+                        </svg>
+                    </div>
+                    <div class="binding-info">
+                        <div class="binding-name">微信账号</div>
+                        <div class="binding-value">微信用户_abc123</div>
+                    </div>
+                    <button class="binding-action" onclick="unbindWechat()">解绑</button>
+                </div>
+            </div>
+
+
+        </main>
+    </div>
+
+    <script>
+        // 解绑手机
+        function unbindPhone() {
+            if (confirm('确定要解绑手机号码吗？')) {
+                alert('解绑功能开发中...');
+            }
+        }
+
+        // 解绑微信
+        function unbindWechat() {
+            if (confirm('确定要解绑微信账号吗？')) {
+                alert('解绑功能开发中...');
+            }
+        }
+    </script>
+</body>
+</html>

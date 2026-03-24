@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>故障预约上门</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --bg-card-hover: rgba(46, 49, 69, 0.75);
+            --accent-blue: #5b8def;
+            --accent-blue-light: #7ca6f3;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-red: #ef4444;
+            --accent-purple: #9b8bf4;
+            --accent-yellow: #fbbf24;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        /* 卡片标题 */
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .section-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: url(#iconGradient);
+        }
+
+        /* 预约类型选择 */
+        .booking-type-section {
+            background: var(--bg-card);
+            border-radius: 4px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .type-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .type-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            padding: 16px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .type-card:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .type-card.active {
+            border-color: var(--accent-blue);
+            background: rgba(91, 141, 239, 0.1);
+        }
+
+        .type-icon {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+        }
+
+        .type-card.fault .type-icon {
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .type-card.fault.active .type-icon {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        .type-card.service .type-icon {
+            background: rgba(91, 141, 239, 0.15);
+        }
+
+        .type-card.service.active .type-icon {
+            background: rgba(91, 141, 239, 0.25);
+        }
+
+        .type-icon svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .type-card.fault .type-icon svg {
+            fill: var(--accent-red);
+        }
+
+        .type-card.service .type-icon svg {
+            fill: var(--accent-blue);
+        }
+
+        .type-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .type-desc {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        /* 子类型选择 */
+        .sub-type-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-subtle);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .sub-type-title {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .sub-type-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .sub-type-tag {
+            padding: 10px 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .sub-type-tag:hover {
+            background: rgba(0, 0, 0, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .sub-type-tag.active {
+            background: linear-gradient(135deg, rgba(91, 141, 239, 0.2) 0%, rgba(78, 205, 196, 0.2) 100%);
+            color: var(--text-primary);
+            border-color: var(--accent-blue);
+            box-shadow: 0 2px 8px rgba(91, 141, 239, 0.2);
+        }
+
+        /* 选中标记 */
+        .sub-type-tag.active::before {
+            content: '✓ ';
+            color: var(--accent-green);
+            font-weight: bold;
+        }
+
+        /* 信息卡片 */
+        .info-section {
+            background: var(--bg-card);
+            border-radius: 4px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .info-item:hover {
+            border-color: var(--border-subtle);
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        .info-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(91, 141, 239, 0.2) 0%, rgba(78, 205, 196, 0.2) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .info-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: url(#iconGradient);
+        }
+
+        .info-title-group {
+            flex: 1;
+        }
+
+        .info-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .info-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: var(--accent-green);
+            padding: 2px 8px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .info-status::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            background: var(--accent-green);
+            border-radius: 50%;
+        }
+
+        .info-status.loading {
+            color: var(--accent-orange);
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.2);
+        }
+
+        .info-status.loading::before {
+            background: var(--accent-orange);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .info-input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .info-input {
+            width: 100%;
+            padding: 12px 40px 12px 14px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-primary);
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .info-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .info-input:focus {
+            border-color: var(--accent-blue);
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 0 3px rgba(91, 141, 239, 0.1);
+        }
+
+        .input-edit-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .input-edit-icon svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--text-tertiary);
+        }
+
+        .info-input:focus + .input-edit-icon svg {
+            fill: var(--accent-blue);
+        }
+
+        .edit-hint {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-top: 8px;
+            padding-left: 2px;
+        }
+
+        .edit-hint svg {
+            width: 12px;
+            height: 12px;
+            fill: var(--accent-blue);
+        }
+
+        .info-value-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border: 1px solid transparent;
+        }
+
+        .info-value-text {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .info-value-badge {
+            padding: 3px 10px;
+            background: rgba(91, 141, 239, 0.1);
+            border-radius: 10px;
+            font-size: 11px;
+            color: var(--accent-blue);
+            border: 1px solid rgba(91, 141, 239, 0.2);
+        }
+
+        /* 装维人员卡片 */
+        .technician-section {
+            background: var(--bg-card);
+            border-radius: 4px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .technician-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .technician-card:hover {
+            border-color: var(--border-subtle);
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        .technician-avatar {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #fff;
+            font-weight: 600;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(91, 141, 239, 0.3);
+        }
+
+        .technician-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .technician-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .technician-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .technician-badge {
+            padding: 3px 10px;
+            background: rgba(16, 185, 129, 0.15);
+            border-radius: 12px;
+            font-size: 11px;
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            font-weight: 500;
+        }
+
+        .technician-phone {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            padding: 6px 0;
+        }
+
+        .technician-phone svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--text-tertiary);
+        }
+
+        .technician-time-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: rgba(16, 185, 129, 0.08);
+            border-radius: 8px;
+            border: 1px solid rgba(16, 185, 129, 0.15);
+        }
+
+        .technician-time-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(16, 185, 129, 0.15);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .technician-time-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--accent-green);
+        }
+
+        .technician-time-content {
+            flex: 1;
+        }
+
+        .technician-time-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-bottom: 2px;
+        }
+
+        .technician-time-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+
+        /* 备注区域 */
+        .remark-section {
+            background: var(--bg-card);
+            border-radius: 4px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .remark-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            font-size: 13px;
+            color: var(--text-primary);
+            font-family: inherit;
+            resize: vertical;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .remark-textarea::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .remark-textarea:focus {
+            border-color: var(--accent-blue);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        /* 按钮区域 */
+        .button-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 20px;
+            background: var(--bg-secondary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(270deg, #00c6ff 0%, #0072ff 100%);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(0, 114, 255, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 114, 255, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            background: linear-gradient(270deg, #3a4a5c 0%, #2d3a4a 100%);
+            color: var(--text-tertiary);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid rgba(0, 114, 255, 0.5);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* 提示信息 */
+        .tips-section {
+            padding: 0 20px;
+            margin-bottom: 8px;
+        }
+
+        .tips-text {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        /* 响应式 */
+        @media (max-width: 480px) {
+            .header {
+                padding: 12px 16px;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .button-section {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-top">
+                <div class="back-btn" onclick="history.back()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                    </svg>
+                </div>
+                <div class="header-title">故障预约上门</div>
+            </div>
+        </header>
+
+        <!-- SVG渐变定义 -->
+        <svg width="0" height="0" style="position: absolute;">
+            <defs>
+                <linearGradient id="iconGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" style="stop-color:#5b8def;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#4ecdc4;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+        </svg>
+
+        <!-- 主内容 -->
+        <main class="main-content">
+            <!-- 预约类型选择 -->
+            <div class="booking-type-section">
+                <div class="section-title">
+                    <div class="section-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    选择预约类型
+                </div>
+                <div class="type-grid">
+                    <div class="type-card fault" onclick="selectType('fault')">
+                        <div class="type-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                            </svg>
+                        </div>
+                        <div class="type-name">故障类</div>
+                        <div class="type-desc">无法上网、上网慢</div>
+                    </div>
+                    <div class="type-card service" onclick="selectType('service')">
+                        <div class="type-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="type-name">延伸服务类</div>
+                        <div class="type-desc">智能组网、设备加装</div>
+                    </div>
+                </div>
+
+                <!-- 子类型选择 -->
+                <div class="sub-type-section" id="subTypeSection" style="display: none;">
+                    <div class="sub-type-title">请选择具体问题</div>
+                    <div class="sub-type-list" id="subTypeList">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 自动获取信息 -->
+            <div class="info-section">
+                <div class="section-title">
+                    <div class="section-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                        </svg>
+                    </div>
+                    自动获取信息
+                </div>
+                <div class="info-list">
+                    <!-- 位置信息 -->
+                    <div class="info-item">
+                        <div class="info-header">
+                            <div class="info-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                </svg>
+                            </div>
+                            <div class="info-title-group">
+                                <div class="info-label">当前位置</div>
+                                <div class="info-status" id="locationStatus">定位中</div>
+                            </div>
+                        </div>
+                        <div class="info-input-wrapper">
+                            <input type="text" class="info-input" id="locationInput" placeholder="正在获取您的位置..." />
+                        </div>
+                    </div>
+                    
+                    <!-- 账号信息 -->
+                    <div class="info-item">
+                        <div class="info-header">
+                            <div class="info-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                </svg>
+                            </div>
+                            <div class="info-title-group">
+                                <div class="info-label">登录账号</div>
+                                <div class="info-status" id="accountStatus">已获取</div>
+                            </div>
+                        </div>
+                        <div class="info-value-box">
+                            <span class="info-value-text" id="accountValue">获取中...</span>
+                            <span class="info-value-badge">已认证</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 装维人员分配 -->
+            <div class="technician-section">
+                <div class="section-title">
+                    <div class="section-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                        </svg>
+                    </div>
+                    装维人员分配
+                </div>
+                <div class="technician-card">
+                    <div class="technician-avatar">张</div>
+                    <div class="technician-info">
+                        <div class="technician-header">
+                            <div class="technician-name">张师傅</div>
+                            <div class="technician-badge">已匹配</div>
+                        </div>
+                        <div class="technician-phone">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                            </svg>
+                            138****5678
+                        </div>
+                        <div class="technician-time-box">
+                            <div class="technician-time-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                                </svg>
+                            </div>
+                            <div class="technician-time-content">
+                                <div class="technician-time-label">预计上门时间</div>
+                                <div class="technician-time-value">今日 14:00-16:00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 备注 -->
+            <div class="remark-section">
+                <div class="section-title">
+                    <div class="section-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                        </svg>
+                    </div>
+                    问题描述（选填）
+                </div>
+                <textarea class="remark-textarea" placeholder="请简要描述您遇到的问题，以便工程师更好地为您服务..."></textarea>
+            </div>
+        </main>
+
+        <!-- 提示信息 -->
+        <div class="tips-section">
+            <div class="tips-text">提交预约后，装维人员将尽快与您联系确认上门时间</div>
+        </div>
+
+        <!-- 按钮 -->
+        <div class="button-section">
+            <button class="btn btn-primary" id="submitBtn" onclick="submitBooking()" disabled>确认预约</button>
+            <button class="btn btn-secondary" onclick="history.back()">取消</button>
+        </div>
+    </div>
+
+    <script>
+        // 预约类型数据
+        const subTypes = {
+            fault: ['无法上网', '上网慢', '频繁掉线', 'WiFi信号差', '其他故障'],
+            service: ['智能组网', '设备加装', '网络优化', '设备调试', '其他服务']
+        };
+
+        let selectedType = null;
+        let selectedSubType = null;
+
+        // 选择预约类型
+        function selectType(type) {
+            selectedType = type;
+            selectedSubType = null;
+            
+            // 更新卡片样式
+            document.querySelectorAll('.type-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.querySelector(`.type-card.${type}`).classList.add('active');
+            
+            // 显示子类型
+            const subTypeSection = document.getElementById('subTypeSection');
+            const subTypeList = document.getElementById('subTypeList');
+            subTypeSection.style.display = 'block';
+            
+            // 生成子类型标签
+            subTypeList.innerHTML = subTypes[type].map((subType, index) => `
+                <div class="sub-type-tag" onclick="selectSubType(this, '${subType}')">${subType}</div>
+            `).join('');
+            
+            checkFormValidity();
+        }
+
+        // 选择子类型
+        function selectSubType(element, subType) {
+            selectedSubType = subType;
+            
+            document.querySelectorAll('.sub-type-tag').forEach(tag => {
+                tag.classList.remove('active');
+            });
+            element.classList.add('active');
+            
+            checkFormValidity();
+        }
+
+        // 检查表单有效性
+        function checkFormValidity() {
+            const submitBtn = document.getElementById('submitBtn');
+            if (selectedType && selectedSubType) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        }
+
+        // 获取地理位置并转换为地址
+        function getLocation() {
+            const locationInput = document.getElementById('locationInput');
+            const locationStatus = document.getElementById('locationStatus');
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        
+                        // 使用高德地图逆地理编码API获取具体地址
+                        getAddressFromCoords(lat, lng, locationInput, locationStatus);
+                    },
+                    (error) => {
+                        locationInput.placeholder = '定位失败，请手动输入地址';
+                        locationStatus.textContent = '请手动输入';
+                        locationStatus.classList.remove('loading');
+                        locationStatus.style.color = 'var(--accent-orange)';
+                        locationStatus.style.borderColor = 'rgba(245, 158, 11, 0.2)';
+                        locationStatus.style.background = 'rgba(245, 158, 11, 0.1)';
+                    }
+                );
+            } else {
+                locationInput.placeholder = '浏览器不支持定位，请手动输入';
+                locationStatus.textContent = '请手动输入';
+                locationStatus.classList.remove('loading');
+            }
+        }
+
+        // 使用高德地图API将坐标转换为地址
+        function getAddressFromCoords(lat, lng, locationInput, locationStatus) {
+            // 使用高德地图逆地理编码API
+            const url = `https://restapi.amap.com/v3/geocode/regeo?key=YOUR_AMAP_KEY&location=${lng},${lat}&extensions=base`;
+            
+            // 由于需要API Key，这里使用免费的OpenStreetMap Nominatim API作为示例
+            const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+            
+            fetch(nominatimUrl, {
+                headers: {
+                    'Accept-Language': 'zh-CN'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.display_name) {
+                    // 提取简要地址信息
+                    const address = formatAddress(data);
+                    locationInput.value = address;
+                    locationStatus.textContent = '已定位';
+                } else {
+                    locationInput.value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                    locationStatus.textContent = '已定位';
+                }
+                locationStatus.classList.remove('loading');
+            })
+            .catch(error => {
+                // 如果API调用失败，显示坐标
+                locationInput.value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                locationStatus.textContent = '已定位';
+                locationStatus.classList.remove('loading');
+            });
+        }
+
+        // 格式化地址信息
+        function formatAddress(data) {
+            const address = data.address || {};
+            const parts = [];
+            
+            // 按优先级添加地址组成部分
+            if (address.city) parts.push(address.city);
+            else if (address.town) parts.push(address.town);
+            else if (address.county) parts.push(address.county);
+            
+            if (address.district) parts.push(address.district);
+            if (address.suburb) parts.push(address.suburb);
+            if (address.road) parts.push(address.road);
+            if (address.house_number) parts.push(address.house_number + '号');
+            
+            // 如果有详细地址，使用详细地址
+            if (parts.length > 0) {
+                return parts.join('');
+            }
+            
+            // 否则返回显示名称的前50个字符
+            return data.display_name ? data.display_name.substring(0, 50) + '...' : '未知位置';
+        }
+
+        // 获取账号信息
+        function getAccountInfo() {
+            const accountValue = document.getElementById('accountValue');
+            // 模拟获取账号信息
+            setTimeout(() => {
+                accountValue.textContent = '138****5678';
+            }, 500);
+        }
+
+        // 提交预约
+        function submitBooking() {
+            const btn = document.getElementById('submitBtn');
+            btn.textContent = '提交中...';
+            btn.disabled = true;
+            
+            // 模拟提交
+            setTimeout(() => {
+                alert('预约成功！装维人员将尽快与您联系。');
+                btn.textContent = '确认预约';
+                btn.disabled = false;
+            }, 1500);
+        }
+
+        // 页面加载时自动获取信息并默认选择故障类
+        window.onload = function() {
+            getLocation();
+            getAccountInfo();
+            // 默认选择故障类
+            selectType('fault');
+            // 默认选择第一个子类型
+            setTimeout(() => {
+                const firstSubType = document.querySelector('.sub-type-tag');
+                if (firstSubType) {
+                    firstSubType.click();
+                }
+            }, 100);
+        };
+    </script>
+</body>
+</html>

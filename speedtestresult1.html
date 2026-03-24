@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网络测速结果</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --bg-card-hover: rgba(46, 49, 69, 0.75);
+            --accent-blue: #5b8def;
+            --accent-blue-light: #7ca6f3;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-purple: #9b8bf4;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .wifi-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .wifi-icon-large {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wifi-icon-large svg {
+            width: 28px;
+            height: 28px;
+            fill: var(--accent-blue);
+        }
+
+        .wifi-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .wifi-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .wifi-model {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        /* 统一数据卡片网格 */
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .data-card {
+            background: var(--bg-card);
+            border-radius: 4px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+            transition: all 0.2s ease;
+        }
+
+        .data-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+
+        .data-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .data-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .data-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: url(#iconGradient);
+        }
+
+        .signal-icon {
+            position: relative;
+            width: 16px;
+            height: 12px;
+        }
+
+        .signal-icon span {
+            position: absolute;
+            bottom: 0;
+            width: 2.5px;
+            background: linear-gradient(to top, var(--accent-blue), var(--accent-cyan));
+            border-radius: 1px;
+        }
+
+        .signal-icon span:nth-child(1) { left: 0; height: 30%; }
+        .signal-icon span:nth-child(2) { left: 4px; height: 55%; }
+        .signal-icon span:nth-child(3) { left: 8px; height: 80%; }
+        .signal-icon span:nth-child(4) { left: 12px; height: 100%; }
+
+        .interference-icon {
+            display: flex;
+            gap: 2px;
+            align-items: center;
+            width: 16px;
+            height: 16px;
+        }
+
+        .interference-icon span {
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent-blue), var(--accent-cyan));
+            border-radius: 1px;
+        }
+
+        .interference-icon span:nth-child(1) { height: 8px; }
+        .interference-icon span:nth-child(2) { height: 14px; }
+        .interference-icon span:nth-child(3) { height: 10px; }
+
+        .download-icon, .upload-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+        }
+
+        .download-icon svg, .upload-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: url(#iconGradient);
+        }
+
+        .internal-latency-icon svg, .external-latency-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: url(#iconGradient);
+        }
+
+        .data-value {
+            font-size: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: baseline;
+            gap: 3px;
+        }
+
+        .data-value .unit {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+        }
+
+        .data-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 3px 8px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--accent-green);
+            margin-top: 8px;
+            border: 1px solid rgba(16, 185, 129, 0.15);
+        }
+
+        .data-badge::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background: var(--accent-green);
+            border-radius: 50%;
+        }
+
+        .data-status {
+            font-size: 12px;
+            color: var(--accent-blue-light);
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        /* AI诊断区域 */
+        .ai-diagnosis {
+            background: var(--bg-card);
+            border-radius: 4px;
+            padding: 24px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .ai-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: #fff;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .ai-title-group {
+            flex: 1;
+        }
+
+        .ai-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .ai-subtitle {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .ai-status {
+            font-size: 11px;
+            color: var(--accent-green);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 20px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .ai-status::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            background: var(--accent-green);
+            border-radius: 50%;
+        }
+
+        .diagnosis-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .diagnosis-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .diagnosis-item:first-child {
+            padding-top: 0;
+        }
+
+        .diagnosis-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            flex-shrink: 0;
+            font-weight: 600;
+        }
+
+        .diagnosis-icon.good {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .diagnosis-icon.warning {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-orange);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .diagnosis-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            padding-top: 2px;
+        }
+
+        /* 故障预约入口 */
+        .service-booking {
+            background: linear-gradient(135deg, rgba(244, 162, 97, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%);
+            border-radius: 4px;
+            padding: 20px;
+            border: 1px solid rgba(244, 162, 97, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .service-booking:hover {
+            background: linear-gradient(135deg, rgba(244, 162, 97, 0.2) 0%, rgba(245, 158, 11, 0.15) 100%);
+            border-color: rgba(244, 162, 97, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .service-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-orange), #f59e0b);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(244, 162, 97, 0.3);
+        }
+
+        .service-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: #fff;
+        }
+
+        .service-content {
+            flex: 1;
+        }
+
+        .service-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .service-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .service-arrow {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .service-arrow svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--accent-orange);
+        }
+
+        /* 按钮区域 */
+        .button-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 20px;
+            background: var(--bg-secondary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(270deg, #00c6ff 0%, #0072ff 100%);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(0, 114, 255, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 114, 255, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid rgba(0, 114, 255, 0.5);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* 响应式 */
+        @media (max-width: 480px) {
+            .header {
+                padding: 12px 16px 20px 16px;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .speed-number {
+                font-size: 48px;
+            }
+
+            .button-section {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-top">
+                <div class="back-btn" onclick="history.back()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                    </svg>
+                </div>
+                <div class="header-title">检测结果</div>
+            </div>
+            <div class="wifi-info">
+                <div class="wifi-icon-large">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
+                    </svg>
+                </div>
+                <div class="wifi-details">
+                    <div class="wifi-name">X-WRT_419E_2.4G</div>
+                    <div class="wifi-model">V2020CA</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- SVG渐变定义 -->
+        <svg width="0" height="0" style="position: absolute;">
+            <defs>
+                <linearGradient id="iconGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" style="stop-color:#5b8def;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#4ecdc4;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+        </svg>
+
+        <!-- 主内容 -->
+        <main class="main-content">
+            <!-- 数据网格 - 6个统一卡片 -->
+            <div class="data-grid">
+                <div class="data-card">
+                    <div class="data-label">
+                        <div class="data-icon signal-icon">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        信号强度
+                    </div>
+                    <div class="data-value">
+                        -50<span class="unit">dBm</span>
+                    </div>
+                </div>
+
+                <div class="data-card">
+                    <div class="data-label">
+                        <div class="data-icon interference-icon">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        Wi-Fi 干扰
+                    </div>
+                    <div class="data-value">较少</div>
+                </div>
+
+                <div class="data-card">
+                    <div class="data-label">
+                        <div class="data-icon download-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                            </svg>
+                        </div>
+                        下行网速
+                    </div>
+                    <div class="data-value">
+                        4.68<span class="unit">MB/s</span>
+                    </div>
+                </div>
+
+                <div class="data-card">
+                    <div class="data-label">
+                        <div class="data-icon upload-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2v2h14v-2H5z"/>
+                            </svg>
+                        </div>
+                        上行网速
+                    </div>
+                    <div class="data-value">
+                        4.68<span class="unit">MB/s</span>
+                    </div>
+                </div>
+
+                <div class="data-card">
+                    <div class="data-label">
+                        <div class="data-icon internal-latency-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+                            </svg>
+                        </div>
+                        内网延迟
+                    </div>
+                    <div class="data-value">
+                        4<span class="unit">ms</span>
+                    </div>
+                </div>
+
+                <div class="data-card">
+                    <div class="data-label">
+                        <div class="data-icon external-latency-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h-2V9h6v2h-2v6z"/>
+                            </svg>
+                        </div>
+                        外网延迟
+                    </div>
+                    <div class="data-value">
+                        10<span class="unit">ms</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI诊断 -->
+            <div class="ai-diagnosis">
+                <div class="ai-header">
+                    <div class="ai-icon">AI</div>
+                    <div class="ai-title-group">
+                        <div class="ai-title">智能诊断结果</div>
+                        <div class="ai-subtitle">基于当前网络环境分析</div>
+                    </div>
+                </div>
+                <div class="ai-content">
+                    <div class="diagnosis-item">
+                        <div class="diagnosis-icon good">✓</div>
+                        <div class="diagnosis-text">网络连接稳定，信号强度优秀，适合高清视频流媒体播放</div>
+                    </div>
+                    <div class="diagnosis-item">
+                        <div class="diagnosis-icon good">✓</div>
+                        <div class="diagnosis-text">上下行速率均衡，满足日常办公和文件传输需求</div>
+                    </div>
+                    <div class="diagnosis-item">
+                        <div class="diagnosis-icon warning">!</div>
+                        <div class="diagnosis-text">建议定期检查路由器固件更新以获得最佳性能</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 故障预约上门入口 -->
+            <div class="service-booking" onclick="goToServiceBooking()">
+                <div class="service-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                </div>
+                <div class="service-content">
+                    <div class="service-title">故障预约上门</div>
+                    <div class="service-desc">网络问题无法解决？预约专业工程师上门服务</div>
+                </div>
+                <div class="service-arrow">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                    </svg>
+                </div>
+            </div>
+        </main>
+
+        <!-- 按钮 -->
+        <div class="button-section">
+            <button class="btn btn-primary" onclick="goToDetails()">查看测试详情</button>
+            <button class="btn btn-secondary" onclick="retest()">重新检测</button>
+        </div>
+    </div>
+
+    <script>
+        // 跳转到故障预约页面
+        function goToServiceBooking() {
+            window.location.href = 'service-booking.html';
+        }
+
+        // 查看测试详情
+        function goToDetails() {
+            window.location.href = 'speedtestresult2.html';
+        }
+
+        // 重新检测
+        function retest() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
