@@ -106,6 +106,7 @@
             stroke-linecap: round;
             stroke-dasharray: 754;
             stroke-dashoffset: 754;
+            transition: stroke-dashoffset 0.3s ease;
         }
 
         .gauge-inner {
@@ -151,12 +152,73 @@
             cursor: pointer;
             box-shadow: 0 4px 20px rgba(0, 114, 255, 0.4);
             margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .speed-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(0, 114, 255, 0.5);
         }
 
         .speed-btn:active {
-            opacity: 0.9;
+            transform: translateY(0);
         }
 
+        .speed-btn:disabled {
+            background: linear-gradient(270deg, #3a4a5c 0%, #2d3a4a 100%);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* 测速结果区域 */
+        .results-section {
+            width: 100%;
+            padding: 0 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px 12px;
+            text-align: center;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .result-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 4px;
+        }
+
+        .result-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .result-unit {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
 
         /* 底部导航 */
         .bottom-nav {
@@ -238,11 +300,47 @@
                 <div class="gauge-inner">
                     <div class="gauge-value" id="speedValue">0.0</div>
                     <div class="gauge-unit">Mbps</div>
-                    <div class="gauge-label">点击开始测速</div>
+                    <div class="gauge-label" id="gaugeLabel">点击开始测速</div>
                 </div>
             </div>
 
             <button class="speed-btn" id="speedBtn" onclick="startSpeedTest()">开始测速</button>
+
+            <!-- 测速结果 -->
+            <div class="results-section" id="resultsSection">
+                <div class="results-grid">
+                    <div class="result-item">
+                        <div class="result-value" id="pingValue">--</div>
+                        <div class="result-label">延迟</div>
+                        <div class="result-unit">ms</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="jitterValue">--</div>
+                        <div class="result-label">抖动</div>
+                        <div class="result-unit">ms</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="lossValue">--</div>
+                        <div class="result-label">丢包率</div>
+                        <div class="result-unit">%</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="downloadValue">--</div>
+                        <div class="result-label">下载速度</div>
+                        <div class="result-unit">Mbps</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="uploadValue">--</div>
+                        <div class="result-label">上传速度</div>
+                        <div class="result-unit">Mbps</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="scoreValue">--</div>
+                        <div class="result-label">综合评分</div>
+                        <div class="result-unit">分</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -255,17 +353,17 @@
             </svg>
             <span class="nav-label">测速</span>
         </a>
-        <a href="ping-diagnosis.html" class="nav-item">
+        <a href="toolbox.html" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 24 24">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
             </svg>
-            <span class="nav-label">PING诊断</span>
+            <span class="nav-label">工具箱</span>
         </a>
         <a href="wifi-diagnosis.html" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 24 24">
                 <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
             </svg>
-            <span class="nav-label">WIFI诊断</span>
+            <span class="nav-label">WiFi诊断</span>
         </a>
         <a href="profile.html" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 24 24">
@@ -276,22 +374,73 @@
     </nav>
 
     <script>
-        // 开始测速 - 直接跳转
+        let isTesting = false;
+
         function startSpeedTest() {
-            // 生成随机测试结果
-            const testResults = {
-                ping: Math.floor(Math.random() * 20) + 5,
-                jitter: Math.floor(Math.random() * 5) + 1,
-                loss: 0,
-                download: 350 + Math.random() * 200,
-                upload: (350 + Math.random() * 200) * 0.6
-            };
+            if (isTesting) return;
             
-            // 保存结果
-            localStorage.setItem('speedTestResults', JSON.stringify(testResults));
+            isTesting = true;
+            const btn = document.getElementById('speedBtn');
+            const gaugeLabel = document.getElementById('gaugeLabel');
+            const gaugeProgress = document.getElementById('gaugeProgress');
+            const speedValue = document.getElementById('speedValue');
+            const resultsSection = document.getElementById('resultsSection');
             
-            // 直接跳转到结果页面
-            window.location.href = 'speedtestresult1.html';
+            btn.disabled = true;
+            btn.textContent = '测速中...';
+            gaugeLabel.textContent = '正在测试网络...';
+            resultsSection.classList.remove('show');
+            
+            // 模拟测速过程
+            let progress = 0;
+            const testInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 100) progress = 100;
+                
+                // 更新仪表盘
+                const offset = 754 - (754 * progress / 100);
+                gaugeProgress.style.strokeDashoffset = offset;
+                speedValue.textContent = (progress * 5.5).toFixed(1);
+                
+                if (progress >= 100) {
+                    clearInterval(testInterval);
+                    completeTest();
+                }
+            }, 200);
+            
+            function completeTest() {
+                // 生成测试结果
+                const testResults = {
+                    ping: Math.floor(Math.random() * 20) + 5,
+                    jitter: Math.floor(Math.random() * 5) + 1,
+                    loss: 0,
+                    download: 350 + Math.random() * 200,
+                    upload: (350 + Math.random() * 200) * 0.6
+                };
+                
+                // 计算综合评分
+                const score = Math.min(100, Math.floor(85 + Math.random() * 15));
+                
+                // 显示结果
+                document.getElementById('pingValue').textContent = testResults.ping;
+                document.getElementById('jitterValue').textContent = testResults.jitter;
+                document.getElementById('lossValue').textContent = testResults.loss;
+                document.getElementById('downloadValue').textContent = testResults.download.toFixed(1);
+                document.getElementById('uploadValue').textContent = testResults.upload.toFixed(1);
+                document.getElementById('scoreValue').textContent = score;
+                
+                // 更新UI
+                speedValue.textContent = testResults.download.toFixed(1);
+                gaugeLabel.textContent = '测速完成';
+                btn.disabled = false;
+                btn.textContent = '重新测速';
+                resultsSection.classList.add('show');
+                
+                // 保存结果
+                localStorage.setItem('speedTestResults', JSON.stringify(testResults));
+                
+                isTesting = false;
+            }
         }
     </script>
 </body>

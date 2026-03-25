@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WiFi诊断</title>
+    <title>工具箱</title>
     <style>
         * {
             margin: 0;
@@ -48,61 +48,85 @@
             padding-bottom: calc(80px + env(safe-area-inset-bottom));
         }
 
+        /* 页面标题 */
+        .page-title {
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
         /* 主内容 */
         .main-content {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
             padding: 20px;
-            gap: 40px;
         }
 
-        .page-title {
-            font-size: 24px;
-            color: var(--text-primary);
-            font-weight: 600;
+        /* 工具卡片 */
+        .tool-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .wifi-icon-large {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, rgba(91, 141, 239, 0.2), rgba(78, 205, 196, 0.2));
-            border-radius: 50%;
+        .tool-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .tool-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .tool-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
         }
 
-        .wifi-icon-large svg {
-            width: 60px;
-            height: 60px;
+        .tool-icon.ping {
+            background: linear-gradient(135deg, rgba(91, 141, 239, 0.2), rgba(78, 205, 196, 0.2));
+        }
+
+        .tool-icon.video {
+            background: linear-gradient(135deg, rgba(244, 162, 97, 0.2), rgba(155, 139, 244, 0.2));
+        }
+
+        .tool-icon svg {
+            width: 24px;
+            height: 24px;
             fill: var(--accent-blue);
         }
 
-        .start-test-btn {
-            background: linear-gradient(270deg, #00c6ff 0%, #0072ff 100%);
-            color: #fff;
-            border: none;
-            padding: 18px 60px;
-            border-radius: 50px;
+        .tool-icon.video svg {
+            fill: var(--accent-orange);
+        }
+
+        .tool-info {
+            flex: 1;
+        }
+
+        .tool-name {
             font-size: 18px;
             font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(0, 114, 255, 0.4);
-            transition: all 0.3s ease;
-            font-family: inherit;
+            color: var(--text-primary);
+            margin-bottom: 4px;
         }
 
-        .start-test-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 24px rgba(0, 114, 255, 0.5);
-        }
-
-        .start-test-btn:active {
-            transform: translateY(0);
+        .tool-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
         }
 
         /* 底部导航 */
@@ -166,15 +190,40 @@
 </head>
 <body>
     <div class="container">
+        <!-- 页面标题 -->
+        <div class="page-title">工具箱</div>
+
         <!-- 主内容 -->
         <main class="main-content">
-            <div class="wifi-icon-large">
-                <svg viewBox="0 0 24 24">
-                    <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
-                </svg>
+            <!-- Ping测试卡片 -->
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon ping">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <div class="tool-info">
+                        <div class="tool-name">Ping测试</div>
+                        <div class="tool-desc">检测网络延迟和丢包情况</div>
+                    </div>
+                </div>
             </div>
-            <div class="page-title">WiFi诊断</div>
-            <button class="start-test-btn" onclick="startWiFiTest()">开始测试</button>
+
+            <!-- 视频测试卡片 -->
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon video">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                        </svg>
+                    </div>
+                    <div class="tool-info">
+                        <div class="tool-name">视频测试</div>
+                        <div class="tool-desc">检测视频流畅度和缓冲性能</div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -186,13 +235,13 @@
             </svg>
             <span class="nav-label">测速</span>
         </a>
-        <a href="toolbox.html" class="nav-item">
+        <a href="toolbox.html" class="nav-item active">
             <svg class="nav-icon" viewBox="0 0 24 24">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
             </svg>
             <span class="nav-label">工具箱</span>
         </a>
-        <a href="wifi-diagnosis.html" class="nav-item active">
+        <a href="wifi-diagnosis.html" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 24 24">
                 <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
             </svg>
@@ -206,24 +255,6 @@
         </a>
     </nav>
 
-    <script>
-        function startWiFiTest() {
-            // 生成WiFi测试结果数据
-            const wifiResults = {
-                signalStrength: Math.floor(Math.random() * 40) + 60, // 60-100
-                channel: [1, 6, 11][Math.floor(Math.random() * 3)],
-                frequency: '2.4GHz / 5GHz',
-                security: 'WPA2-PSK',
-                interference: Math.floor(Math.random() * 30),
-                speed: Math.floor(Math.random() * 200) + 100
-            };
-            
-            // 保存结果到本地存储
-            localStorage.setItem('wifiTestResults', JSON.stringify(wifiResults));
-            
-            // 直接跳转到结果页面
-            window.location.href = 'speedtestresult1.html';
-        }
-    </script>
+
 </body>
 </html>
