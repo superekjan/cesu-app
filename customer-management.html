@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>绑定客户管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --accent-blue: #5b8def;
+            --accent-blue-light: #7ca6f3;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-red: #ef4444;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* 主内容 */
+        .main-content {
+            flex: 1;
+            padding: 16px 20px;
+            overflow-y: auto;
+        }
+
+        /* 统计行 - 无卡片容器 */
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            padding: 0 4px;
+        }
+
+        .stat-item {
+            text-align: center;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            min-width: 60px;
+        }
+
+        .stat-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .stat-item.active {
+            background: rgba(91, 141, 239, 0.1);
+        }
+
+        .stat-item.active .stat-value {
+            color: var(--accent-blue);
+        }
+
+        .stat-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            transition: color 0.2s ease;
+        }
+
+        .stat-value.active {
+            color: var(--accent-green);
+        }
+
+        .stat-value.pending {
+            color: var(--accent-orange);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            transition: color 0.2s ease;
+        }
+
+        /* 搜索与排序栏 */
+        .search-filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .search-box {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .search-input:focus {
+            border-color: rgba(91, 141, 239, 0.4);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            fill: var(--text-tertiary);
+        }
+
+        .sort-dropdown {
+            position: relative;
+        }
+
+        .sort-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 14px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .sort-btn:hover {
+            border-color: rgba(91, 141, 239, 0.3);
+        }
+
+        .sort-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+
+
+        /* 客户列表 */
+        .customer-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .customer-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .customer-card:hover {
+            border-color: rgba(91, 141, 239, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .customer-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .customer-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .customer-avatar svg {
+            width: 24px;
+            height: 24px;
+            fill: #fff;
+        }
+
+        .customer-info {
+            flex: 1;
+        }
+
+        .customer-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .customer-phone {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .customer-status {
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .customer-status.active {
+            background: rgba(93, 190, 141, 0.15);
+            color: var(--accent-green);
+        }
+
+        .customer-status.recent {
+            background: rgba(91, 141, 239, 0.15);
+            color: var(--accent-blue);
+        }
+
+        .customer-meta {
+            display: flex;
+            gap: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .meta-item svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--text-tertiary);
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(91, 141, 239, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .empty-icon svg {
+            width: 40px;
+            height: 40px;
+            fill: var(--accent-blue);
+        }
+
+        .empty-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .empty-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* 底部按钮 */
+        .footer-action {
+            padding: 16px 20px calc(16px + env(safe-area-inset-bottom));
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-cyan) 100%);
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-top">
+                <div class="back-btn" onclick="history.back()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                    </svg>
+                </div>
+                <div class="header-title">客户管理</div>
+            </div>
+        </header>
+
+        
+
+        <!-- 主内容 -->
+        <main class="main-content">
+        <!-- 搜索与排序 -->
+        <div class="search-filter-bar">
+            <div class="search-box">
+                <svg class="search-icon" viewBox="0 0 24 24">
+                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+                <input type="text" class="search-input" placeholder="搜索客户姓名、手机号..." oninput="searchCustomers(this.value)">
+            </div>
+            <div class="sort-dropdown">
+                <button class="sort-btn" onclick="toggleSortMenu()">
+                    <span id="sortLabel">时间排序</span>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M7 10l5 5 5-5z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+            <div class="customer-list">
+                <!-- 客户1 -->
+                <div class="customer-card" onclick="viewCustomerDetail('C001')">
+                    <div class="customer-header">
+                        <div class="customer-avatar">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        </div>
+                        <div class="customer-info">
+                            <div class="customer-name">
+                                张先生
+                                <span style="font-size: 12px; color: var(--text-tertiary); font-weight: normal;">138****5678</span>
+                            </div>
+                            <div class="customer-phone">北京市朝阳区建国路88号</div>
+                        </div>
+                        <span class="customer-status active">活跃</span>
+                    </div>
+                    <div class="customer-meta">
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                            最近测速：2小时前
+                        </div>
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                            </svg>
+                            历史报告：6份
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 客户2 -->
+                <div class="customer-card" onclick="viewCustomerDetail('C002')">
+                    <div class="customer-header">
+                        <div class="customer-avatar">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        </div>
+                        <div class="customer-info">
+                            <div class="customer-name">
+                                李女士
+                                <span style="font-size: 12px; color: var(--text-tertiary); font-weight: normal;">139****1234</span>
+                            </div>
+                            <div class="customer-phone">北京市海淀区中关村大街1号</div>
+                        </div>
+                        <span class="customer-status recent">近期</span>
+                    </div>
+                    <div class="customer-meta">
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                            最近测速：3天前
+                        </div>
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                            </svg>
+                            历史报告：3份
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 客户3 -->
+                <div class="customer-card" onclick="viewCustomerDetail('C003')">
+                    <div class="customer-header">
+                        <div class="customer-avatar">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        </div>
+                        <div class="customer-info">
+                            <div class="customer-name">
+                                王先生
+                                <span style="font-size: 12px; color: var(--text-tertiary); font-weight: normal;">137****9876</span>
+                            </div>
+                            <div class="customer-phone">北京市西城区金融街1号</div>
+                        </div>
+                        <span class="customer-status active">活跃</span>
+                    </div>
+                    <div class="customer-meta">
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                            最近测速：5小时前
+                        </div>
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                            </svg>
+                            历史报告：12份
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 客户4 -->
+                <div class="customer-card" onclick="viewCustomerDetail('C004')">
+                    <div class="customer-header">
+                        <div class="customer-avatar">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        </div>
+                        <div class="customer-info">
+                            <div class="customer-name">
+                                赵女士
+                                <span style="font-size: 12px; color: var(--text-tertiary); font-weight: normal;">136****2468</span>
+                            </div>
+                            <div class="customer-phone">北京市东城区王府井大街88号</div>
+                        </div>
+                        <span class="customer-status recent">近期</span>
+                    </div>
+                    <div class="customer-meta">
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                            最近测速：1周前
+                        </div>
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                            </svg>
+                            历史报告：2份
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 底部按钮 -->
+        <div class="footer-action">
+            <button class="btn-primary" onclick="goToInvitation()">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+                邀请新客户
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 选择统计项
+        function selectStat(element, stat) {
+            document.querySelectorAll('.stat-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+            // 根据状态筛选客户
+        }
+
+        // 搜索客户
+        function searchCustomers(keyword) {
+            console.log('搜索客户:', keyword);
+        }
+
+        // 切换排序菜单
+        function toggleSortMenu() {
+            const sortLabel = document.getElementById('sortLabel');
+            if (sortLabel.textContent === '时间排序') {
+                sortLabel.textContent = '活跃度排序';
+            } else {
+                sortLabel.textContent = '时间排序';
+            }
+            // 执行排序
+        }
+
+        // 查看客户详情
+        function viewCustomerDetail(customerId) {
+            window.location.href = `customer-detail.html?id=${customerId}`;
+        }
+
+        // 前往邀请页面
+        function goToInvitation() {
+            window.location.href = 'staff-invitation.html';
+        }
+    </script>
+</body>
+</html>

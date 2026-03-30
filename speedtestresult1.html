@@ -138,155 +138,101 @@
             border-top: 1px solid var(--border-subtle);
         }
 
-        /* 统一数据卡片网格 */
-        .data-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
+        /* 分类指标卡片 */
+        .metrics-section {
+            display: flex;
+            flex-direction: column;
             gap: 12px;
         }
 
-        .data-card {
+        .metrics-card {
             background: var(--bg-card);
-            border-radius: 4px;
+            border-radius: 12px;
             padding: 16px;
             border: 1px solid var(--border-subtle);
             transition: all 0.2s ease;
         }
 
-        .data-card:hover {
+        .metrics-card:hover {
             background: var(--bg-card-hover);
-            border-color: rgba(59, 130, 246, 0.2);
+            border-color: rgba(91, 141, 239, 0.25);
         }
 
-        .data-label {
+        .metrics-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .metrics-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, rgba(91, 141, 239, 0.2) 0%, rgba(78, 205, 196, 0.2) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .metrics-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: url(#iconGradient);
+        }
+
+        .metrics-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .metrics-grid.three-col {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .metric-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .metric-label {
             font-size: 11px;
             color: var(--text-tertiary);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
         }
 
-        .data-icon {
-            width: 16px;
-            height: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .data-icon svg {
-            width: 16px;
-            height: 16px;
-            fill: url(#iconGradient);
-        }
-
-        .signal-icon {
-            position: relative;
-            width: 16px;
-            height: 12px;
-        }
-
-        .signal-icon span {
-            position: absolute;
-            bottom: 0;
-            width: 2.5px;
-            background: linear-gradient(to top, var(--accent-blue), var(--accent-cyan));
-            border-radius: 1px;
-        }
-
-        .signal-icon span:nth-child(1) { left: 0; height: 30%; }
-        .signal-icon span:nth-child(2) { left: 4px; height: 55%; }
-        .signal-icon span:nth-child(3) { left: 8px; height: 80%; }
-        .signal-icon span:nth-child(4) { left: 12px; height: 100%; }
-
-        .interference-icon {
-            display: flex;
-            gap: 2px;
-            align-items: center;
-            width: 16px;
-            height: 16px;
-        }
-
-        .interference-icon span {
-            width: 2px;
-            background: linear-gradient(to bottom, var(--accent-blue), var(--accent-cyan));
-            border-radius: 1px;
-        }
-
-        .interference-icon span:nth-child(1) { height: 8px; }
-        .interference-icon span:nth-child(2) { height: 14px; }
-        .interference-icon span:nth-child(3) { height: 10px; }
-
-        .download-icon, .upload-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 16px;
-            height: 16px;
-        }
-
-        .download-icon svg, .upload-icon svg {
-            width: 16px;
-            height: 16px;
-            fill: url(#iconGradient);
-        }
-
-        .internal-latency-icon svg, .external-latency-icon svg {
-            width: 16px;
-            height: 16px;
-            fill: url(#iconGradient);
-        }
-
-        .data-value {
-            font-size: 20px;
+        .metric-value {
+            font-size: 15px;
+            font-weight: 600;
             color: var(--text-primary);
             display: flex;
             align-items: baseline;
             gap: 3px;
         }
 
-        .data-value .unit {
+        .metric-value .unit {
             font-size: 11px;
-            color: var(--text-tertiary);
-            font-weight: 500;
+            color: var(--text-secondary);
+            font-weight: 400;
         }
 
-        .data-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            padding: 3px 8px;
-            background: rgba(16, 185, 129, 0.1);
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 500;
-            color: var(--accent-green);
-            margin-top: 8px;
-            border: 1px solid rgba(16, 185, 129, 0.15);
-        }
-
-        .data-badge::before {
-            content: '';
-            width: 4px;
-            height: 4px;
-            background: var(--accent-green);
-            border-radius: 50%;
-        }
-
-        .data-status {
-            font-size: 12px;
-            color: var(--accent-blue-light);
-            margin-top: 6px;
-            font-weight: 500;
+        .metric-value.small {
+            font-size: 13px;
         }
 
         /* AI诊断区域 */
         .ai-diagnosis {
             background: var(--bg-card);
-            border-radius: 4px;
+            border-radius: 12px;
             padding: 24px;
             border: 1px solid var(--border-subtle);
         }
@@ -401,7 +347,7 @@
         /* 故障预约入口 */
         .service-booking {
             background: linear-gradient(135deg, rgba(244, 162, 97, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%);
-            border-radius: 4px;
+            border-radius: 12px;
             padding: 20px;
             border: 1px solid rgba(244, 162, 97, 0.3);
             display: flex;
@@ -572,88 +518,95 @@
 
         <!-- 主内容 -->
         <main class="main-content">
-            <!-- 数据网格 - 6个统一卡片 -->
-            <div class="data-grid">
-                <div class="data-card">
-                    <div class="data-label">
-                        <div class="data-icon signal-icon">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                        信号强度
-                    </div>
-                    <div class="data-value">
-                        -50<span class="unit">dBm</span>
-                    </div>
-                </div>
-
-                <div class="data-card">
-                    <div class="data-label">
-                        <div class="data-icon interference-icon">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                        Wi-Fi 干扰
-                    </div>
-                    <div class="data-value">较少</div>
-                </div>
-
-                <div class="data-card">
-                    <div class="data-label">
-                        <div class="data-icon download-icon">
+            <!-- 分类指标展示 -->
+            <div class="metrics-section">
+                <!-- 终端连接 -->
+                <div class="metrics-card">
+                    <div class="metrics-header">
+                        <div class="metrics-icon">
                             <svg viewBox="0 0 24 24">
-                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
                             </svg>
                         </div>
-                        下行网速
+                        <div class="metrics-title">终端连接</div>
                     </div>
-                    <div class="data-value">
-                        4.68<span class="unit">MB/s</span>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-label">WiFi速率</div>
+                            <div class="metric-value">1200<span class="unit">Mbps</span></div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">WiFi频段</div>
+                            <div class="metric-value">5<span class="unit">GHz</span></div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">WiFi信号</div>
+                            <div class="metric-value">-50<span class="unit">dBm</span></div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">WiFi干扰</div>
+                            <div class="metric-value small">较少</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">型号版本</div>
+                            <div class="metric-value small">V2.1.5</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">型号名称</div>
+                            <div class="metric-value small">AX3000</div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="data-card">
-                    <div class="data-label">
-                        <div class="data-icon upload-icon">
+                <!-- 网关信息 -->
+                <div class="metrics-card">
+                    <div class="metrics-header">
+                        <div class="metrics-icon">
                             <svg viewBox="0 0 24 24">
-                                <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2v2h14v-2H5z"/>
+                                <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>
                             </svg>
                         </div>
-                        上行网速
+                        <div class="metrics-title">网关信息</div>
                     </div>
-                    <div class="data-value">
-                        4.68<span class="unit">MB/s</span>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-label">网关厂家</div>
+                            <div class="metric-value small">华为</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">WiFi名称</div>
+                            <div class="metric-value small">ChinaNet-5G</div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="data-card">
-                    <div class="data-label">
-                        <div class="data-icon internal-latency-icon">
+                <!-- 内网质量 -->
+                <div class="metrics-card">
+                    <div class="metrics-header">
+                        <div class="metrics-icon">
                             <svg viewBox="0 0 24 24">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                             </svg>
                         </div>
-                        内网延迟
+                        <div class="metrics-title">内网质量</div>
                     </div>
-                    <div class="data-value">
-                        4<span class="unit">ms</span>
-                    </div>
-                </div>
-
-                <div class="data-card">
-                    <div class="data-label">
-                        <div class="data-icon external-latency-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h-2V9h6v2h-2v6z"/>
-                            </svg>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-label">上行</div>
+                            <div class="metric-value">4.68<span class="unit">MB/s</span></div>
                         </div>
-                        外网延迟
-                    </div>
-                    <div class="data-value">
-                        10<span class="unit">ms</span>
+                        <div class="metric-item">
+                            <div class="metric-label">下行</div>
+                            <div class="metric-value">4.68<span class="unit">MB/s</span></div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">内网时延</div>
+                            <div class="metric-value">4<span class="unit">ms</span></div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">外网时延</div>
+                            <div class="metric-value">10<span class="unit">ms</span></div>
+                        </div>
                     </div>
                 </div>
             </div>

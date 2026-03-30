@@ -216,6 +216,441 @@
             background: rgba(88, 166, 255, 0.25);
         }
 
+        /* 装维绑定区域 */
+        .staff-binding-section {
+            margin-top: 24px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            padding-left: 4px;
+        }
+
+        /* 绑定方式选择 */
+        .binding-methods {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .method-btn {
+            flex: 1;
+            padding: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .method-btn:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-blue);
+        }
+
+        .method-btn.active {
+            background: rgba(91, 141, 239, 0.15);
+            border-color: var(--accent-blue);
+        }
+
+        .method-icon {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 8px;
+            background: rgba(91, 141, 239, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .method-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--accent-blue);
+        }
+
+        .method-name {
+            font-size: 13px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* 绑定表单 */
+        .binding-form {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-subtle);
+            display: none;
+        }
+
+        .binding-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 6px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(91, 141, 239, 0.4);
+        }
+
+        .submit-btn:disabled {
+            background: linear-gradient(135deg, #3a4a5c, #2d3a4a);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 扫码区域 */
+        .scan-area {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            border: 2px dashed var(--border-subtle);
+            margin-bottom: 16px;
+        }
+
+        .scan-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            background: rgba(91, 141, 239, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scan-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--accent-blue);
+        }
+
+        .scan-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .scan-btn {
+            padding: 10px 24px;
+            background: rgba(91, 141, 239, 0.15);
+            border: 1px solid var(--accent-blue);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--accent-blue);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .scan-btn:hover {
+            background: rgba(91, 141, 239, 0.25);
+        }
+
+        /* 已绑定装维信息 */
+        .staff-info-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-subtle);
+            margin-top: 16px;
+        }
+
+        .staff-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .staff-avatar {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .staff-avatar svg {
+            width: 28px;
+            height: 28px;
+            fill: #fff;
+        }
+
+        .staff-basic-info {
+            flex: 1;
+        }
+
+        .staff-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .staff-id {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .staff-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: rgba(93, 190, 141, 0.15);
+            border-radius: 12px;
+            font-size: 11px;
+            color: var(--accent-green);
+        }
+
+        .staff-status::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            background: var(--accent-green);
+            border-radius: 50%;
+        }
+
+        .staff-details {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .detail-value {
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .unbind-staff-btn {
+            width: 100%;
+            padding: 12px;
+            background: rgba(248, 81, 73, 0.15);
+            border: 1px solid rgba(248, 81, 73, 0.3);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--accent-red);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .unbind-staff-btn:hover {
+            background: rgba(248, 81, 73, 0.25);
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .empty-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--text-tertiary);
+        }
+
+        .empty-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Toast提示 */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 模态框 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 320px;
+            width: 100%;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .modal-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .modal-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-btn.cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .modal-btn.cancel:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .modal-btn.confirm {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            color: #fff;
+        }
+
+        .modal-btn.confirm:hover {
+            opacity: 0.9;
+        }
+
+        .modal-btn.danger {
+            background: rgba(248, 81, 73, 0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(248, 81, 73, 0.3);
+        }
+
+        .modal-btn.danger:hover {
+            background: rgba(248, 81, 73, 0.25);
+        }
 
     </style>
 </head>
@@ -274,7 +709,6 @@
                     <button class="binding-action" onclick="unbindWechat()">解绑</button>
                 </div>
             </div>
-
 
         </main>
     </div>

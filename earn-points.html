@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>赚积分</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --bg-card-hover: rgba(46, 49, 69, 0.75);
+            --accent-blue: #5b8def;
+            --accent-blue-light: #7ca6f3;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-purple: #9b8bf4;
+            --accent-gold: #e3b341;
+            --accent-red: #ef4444;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* 主内容 */
+        .main-content {
+            flex: 1;
+            padding: 16px 20px;
+            overflow-y: auto;
+        }
+
+        /* 积分概览 - 简化版 */
+        .points-overview {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 16px;
+        }
+
+        .points-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .points-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(227, 179, 65, 0.15);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .points-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--accent-gold);
+        }
+
+        .points-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .points-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .points-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-gold);
+        }
+
+        .points-today {
+            text-align: right;
+        }
+
+        .points-today-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+
+        .points-today-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-top: 2px;
+        }
+
+        /* 任务区域 */
+        .tasks-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--accent-gold);
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .task-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, rgba(91, 141, 239, 0.2) 0%, rgba(78, 205, 196, 0.2) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .task-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: url(#iconGradient);
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-name {
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .task-reward {
+            font-size: 12px;
+            color: var(--accent-gold);
+        }
+
+        .task-btn {
+            padding: 8px 16px;
+            background: linear-gradient(270deg, #00c6ff 0%, #0072ff 100%);
+            border: none;
+            border-radius: 16px;
+            font-size: 12px;
+            color: #fff;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .task-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 114, 255, 0.3);
+        }
+
+        .task-btn.completed {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+        }
+
+        /* 签到区域 */
+        .checkin-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 20px;
+        }
+
+        .checkin-calendar {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+        }
+
+        .checkin-day {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkin-day-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .checkin-day-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+            border: 1px solid transparent;
+        }
+
+        .checkin-day-box.checked {
+            background: rgba(93, 190, 141, 0.15);
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .checkin-day-box.today {
+            background: linear-gradient(135deg, rgba(91, 141, 239, 0.2) 0%, rgba(78, 205, 196, 0.2) 100%);
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
+
+        .checkin-day-box svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--accent-green);
+        }
+
+        .checkin-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-cyan) 100%);
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 16px;
+        }
+
+        .checkin-btn:hover {
+            opacity: 0.9;
+        }
+
+        .checkin-btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-tertiary);
+            cursor: not-allowed;
+        }
+
+        /* 底部安全区域 */
+        .safe-area-bottom {
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SVG渐变定义 -->
+        <svg width="0" height="0" style="position: absolute;">
+            <defs>
+                <linearGradient id="iconGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" style="stop-color:#5b8def;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#4ecdc4;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+        </svg>
+
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-top">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="back-btn" onclick="history.back()">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                        </svg>
+                    </div>
+                    <div class="header-title">赚积分</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主内容 -->
+        <main class="main-content">
+            <!-- 积分概览 - 简化版 -->
+            <div class="points-overview">
+                <div class="points-info">
+                    <div class="points-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    </div>
+                    <div class="points-text">
+                        <div class="points-label">我的积分</div>
+                        <div class="points-value">2,580</div>
+                    </div>
+                </div>
+                <div class="points-today">
+                    <div class="points-today-value">+120</div>
+                    <div class="points-today-label">今日获得</div>
+                </div>
+            </div>
+
+            <!-- 每日签到 -->
+            <div class="checkin-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/>
+                        </svg>
+                        每日签到
+                    </div>
+                </div>
+                <div class="checkin-calendar">
+                    <div class="checkin-day">
+                        <div class="checkin-day-label">周一</div>
+                        <div class="checkin-day-box checked">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="checkin-day">
+                        <div class="checkin-day-label">周二</div>
+                        <div class="checkin-day-box checked">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="checkin-day">
+                        <div class="checkin-day-label">周三</div>
+                        <div class="checkin-day-box checked">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="checkin-day">
+                        <div class="checkin-day-label">周四</div>
+                        <div class="checkin-day-box checked">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="checkin-day">
+                        <div class="checkin-day-label">周五</div>
+                        <div class="checkin-day-box checked">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="checkin-day">
+                        <div class="checkin-day-label">周六</div>
+                        <div class="checkin-day-box checked">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="checkin-day">
+                        <div class="checkin-day-label">周日</div>
+                        <div class="checkin-day-box today">+15</div>
+                    </div>
+                </div>
+                <button class="checkin-btn" onclick="doCheckin()">立即签到 +15 积分</button>
+            </div>
+
+            <!-- 每日任务 -->
+            <div class="tasks-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                        </svg>
+                        每日任务
+                    </div>
+                </div>
+                <div class="task-list">
+                    <div class="task-item">
+                        <div class="task-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="task-content">
+                            <div class="task-name">每日测速</div>
+                            <div class="task-reward">+10 积分</div>
+                        </div>
+                        <button class="task-btn" onclick="doTask('speedtest')">去完成</button>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="task-content">
+                            <div class="task-name">WiFi检测</div>
+                            <div class="task-reward">+20 积分</div>
+                        </div>
+                        <button class="task-btn" onclick="doTask('wifi')">去完成</button>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="task-content">
+                            <div class="task-name">满意度反馈</div>
+                            <div class="task-reward">+30 积分</div>
+                        </div>
+                        <button class="task-btn" onclick="doTask('feedback')">去完成</button>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="task-content">
+                            <div class="task-name">网络知识学习</div>
+                            <div class="task-reward">+30 积分</div>
+                        </div>
+                        <button class="task-btn" onclick="doTask('knowledge')">去完成</button>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="safe-area-bottom"></div>
+        </main>
+    </div>
+
+    <script>
+        // 选择分类
+        function selectCategory(element, category) {
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            element.classList.add('active');
+            // 这里可以根据分类加载对应的任务
+        }
+
+        // 签到
+        function doCheckin() {
+            const btn = document.querySelector('.checkin-btn');
+            btn.textContent = '今日已签到';
+            btn.disabled = true;
+            
+            const todayBox = document.querySelector('.checkin-day-box.today');
+            todayBox.classList.remove('today');
+            todayBox.classList.add('checked');
+            todayBox.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+            
+            alert('签到成功！获得 15 积分');
+        }
+
+        // 做任务
+        function doTask(taskType) {
+            switch(taskType) {
+                case 'speedtest':
+                    window.location.href = 'index.html';
+                    break;
+                case 'wifi':
+                    window.location.href = 'wifi-diagnosis.html';
+                    break;
+                case 'share':
+                    alert('分享功能开发中...');
+                    break;
+                case 'invite':
+                    window.location.href = 'staff-invitation.html';
+                    break;
+                case 'feedback':
+                    alert('反馈功能开发中...');
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>

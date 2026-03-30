@@ -146,68 +146,132 @@
             overflow-y: auto;
         }
 
-        /* 统计卡片 */
-        .stats-section {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+        /* 统计行 - 无卡片容器 */
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
             margin-bottom: 20px;
+            padding: 0 4px;
         }
 
-        .stat-card {
-            background: var(--bg-card);
-            border-radius: 10px;
-            padding: 14px 8px;
+        .stat-item {
             text-align: center;
-            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            min-width: 60px;
+        }
+
+        .stat-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .stat-item.active {
+            background: rgba(91, 141, 239, 0.1);
+        }
+
+        .stat-item.active .stat-value {
+            color: var(--accent-blue);
         }
 
         .stat-value {
-            font-size: 20px;
+            font-size: 26px;
             font-weight: 700;
-            color: var(--accent-blue);
+            color: var(--text-primary);
             margin-bottom: 4px;
+            transition: color 0.2s ease;
+        }
+
+        .stat-value.pending {
+            color: var(--accent-orange);
+        }
+
+        .stat-value.processing {
+            color: var(--accent-blue);
+        }
+
+        .stat-value.completed {
+            color: var(--accent-green);
         }
 
         .stat-label {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--text-secondary);
+            transition: color 0.2s ease;
         }
 
-        /* 筛选栏 */
-        .filter-bar {
+        /* 搜索与排序栏 */
+        .search-filter-bar {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 12px;
             margin-bottom: 16px;
         }
 
-        .filter-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-primary);
+        .search-box {
+            flex: 1;
+            position: relative;
         }
 
-        .filter-options {
-            display: flex;
-            gap: 8px;
-        }
-
-        .filter-btn {
-            padding: 6px 12px;
+        .search-input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
             background: rgba(0, 0, 0, 0.2);
             border: 1px solid var(--border-subtle);
-            border-radius: 16px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            cursor: pointer;
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--text-primary);
+            outline: none;
             transition: all 0.2s ease;
         }
 
-        .filter-btn:hover, .filter-btn.active {
-            background: rgba(91, 141, 239, 0.15);
-            color: var(--accent-blue);
+        .search-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .search-input:focus {
+            border-color: rgba(91, 141, 239, 0.4);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            fill: var(--text-tertiary);
+        }
+
+        .sort-dropdown {
+            position: relative;
+        }
+
+        .sort-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 14px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .sort-btn:hover {
             border-color: rgba(91, 141, 239, 0.3);
+        }
+
+        .sort-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
         }
 
         /* 工单列表 */
@@ -404,33 +468,41 @@
 
         <!-- 主内容 -->
         <main class="main-content">
-            <!-- 统计 -->
-            <section class="stats-section">
-                <div class="stat-card">
-                    <div class="stat-value">6</div>
+            <!-- 统计行 -->
+            <div class="stats-row">
+                <div class="stat-item active" onclick="selectStat(this, 'all')">
+                    <div class="stat-value">66</div>
+                    <div class="stat-label">全部</div>
+                </div>
+                <div class="stat-item" onclick="selectStat(this, 'pending')">
+                    <div class="stat-value pending">6</div>
                     <div class="stat-label">待处理</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value">12</div>
+                <div class="stat-item" onclick="selectStat(this, 'processing')">
+                    <div class="stat-value processing">12</div>
                     <div class="stat-label">处理中</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value">48</div>
+                <div class="stat-item" onclick="selectStat(this, 'completed')">
+                    <div class="stat-value completed">48</div>
                     <div class="stat-label">已完成</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value">66</div>
-                    <div class="stat-label">总工单</div>
-                </div>
-            </section>
+            </div>
 
-            <!-- 筛选栏 -->
-            <div class="filter-bar">
-                <div class="filter-title">工单列表</div>
-                <div class="filter-options">
-                    <button class="filter-btn active" onclick="selectFilter(this, 'all')">全部</button>
-                    <button class="filter-btn" onclick="selectFilter(this, 'pending')">待处理</button>
-                    <button class="filter-btn" onclick="selectFilter(this, 'processing')">处理中</button>
+            <!-- 搜索与排序 -->
+            <div class="search-filter-bar">
+                <div class="search-box">
+                    <svg class="search-icon" viewBox="0 0 24 24">
+                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                    </svg>
+                    <input type="text" class="search-input" placeholder="搜索工单号、用户姓名..." oninput="searchWorkOrders(this.value)">
+                </div>
+                <div class="sort-dropdown">
+                    <button class="sort-btn" onclick="toggleSortMenu()">
+                        <span id="sortLabel">时间排序</span>
+                        <svg viewBox="0 0 24 24">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
@@ -616,12 +688,29 @@
         }
 
         // 选择筛选条件
-        function selectFilter(element, filter) {
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
+        function selectStat(element, stat) {
+            document.querySelectorAll('.stat-item').forEach(item => {
+                item.classList.remove('active');
             });
             element.classList.add('active');
             // 根据状态筛选工单
+        }
+
+        // 搜索工单
+        function searchWorkOrders(keyword) {
+            // 根据关键词搜索工单
+            console.log('搜索:', keyword);
+        }
+
+        // 切换排序菜单
+        function toggleSortMenu() {
+            const sortLabel = document.getElementById('sortLabel');
+            if (sortLabel.textContent === '时间排序') {
+                sortLabel.textContent = '优先级排序';
+            } else {
+                sortLabel.textContent = '时间排序';
+            }
+            // 执行排序
         }
 
         // 查看工单详情
