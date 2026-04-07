@@ -344,6 +344,62 @@
             padding-top: 2px;
         }
 
+        /* 新AI诊断三行样式 */
+        .diagnosis-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .diagnosis-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .diagnosis-row:first-child {
+            padding-top: 0;
+        }
+
+        .diagnosis-label {
+            width: 70px;
+            font-size: 13px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+            flex-shrink: 0;
+            padding-top: 2px;
+        }
+
+        .diagnosis-value {
+            font-size: 15px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 6px;
+        }
+
+        .diagnosis-value.excellent {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+        }
+
+        .diagnosis-value.good {
+            background: rgba(91, 141, 239, 0.15);
+            color: var(--accent-blue);
+        }
+
+        .diagnosis-value.poor {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .diagnosis-desc {
+            flex: 1;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
         /* 故障预约入口 */
         .service-booking {
             background: linear-gradient(135deg, rgba(244, 162, 97, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%);
@@ -621,17 +677,17 @@
                     </div>
                 </div>
                 <div class="ai-content">
-                    <div class="diagnosis-item">
-                        <div class="diagnosis-icon good">✓</div>
-                        <div class="diagnosis-text">网络连接稳定，信号强度优秀，适合高清视频流媒体播放</div>
+                    <div class="diagnosis-row">
+                        <div class="diagnosis-label">网络评价</div>
+                        <div class="diagnosis-value poor">差</div>
                     </div>
-                    <div class="diagnosis-item">
-                        <div class="diagnosis-icon good">✓</div>
-                        <div class="diagnosis-text">上下行速率均衡，满足日常办公和文件传输需求</div>
+                    <div class="diagnosis-row">
+                        <div class="diagnosis-label">网络分析</div>
+                        <div class="diagnosis-desc">信号弱，干扰严重，连接数过多，导致延迟高、网速慢。</div>
                     </div>
-                    <div class="diagnosis-item">
-                        <div class="diagnosis-icon warning">!</div>
-                        <div class="diagnosis-text">建议定期检查路由器固件更新以获得最佳性能</div>
+                    <div class="diagnosis-row">
+                        <div class="diagnosis-label">整改建议</div>
+                        <div class="diagnosis-desc">建议将路由器更换为WiFi6型号，并将手机连接到5G频段，同时减少同时连接的设备数量，以显著提升网速和降低延迟。</div>
                     </div>
                 </div>
             </div>

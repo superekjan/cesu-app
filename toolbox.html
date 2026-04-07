@@ -95,6 +95,10 @@
             justify-content: center;
         }
 
+        .tool-icon.speedtest {
+            background: linear-gradient(135deg, rgba(93, 190, 141, 0.2), rgba(78, 205, 196, 0.2));
+        }
+
         .tool-icon.ping {
             background: linear-gradient(135deg, rgba(91, 141, 239, 0.2), rgba(78, 205, 196, 0.2));
         }
@@ -107,6 +111,10 @@
             width: 24px;
             height: 24px;
             fill: var(--accent-blue);
+        }
+
+        .tool-icon.speedtest svg {
+            fill: var(--accent-green);
         }
 
         .tool-icon.video svg {
@@ -195,8 +203,23 @@
 
         <!-- 主内容 -->
         <main class="main-content">
+            <!-- 网络测速卡片 -->
+            <div class="tool-card" onclick="location.href='wifi-diagnosis.html'">
+                <div class="tool-header">
+                    <div class="tool-icon speedtest">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <div class="tool-info">
+                        <div class="tool-name">网络测速</div>
+                        <div class="tool-desc">测试网络速度和连接质量</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Ping测试卡片 -->
-            <div class="tool-card">
+            <div class="tool-card" onclick="location.href='ping-diagnosis.html'">
                 <div class="tool-header">
                     <div class="tool-icon ping">
                         <svg viewBox="0 0 24 24">
@@ -230,12 +253,6 @@
     <!-- 底部导航 -->
     <nav class="bottom-nav">
         <a href="index.html" class="nav-item">
-            <svg class="nav-icon" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-            </svg>
-            <span class="nav-label">测速</span>
-        </a>
-        <a href="wifi-diagnosis.html" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 24 24">
                 <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
             </svg>

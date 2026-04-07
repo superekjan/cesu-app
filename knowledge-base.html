@@ -88,182 +88,129 @@
             color: var(--text-primary);
         }
 
-        /* 搜索区域 */
-        .search-section {
-            padding: 12px 16px;
-        }
-
-        .search-box {
-            position: relative;
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 14px 44px 14px 16px;
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-            font-size: 15px;
-            outline: none;
-        }
-
-        .search-input::placeholder {
-            color: var(--text-tertiary);
-        }
-
-        .search-icon {
-            position: absolute;
-            right: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 20px;
-            height: 20px;
-            fill: var(--text-tertiary);
-        }
-
-        /* 分类标签 */
-        .category-section {
-            padding: 0 16px 20px 16px;
-        }
-
-        .category-list {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-            scrollbar-width: none;
-        }
-
-        .category-list::-webkit-scrollbar {
-            display: none;
-        }
-
-        .category-tag {
-            flex-shrink: 0;
-            padding: 8px 16px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: 20px;
-            font-size: 13px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-
-        .category-tag:hover {
-            background: rgba(91, 141, 239, 0.1);
-            border-color: rgba(91, 141, 239, 0.3);
-        }
-
-        .category-tag.active {
-            background: linear-gradient(135deg, rgba(91, 141, 239, 0.2) 0%, rgba(91, 141, 239, 0.1) 100%);
-            border-color: var(--accent-blue);
-            color: var(--accent-blue);
-        }
-
-        /* 知识列表 */
+        /* 知识列表 - 简洁列表样式 */
         .knowledge-section {
-            padding: 0 16px 20px 16px;
+            padding: 20px;
         }
 
         .knowledge-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+            overflow: hidden;
         }
 
-        .knowledge-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 16px;
+        /* 广告轮播图 */
+        .ad-carousel {
+            position: relative;
+            width: 100%;
+            height: 160px;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border-subtle);
+            cursor: pointer;
+        }
+
+        .ad-carousel-track {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+        }
+
+        .ad-slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ad-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .ad-dots {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 2;
+        }
+
+        .ad-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .knowledge-card:hover {
-            border-color: rgba(91, 141, 239, 0.3);
-            transform: translateY(-2px);
+        .ad-dot.active {
+            background: rgba(255, 255, 255, 0.95);
+            transform: scale(1.2);
         }
 
-        .knowledge-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 10px;
-        }
-
-        .knowledge-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, rgba(91, 141, 239, 0.2) 0%, rgba(91, 141, 239, 0.1) 100%);
-            border-radius: 10px;
+        .knowledge-item {
             display: flex;
             align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
+            justify-content: space-between;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid var(--border-subtle);
         }
 
-        .knowledge-icon svg {
-            width: 20px;
-            height: 20px;
-            fill: var(--accent-blue);
+        .knowledge-item:last-child {
+            border-bottom: none;
+        }
+
+        .knowledge-item:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .knowledge-item:active {
+            background: rgba(91, 141, 239, 0.1);
+        }
+
+        .knowledge-text {
+            flex: 1;
+            padding-right: 12px;
         }
 
         .knowledge-title {
-            flex: 1;
             font-size: 15px;
-            font-weight: 600;
+            font-weight: 500;
             color: var(--text-primary);
-            line-height: 1.4;
-        }
-
-        .knowledge-category {
-            display: inline-block;
-            padding: 3px 8px;
-            background: rgba(91, 141, 239, 0.1);
-            border-radius: 4px;
-            font-size: 11px;
-            color: var(--accent-blue);
-            margin-bottom: 8px;
-        }
-
-        .knowledge-summary {
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.6;
+            line-height: 1.5;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
 
-        .knowledge-meta {
+        .knowledge-thumb {
+            width: 70px;
+            height: 50px;
+            border-radius: 4px;
+            background: linear-gradient(135deg, rgba(91, 141, 239, 0.15) 0%, rgba(78, 205, 196, 0.15) 100%);
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid var(--border-subtle);
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
         }
 
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 12px;
-            color: var(--text-tertiary);
-        }
-
-        .meta-item svg {
-            width: 14px;
-            height: 14px;
-            fill: var(--text-tertiary);
+        .knowledge-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
         }
 
         /* 详情弹窗 */
@@ -476,32 +423,29 @@
             </div>
         </header>
 
-        <!-- 搜索区域 -->
-        <section class="search-section">
-            <div class="search-box">
-                <input type="text" class="search-input" id="searchInput" placeholder="搜索网络问题、故障排查..." oninput="handleSearch()">
-                <svg class="search-icon" viewBox="0 0 24 24">
-                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                </svg>
-            </div>
-        </section>
-
-        <!-- 分类标签 -->
-        <section class="category-section">
-            <div class="category-list" id="categoryList">
-                <div class="category-tag active" data-category="all" onclick="filterCategory('all')">全部</div>
-                <div class="category-tag" data-category="wifi" onclick="filterCategory('wifi')">WiFi问题</div>
-                <div class="category-tag" data-category="speed" onclick="filterCategory('speed')">网速优化</div>
-                <div class="category-tag" data-category="security" onclick="filterCategory('security')">网络安全</div>
-                <div class="category-tag" data-category="device" onclick="filterCategory('device')">设备维护</div>
-                <div class="category-tag" data-category="basic" onclick="filterCategory('basic')">基础知识</div>
-            </div>
-        </section>
-
         <!-- 知识列表 -->
         <section class="knowledge-section">
             <div class="knowledge-list" id="knowledgeList">
-                <!-- 动态生成 -->
+                <!-- 广告轮播图 -->
+                <div class="ad-carousel" id="adCarousel">
+                    <div class="ad-carousel-track" id="adCarouselTrack">
+                        <div class="ad-slide">
+                            <img src="img/ad_1.png" alt="小翼管家">
+                        </div>
+                        <div class="ad-slide">
+                            <img src="img/ad_2.png" alt="天翼云电脑">
+                        </div>
+                        <div class="ad-slide">
+                            <img src="img/ad_3.png" alt="天翼看家">
+                        </div>
+                    </div>
+                    <div class="ad-dots" id="adDots">
+                        <div class="ad-dot active"></div>
+                        <div class="ad-dot"></div>
+                        <div class="ad-dot"></div>
+                    </div>
+                </div>
+                <!-- 知识列表内容动态生成 -->
             </div>
         </section>
     </div>
@@ -733,37 +677,26 @@
                 return;
             }
             
-            // 渲染列表
-            listContainer.innerHTML = filteredData.map(item => `
-                <div class="knowledge-card" onclick="showDetail(${item.id})">
-                    <div class="knowledge-header">
-                        <div class="knowledge-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
-                            </svg>
-                        </div>
-                        <div style="flex: 1;">
-                            <span class="knowledge-category">${item.categoryName}</span>
-                            <div class="knowledge-title">${item.title}</div>
-                        </div>
+            // 保留轮播图，只渲染知识列表项
+            const itemsHTML = filteredData.map((item, index) => {
+                // 使用 ico_1 到 ico_8 循环分配图片
+                const icoIndex = (index % 8) + 1;
+                return `
+                <div class="knowledge-item" onclick="showDetail(${item.id})">
+                    <div class="knowledge-text">
+                        <div class="knowledge-title">${item.title}</div>
                     </div>
-                    <div class="knowledge-summary">${item.summary}</div>
-                    <div class="knowledge-meta">
-                        <div class="meta-item">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                            </svg>
-                            <span>${formatNumber(item.views)}</span>
-                        </div>
-                        <div class="meta-item">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                            </svg>
-                            <span>${formatNumber(item.likes)}</span>
-                        </div>
+                    <div class="knowledge-thumb">
+                        <img src="img/ico_${icoIndex}.png" alt="${item.title}">
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
+
+            // 保留轮播图，只更新列表项
+            const carousel = document.getElementById('adCarousel');
+            listContainer.innerHTML = '';
+            listContainer.appendChild(carousel);
+            listContainer.insertAdjacentHTML('beforeend', itemsHTML);
         }
 
         // 分类过滤
@@ -820,19 +753,58 @@
             return num.toString();
         }
 
+        // 广告轮播功能
+        let currentSlide = 0;
+        const totalSlides = 3;
+        let carouselInterval;
+
+        function initCarousel() {
+            const track = document.getElementById('adCarouselTrack');
+            const dots = document.querySelectorAll('.ad-dot');
+
+            // 自动轮播
+            carouselInterval = setInterval(() => {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                updateCarousel();
+            }, 3000);
+
+            // 点击指示器切换
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    currentSlide = index;
+                    updateCarousel();
+                    // 重置自动轮播计时器
+                    clearInterval(carouselInterval);
+                    carouselInterval = setInterval(() => {
+                        currentSlide = (currentSlide + 1) % totalSlides;
+                        updateCarousel();
+                    }, 3000);
+                });
+            });
+        }
+
+        function updateCarousel() {
+            const track = document.getElementById('adCarouselTrack');
+            const dots = document.querySelectorAll('.ad-dot');
+
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
         // 页面加载完成后初始化
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', () => {
+            init();
+            initCarousel();
+        });
     </script>
 
     <!-- 底部导航栏 -->
     <nav class="bottom-nav">
         <a href="index.html" class="nav-item">
-            <svg class="nav-icon" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-            </svg>
-            <span class="nav-label">测速</span>
-        </a>
-        <a href="wifi-diagnosis.html" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 24 24">
                 <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
             </svg>
