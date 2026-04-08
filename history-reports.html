@@ -221,7 +221,7 @@
         }
 
         .report-item.expanded .report-detail {
-            max-height: 380px;
+            max-height: 600px;
         }
 
         .report-detail-content {
@@ -229,121 +229,82 @@
             border-top: 1px solid var(--border-subtle);
         }
 
-        /* 统一数据卡片网格 - 与speedtestresult1.html一致 */
-        .detail-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            padding: 12px 0;
+        /* 紧凑预览式数据展示 */
+        .detail-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 8px 0;
         }
 
-        .detail-card {
-            background: var(--bg-card);
-            border-radius: 4px;
-            padding: 12px 14px;
+        .detail-section {
+            background: rgba(38, 41, 58, 0.4);
+            border-radius: 8px;
+            padding: 10px 12px;
             border: 1px solid var(--border-subtle);
-            transition: all 0.2s ease;
         }
 
-        .detail-card:hover {
-            background: var(--bg-card-hover);
-            border-color: rgba(59, 130, 246, 0.2);
-        }
-
-        .detail-label {
-            font-size: 11px;
-            color: var(--text-tertiary);
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             margin-bottom: 8px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
+
+        .section-status {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .section-status.good {
+            background: rgba(93, 190, 141, 0.15);
+            color: var(--accent-green);
+        }
+
+        .section-status.warning {
+            background: rgba(244, 162, 97, 0.15);
+            color: var(--accent-orange);
+        }
+
+        .section-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .metric-item {
             display: flex;
-            align-items: center;
-            gap: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-
-        .detail-icon {
-            width: 16px;
-            height: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .detail-icon svg {
-            width: 16px;
-            height: 16px;
-            fill: url(#iconGradient);
-        }
-
-        .signal-icon {
-            position: relative;
-            width: 16px;
-            height: 12px;
-        }
-
-        .signal-icon span {
-            position: absolute;
-            bottom: 0;
-            width: 2.5px;
-            background: linear-gradient(to top, var(--accent-blue), var(--accent-cyan));
-            border-radius: 1px;
-        }
-
-        .signal-icon span:nth-child(1) { left: 0; height: 30%; }
-        .signal-icon span:nth-child(2) { left: 4px; height: 55%; }
-        .signal-icon span:nth-child(3) { left: 8px; height: 80%; }
-        .signal-icon span:nth-child(4) { left: 12px; height: 100%; }
-
-        .interference-icon {
-            display: flex;
+            flex-direction: column;
             gap: 2px;
-            align-items: center;
-            width: 16px;
-            height: 16px;
         }
 
-        .interference-icon span {
-            width: 2px;
-            background: linear-gradient(to bottom, var(--accent-blue), var(--accent-cyan));
-            border-radius: 1px;
+        .metric-label {
+            font-size: 10px;
+            color: var(--text-tertiary);
         }
 
-        .interference-icon span:nth-child(1) { height: 8px; }
-        .interference-icon span:nth-child(2) { height: 14px; }
-        .interference-icon span:nth-child(3) { height: 10px; }
-
-        .download-icon, .upload-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 16px;
-            height: 16px;
-        }
-
-        .download-icon svg, .upload-icon svg {
-            width: 16px;
-            height: 16px;
-            fill: url(#iconGradient);
-        }
-
-        .internal-latency-icon svg, .external-latency-icon svg {
-            width: 16px;
-            height: 16px;
-            fill: url(#iconGradient);
-        }
-
-        .detail-value {
-            font-size: 18px;
+        .metric-value {
+            font-size: 13px;
+            font-weight: 600;
             color: var(--text-primary);
             display: flex;
             align-items: baseline;
-            gap: 3px;
+            gap: 2px;
         }
 
-        .detail-value .unit {
-            font-size: 11px;
+        .metric-value .unit {
+            font-size: 9px;
             color: var(--text-tertiary);
-            font-weight: 500;
+            font-weight: 400;
         }
 
         /* 操作按钮 */
@@ -479,87 +440,81 @@
                     </div>
                     <div class="report-detail">
                         <div class="report-detail-content">
-                            <div class="detail-grid">
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon signal-icon">
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                        </div>
-                                        信号强度
+                            <div class="detail-sections">
+                                <!-- 终端连接 -->
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <div class="section-title">终端连接</div>
+                                        <div class="section-status good">正常</div>
                                     </div>
-                                    <div class="detail-value">
-                                        -50<span class="unit">dBm</span>
+                                    <div class="section-grid">
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi速率</div>
+                                            <div class="metric-value">1200<span class="unit">Mbps</span></div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi频段</div>
+                                            <div class="metric-value">5<span class="unit">GHz</span></div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi信号</div>
+                                            <div class="metric-value">-50<span class="unit">dBm</span></div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi干扰</div>
+                                            <div class="metric-value">较少</div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">型号版本</div>
+                                            <div class="metric-value">V2.1.5</div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">型号名称</div>
+                                            <div class="metric-value">AX3000</div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon interference-icon">
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                        </div>
-                                        Wi-Fi 干扰
+                                <!-- 网关信息 -->
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <div class="section-title">网关信息</div>
                                     </div>
-                                    <div class="detail-value">较少</div>
-                                </div>
-
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon download-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                                            </svg>
+                                    <div class="section-grid">
+                                        <div class="metric-item">
+                                            <div class="metric-label">网关厂家</div>
+                                            <div class="metric-value">华为</div>
                                         </div>
-                                        下行网速
-                                    </div>
-                                    <div class="detail-value">
-                                        4.68<span class="unit">MB/s</span>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi名称</div>
+                                            <div class="metric-value">ChinaNet-5G</div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon upload-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2v2h14v-2H5z"/>
-                                            </svg>
+                                <!-- 内网质量 -->
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <div class="section-title">内网质量</div>
+                                        <div class="section-status good">优秀</div>
+                                    </div>
+                                    <div class="section-grid">
+                                        <div class="metric-item">
+                                            <div class="metric-label">上行</div>
+                                            <div class="metric-value">4.68<span class="unit">MB/s</span></div>
                                         </div>
-                                        上行网速
-                                    </div>
-                                    <div class="detail-value">
-                                        4.68<span class="unit">MB/s</span>
-                                    </div>
-                                </div>
-
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon internal-latency-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
-                                            </svg>
+                                        <div class="metric-item">
+                                            <div class="metric-label">下行</div>
+                                            <div class="metric-value">4.68<span class="unit">MB/s</span></div>
                                         </div>
-                                        内网延迟
-                                    </div>
-                                    <div class="detail-value">
-                                        4<span class="unit">ms</span>
-                                    </div>
-                                </div>
-
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon external-latency-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h-2V9h6v2h-2v6z"/>
-                                            </svg>
+                                        <div class="metric-item">
+                                            <div class="metric-label">内网时延</div>
+                                            <div class="metric-value">4<span class="unit">ms</span></div>
                                         </div>
-                                        外网延迟
-                                    </div>
-                                    <div class="detail-value">
-                                        10<span class="unit">ms</span>
+                                        <div class="metric-item">
+                                            <div class="metric-label">外网时延</div>
+                                            <div class="metric-value">10<span class="unit">ms</span></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -592,87 +547,81 @@
                     </div>
                     <div class="report-detail">
                         <div class="report-detail-content">
-                            <div class="detail-grid">
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon signal-icon">
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                        </div>
-                                        信号强度
+                            <div class="detail-sections">
+                                <!-- 终端连接 -->
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <div class="section-title">终端连接</div>
+                                        <div class="section-status warning">一般</div>
                                     </div>
-                                    <div class="detail-value">
-                                        -65<span class="unit">dBm</span>
+                                    <div class="section-grid">
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi速率</div>
+                                            <div class="metric-value">866<span class="unit">Mbps</span></div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi频段</div>
+                                            <div class="metric-value">2.4<span class="unit">GHz</span></div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi信号</div>
+                                            <div class="metric-value">-65<span class="unit">dBm</span></div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi干扰</div>
+                                            <div class="metric-value">3个</div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">型号版本</div>
+                                            <div class="metric-value">V1.8.2</div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">型号名称</div>
+                                            <div class="metric-value">WS5200</div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon interference-icon">
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                        </div>
-                                        Wi-Fi 干扰
+                                <!-- 网关信息 -->
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <div class="section-title">网关信息</div>
                                     </div>
-                                    <div class="detail-value">3个</div>
-                                </div>
-
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon download-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                                            </svg>
+                                    <div class="section-grid">
+                                        <div class="metric-item">
+                                            <div class="metric-label">网关厂家</div>
+                                            <div class="metric-value">TP-LINK</div>
                                         </div>
-                                        下行网速
-                                    </div>
-                                    <div class="detail-value">
-                                        2.6<span class="unit">MB/s</span>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi名称</div>
+                                            <div class="metric-value">TP-LINK_5G</div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon upload-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2v2h14v-2H5z"/>
-                                            </svg>
+                                <!-- 内网质量 -->
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <div class="section-title">内网质量</div>
+                                        <div class="section-status warning">一般</div>
+                                    </div>
+                                    <div class="section-grid">
+                                        <div class="metric-item">
+                                            <div class="metric-label">上行</div>
+                                            <div class="metric-value">1.5<span class="unit">MB/s</span></div>
                                         </div>
-                                        上行网速
-                                    </div>
-                                    <div class="detail-value">
-                                        1.5<span class="unit">MB/s</span>
-                                    </div>
-                                </div>
-
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon internal-latency-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
-                                            </svg>
+                                        <div class="metric-item">
+                                            <div class="metric-label">下行</div>
+                                            <div class="metric-value">2.6<span class="unit">MB/s</span></div>
                                         </div>
-                                        内网延迟
-                                    </div>
-                                    <div class="detail-value">
-                                        8<span class="unit">ms</span>
-                                    </div>
-                                </div>
-
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon external-latency-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h-2V9h6v2h-2v6z"/>
-                                            </svg>
+                                        <div class="metric-item">
+                                            <div class="metric-label">内网时延</div>
+                                            <div class="metric-value">8<span class="unit">ms</span></div>
                                         </div>
-                                        外网延迟
-                                    </div>
-                                    <div class="detail-value">
-                                        25<span class="unit">ms</span>
+                                        <div class="metric-item">
+                                            <div class="metric-label">外网时延</div>
+                                            <div class="metric-value">25<span class="unit">ms</span></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -705,87 +654,81 @@
                     </div>
                     <div class="report-detail">
                         <div class="report-detail-content">
-                            <div class="detail-grid">
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon signal-icon">
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                        </div>
-                                        信号强度
+                            <div class="detail-sections">
+                                <!-- 终端连接 -->
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <div class="section-title">终端连接</div>
+                                        <div class="section-status warning">较差</div>
                                     </div>
-                                    <div class="detail-value">
-                                        -78<span class="unit">dBm</span>
+                                    <div class="section-grid">
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi速率</div>
+                                            <div class="metric-value">300<span class="unit">Mbps</span></div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi频段</div>
+                                            <div class="metric-value">2.4<span class="unit">GHz</span></div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi信号</div>
+                                            <div class="metric-value">-78<span class="unit">dBm</span></div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi干扰</div>
+                                            <div class="metric-value">8个</div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">型号版本</div>
+                                            <div class="metric-value">V1.2.0</div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">型号名称</div>
+                                            <div class="metric-value">WR886N</div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon interference-icon">
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                        </div>
-                                        Wi-Fi 干扰
+                                <!-- 网关信息 -->
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <div class="section-title">网关信息</div>
                                     </div>
-                                    <div class="detail-value">8个</div>
-                                </div>
-
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon download-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                                            </svg>
+                                    <div class="section-grid">
+                                        <div class="metric-item">
+                                            <div class="metric-label">网关厂家</div>
+                                            <div class="metric-value">水星</div>
                                         </div>
-                                        下行网速
-                                    </div>
-                                    <div class="detail-value">
-                                        0.5<span class="unit">MB/s</span>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi名称</div>
+                                            <div class="metric-value">MERCURY_2.4G</div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon upload-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2v2h14v-2H5z"/>
-                                            </svg>
+                                <!-- 内网质量 -->
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <div class="section-title">内网质量</div>
+                                        <div class="section-status warning">较差</div>
+                                    </div>
+                                    <div class="section-grid">
+                                        <div class="metric-item">
+                                            <div class="metric-label">上行</div>
+                                            <div class="metric-value">0.3<span class="unit">MB/s</span></div>
                                         </div>
-                                        上行网速
-                                    </div>
-                                    <div class="detail-value">
-                                        0.3<span class="unit">MB/s</span>
-                                    </div>
-                                </div>
-
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon internal-latency-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
-                                            </svg>
+                                        <div class="metric-item">
+                                            <div class="metric-label">下行</div>
+                                            <div class="metric-value">0.5<span class="unit">MB/s</span></div>
                                         </div>
-                                        内网延迟
-                                    </div>
-                                    <div class="detail-value">
-                                        20<span class="unit">ms</span>
-                                    </div>
-                                </div>
-
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon external-latency-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h-2V9h6v2h-2v6z"/>
-                                            </svg>
+                                        <div class="metric-item">
+                                            <div class="metric-label">内网时延</div>
+                                            <div class="metric-value">20<span class="unit">ms</span></div>
                                         </div>
-                                        外网延迟
-                                    </div>
-                                    <div class="detail-value">
-                                        85<span class="unit">ms</span>
+                                        <div class="metric-item">
+                                            <div class="metric-label">外网时延</div>
+                                            <div class="metric-value">85<span class="unit">ms</span></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -818,87 +761,81 @@
                     </div>
                     <div class="report-detail">
                         <div class="report-detail-content">
-                            <div class="detail-grid">
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon signal-icon">
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                        </div>
-                                        信号强度
+                            <div class="detail-sections">
+                                <!-- 终端连接 -->
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <div class="section-title">终端连接</div>
+                                        <div class="section-status good">正常</div>
                                     </div>
-                                    <div class="detail-value">
-                                        -55<span class="unit">dBm</span>
+                                    <div class="section-grid">
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi速率</div>
+                                            <div class="metric-value">1000<span class="unit">Mbps</span></div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi频段</div>
+                                            <div class="metric-value">5<span class="unit">GHz</span></div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi信号</div>
+                                            <div class="metric-value">-55<span class="unit">dBm</span></div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi干扰</div>
+                                            <div class="metric-value">1个</div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">型号版本</div>
+                                            <div class="metric-value">V2.0.3</div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">型号名称</div>
+                                            <div class="metric-value">R6300v2</div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon interference-icon">
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                        </div>
-                                        Wi-Fi 干扰
+                                <!-- 网关信息 -->
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <div class="section-title">网关信息</div>
                                     </div>
-                                    <div class="detail-value">1个</div>
-                                </div>
-
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon download-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                                            </svg>
+                                    <div class="section-grid">
+                                        <div class="metric-item">
+                                            <div class="metric-label">网关厂家</div>
+                                            <div class="metric-value">NETGEAR</div>
                                         </div>
-                                        下行网速
-                                    </div>
-                                    <div class="detail-value">
-                                        4.5<span class="unit">MB/s</span>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi名称</div>
+                                            <div class="metric-value">NETGEAR_5G</div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon upload-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2v2h14v-2H5z"/>
-                                            </svg>
+                                <!-- 内网质量 -->
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <div class="section-title">内网质量</div>
+                                        <div class="section-status good">良好</div>
+                                    </div>
+                                    <div class="section-grid">
+                                        <div class="metric-item">
+                                            <div class="metric-label">上行</div>
+                                            <div class="metric-value">1.9<span class="unit">MB/s</span></div>
                                         </div>
-                                        上行网速
-                                    </div>
-                                    <div class="detail-value">
-                                        1.9<span class="unit">MB/s</span>
-                                    </div>
-                                </div>
-
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon internal-latency-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
-                                            </svg>
+                                        <div class="metric-item">
+                                            <div class="metric-label">下行</div>
+                                            <div class="metric-value">4.5<span class="unit">MB/s</span></div>
                                         </div>
-                                        内网延迟
-                                    </div>
-                                    <div class="detail-value">
-                                        6<span class="unit">ms</span>
-                                    </div>
-                                </div>
-
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon external-latency-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h-2V9h6v2h-2v6z"/>
-                                            </svg>
+                                        <div class="metric-item">
+                                            <div class="metric-label">内网时延</div>
+                                            <div class="metric-value">6<span class="unit">ms</span></div>
                                         </div>
-                                        外网延迟
-                                    </div>
-                                    <div class="detail-value">
-                                        15<span class="unit">ms</span>
+                                        <div class="metric-item">
+                                            <div class="metric-label">外网时延</div>
+                                            <div class="metric-value">15<span class="unit">ms</span></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -931,87 +868,81 @@
                     </div>
                     <div class="report-detail">
                         <div class="report-detail-content">
-                            <div class="detail-grid">
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon signal-icon">
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                        </div>
-                                        信号强度
+                            <div class="detail-sections">
+                                <!-- 终端连接 -->
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <div class="section-title">终端连接</div>
+                                        <div class="section-status good">正常</div>
                                     </div>
-                                    <div class="detail-value">
-                                        -42<span class="unit">dBm</span>
+                                    <div class="section-grid">
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi速率</div>
+                                            <div class="metric-value">2400<span class="unit">Mbps</span></div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi频段</div>
+                                            <div class="metric-value">5<span class="unit">GHz</span></div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi信号</div>
+                                            <div class="metric-value">-42<span class="unit">dBm</span></div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi干扰</div>
+                                            <div class="metric-value">无</div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">型号版本</div>
+                                            <div class="metric-value">V3.0.1</div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">型号名称</div>
+                                            <div class="metric-value">AX6000</div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon interference-icon">
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                        </div>
-                                        Wi-Fi 干扰
+                                <!-- 网关信息 -->
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <div class="section-title">网关信息</div>
                                     </div>
-                                    <div class="detail-value">无</div>
-                                </div>
-
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon download-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                                            </svg>
+                                    <div class="section-grid">
+                                        <div class="metric-item">
+                                            <div class="metric-label">网关厂家</div>
+                                            <div class="metric-value">小米</div>
                                         </div>
-                                        下行网速
-                                    </div>
-                                    <div class="detail-value">
-                                        5.2<span class="unit">MB/s</span>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi名称</div>
+                                            <div class="metric-value">Xiaomi_5G</div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon upload-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2v2h14v-2H5z"/>
-                                            </svg>
+                                <!-- 内网质量 -->
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <div class="section-title">内网质量</div>
+                                        <div class="section-status good">优秀</div>
+                                    </div>
+                                    <div class="section-grid">
+                                        <div class="metric-item">
+                                            <div class="metric-label">上行</div>
+                                            <div class="metric-value">2.1<span class="unit">MB/s</span></div>
                                         </div>
-                                        上行网速
-                                    </div>
-                                    <div class="detail-value">
-                                        2.1<span class="unit">MB/s</span>
-                                    </div>
-                                </div>
-
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon internal-latency-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
-                                            </svg>
+                                        <div class="metric-item">
+                                            <div class="metric-label">下行</div>
+                                            <div class="metric-value">5.2<span class="unit">MB/s</span></div>
                                         </div>
-                                        内网延迟
-                                    </div>
-                                    <div class="detail-value">
-                                        3<span class="unit">ms</span>
-                                    </div>
-                                </div>
-
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon external-latency-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h-2V9h6v2h-2v6z"/>
-                                            </svg>
+                                        <div class="metric-item">
+                                            <div class="metric-label">内网时延</div>
+                                            <div class="metric-value">3<span class="unit">ms</span></div>
                                         </div>
-                                        外网延迟
-                                    </div>
-                                    <div class="detail-value">
-                                        8<span class="unit">ms</span>
+                                        <div class="metric-item">
+                                            <div class="metric-label">外网时延</div>
+                                            <div class="metric-value">8<span class="unit">ms</span></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1044,87 +975,81 @@
                     </div>
                     <div class="report-detail">
                         <div class="report-detail-content">
-                            <div class="detail-grid">
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon signal-icon">
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                        </div>
-                                        信号强度
+                            <div class="detail-sections">
+                                <!-- 终端连接 -->
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <div class="section-title">终端连接</div>
+                                        <div class="section-status good">正常</div>
                                     </div>
-                                    <div class="detail-value">
-                                        -48<span class="unit">dBm</span>
+                                    <div class="section-grid">
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi速率</div>
+                                            <div class="metric-value">1200<span class="unit">Mbps</span></div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi频段</div>
+                                            <div class="metric-value">5<span class="unit">GHz</span></div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi信号</div>
+                                            <div class="metric-value">-48<span class="unit">dBm</span></div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi干扰</div>
+                                            <div class="metric-value">2个</div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">型号版本</div>
+                                            <div class="metric-value">V2.5.0</div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-label">型号名称</div>
+                                            <div class="metric-value">AC86U</div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon interference-icon">
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                        </div>
-                                        Wi-Fi 干扰
+                                <!-- 网关信息 -->
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <div class="section-title">网关信息</div>
                                     </div>
-                                    <div class="detail-value">2个</div>
-                                </div>
-
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon download-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                                            </svg>
+                                    <div class="section-grid">
+                                        <div class="metric-item">
+                                            <div class="metric-label">网关厂家</div>
+                                            <div class="metric-value">华硕</div>
                                         </div>
-                                        下行网速
-                                    </div>
-                                    <div class="detail-value">
-                                        4.9<span class="unit">MB/s</span>
+                                        <div class="metric-item">
+                                            <div class="metric-label">WiFi名称</div>
+                                            <div class="metric-value">ASUS_5G</div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon upload-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2v2h14v-2H5z"/>
-                                            </svg>
+                                <!-- 内网质量 -->
+                                <div class="detail-section">
+                                    <div class="section-header">
+                                        <div class="section-title">内网质量</div>
+                                        <div class="section-status good">良好</div>
+                                    </div>
+                                    <div class="section-grid">
+                                        <div class="metric-item">
+                                            <div class="metric-label">上行</div>
+                                            <div class="metric-value">2.0<span class="unit">MB/s</span></div>
                                         </div>
-                                        上行网速
-                                    </div>
-                                    <div class="detail-value">
-                                        2.0<span class="unit">MB/s</span>
-                                    </div>
-                                </div>
-
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon internal-latency-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
-                                            </svg>
+                                        <div class="metric-item">
+                                            <div class="metric-label">下行</div>
+                                            <div class="metric-value">4.9<span class="unit">MB/s</span></div>
                                         </div>
-                                        内网延迟
-                                    </div>
-                                    <div class="detail-value">
-                                        5<span class="unit">ms</span>
-                                    </div>
-                                </div>
-
-                                <div class="detail-card">
-                                    <div class="detail-label">
-                                        <div class="detail-icon external-latency-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h-2V9h6v2h-2v6z"/>
-                                            </svg>
+                                        <div class="metric-item">
+                                            <div class="metric-label">内网时延</div>
+                                            <div class="metric-value">5<span class="unit">ms</span></div>
                                         </div>
-                                        外网延迟
-                                    </div>
-                                    <div class="detail-value">
-                                        12<span class="unit">ms</span>
+                                        <div class="metric-item">
+                                            <div class="metric-label">外网时延</div>
+                                            <div class="metric-value">12<span class="unit">ms</span></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

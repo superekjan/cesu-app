@@ -683,7 +683,7 @@
 
             <!-- 绑定列表 -->
             <div class="binding-list">
-                <div class="binding-item">
+                <div class="binding-item" onclick="goToPhoneBinding()">
                     <div class="binding-icon">
                         <svg viewBox="0 0 24 24">
                             <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
@@ -691,9 +691,11 @@
                     </div>
                     <div class="binding-info">
                         <div class="binding-name">手机号码</div>
-                        <div class="binding-value">138****5678</div>
+                        <div class="binding-value" id="phoneBindingStatus">138****5678</div>
                     </div>
-                    <button class="binding-action" onclick="unbindPhone()">解绑</button>
+                    <svg class="settings-arrow" viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: var(--text-tertiary);">
+                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                    </svg>
                 </div>
 
                 <div class="binding-item">
@@ -714,11 +716,9 @@
     </div>
 
     <script>
-        // 解绑手机
-        function unbindPhone() {
-            if (confirm('确定要解绑手机号码吗？')) {
-                alert('解绑功能开发中...');
-            }
+        // 跳转到手机号绑定页面
+        function goToPhoneBinding() {
+            window.location.href = 'phone-binding.html';
         }
 
         // 解绑微信
@@ -727,6 +727,23 @@
                 alert('解绑功能开发中...');
             }
         }
+
+        // 页面加载时检查手机号绑定状态
+        window.addEventListener('load', function() {
+            const isPhoneBound = localStorage.getItem('isPhoneBound');
+            const boundPhone = localStorage.getItem('boundPhone');
+            const phoneStatus = document.getElementById('phoneBindingStatus');
+
+            if (isPhoneBound === 'true' && boundPhone) {
+                // 已绑定，显示脱敏手机号
+                phoneStatus.textContent = boundPhone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
+                phoneStatus.style.color = 'var(--accent-green)';
+            } else {
+                // 未绑定
+                phoneStatus.textContent = '未绑定';
+                phoneStatus.style.color = 'var(--accent-orange)';
+            }
+        });
     </script>
 </body>
 </html>
