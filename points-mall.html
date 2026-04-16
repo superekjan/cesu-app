@@ -65,6 +65,36 @@
             margin-bottom: 16px;
         }
 
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .my-orders-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            background: rgba(91, 141, 239, 0.15);
+            border: 1px solid rgba(91, 141, 239, 0.2);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--accent-blue);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .my-orders-btn:hover {
+            background: rgba(91, 141, 239, 0.25);
+        }
+
+        .my-orders-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--accent-blue);
+        }
+
         .back-btn {
             width: 36px;
             height: 36px;
@@ -446,7 +476,7 @@
         <!-- 头部 -->
         <header class="header">
             <div class="header-top">
-                <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="header-left">
                     <div class="back-btn" onclick="history.back()">
                         <svg viewBox="0 0 24 24">
                             <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
@@ -454,11 +484,19 @@
                     </div>
                     <div class="header-title">积分商城</div>
                 </div>
-                <div class="points-display">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                    </svg>
-                    <span>2,580</span>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="my-orders-btn" onclick="goToMyOrders()">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                        </svg>
+                        我的兑换
+                    </div>
+                    <div class="points-display">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        <span id="userPoints">2,580</span>
+                    </div>
                 </div>
             </div>
             <div class="category-tabs">
@@ -481,12 +519,6 @@
                             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                         </svg>
                         热门兑换
-                    </div>
-                    <div class="section-more" onclick="showMoreProducts()">
-                        更多
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
-                        </svg>
                     </div>
                 </div>
                 <div class="products-grid">
@@ -588,10 +620,24 @@
             alert('更多商品敬请期待...');
         }
 
-        // 兑换商品
+        // 跳转到兑换确认页面
+        function goToExchange(name, points, stock, type) {
+            window.location.href = `exchange-confirm.html?name=${encodeURIComponent(name)}&points=${points}&stock=${stock}&type=${type}`;
+        }
+
+        // 兑换商品（旧方法，保留兼容）
         function exchangeProduct(productName) {
-            if (confirm(`确认兑换 ${productName} 吗？`)) {
-                alert(`兑换申请已提交，请等待审核！`);
+            // 根据商品名称映射到新的兑换方法
+            const productMap = {
+                '路由器': { name: '千兆WiFi6路由器', points: 5000, stock: 23, type: 'physical' },
+                '视频会员': { name: '腾讯视频月卡', points: 1500, stock: 156, type: 'virtual' },
+                '网线': { name: '超六类网线 5米', points: 800, stock: 89, type: 'physical' },
+                '流量包': { name: '10GB流量包', points: 2000, stock: 45, type: 'virtual' }
+            };
+
+            const product = productMap[productName];
+            if (product) {
+                goToExchange(product.name, product.points, product.stock, product.type);
             }
         }
 
@@ -609,6 +655,19 @@
                     break;
             }
         }
+
+        // 跳转到我的兑换订单页面
+        function goToMyOrders() {
+            window.location.href = 'my-orders.html';
+        }
+
+        // 页面加载时更新积分显示
+        window.addEventListener('load', function() {
+            const savedPoints = localStorage.getItem('userPoints');
+            if (savedPoints) {
+                document.getElementById('userPoints').textContent = parseInt(savedPoints).toLocaleString();
+            }
+        });
     </script>
 </body>
 </html>

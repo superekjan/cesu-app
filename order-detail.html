@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>订单详情</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --bg-card-hover: rgba(46, 49, 69, 0.75);
+            --accent-blue: #5b8def;
+            --accent-blue-light: #7ca6f3;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-purple: #9b8bf4;
+            --accent-gold: #e3b341;
+            --accent-red: #ef4444;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* 主内容 */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* 状态卡片 */
+        .status-card {
+            background: linear-gradient(135deg, rgba(91, 141, 239, 0.2), rgba(78, 205, 196, 0.2));
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid rgba(91, 141, 239, 0.2);
+        }
+
+        .status-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .status-icon svg {
+            width: 30px;
+            height: 30px;
+            fill: var(--accent-blue);
+        }
+
+        .status-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .status-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* 信息卡片 */
+        .info-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--accent-blue);
+        }
+
+        /* 商品信息 */
+        .product-info {
+            display: flex;
+            gap: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 16px;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(91, 141, 239, 0.1) 0%, rgba(78, 205, 196, 0.1) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .product-image svg {
+            width: 36px;
+            height: 36px;
+            fill: var(--text-tertiary);
+        }
+
+        .product-details {
+            flex: 1;
+        }
+
+        .product-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .product-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            background: rgba(91, 141, 239, 0.15);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--accent-blue);
+            margin-bottom: 8px;
+        }
+
+        .product-type.virtual {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+        }
+
+        .product-points {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .product-points svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--accent-gold);
+        }
+
+        /* 信息行 */
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .info-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .info-value.highlight {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent-gold);
+        }
+
+        /* 地址信息 */
+        .address-info {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .address-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .address-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .address-phone {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .address-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 虚拟商品卡密 */
+        .code-section {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .code-label {
+            font-size: 13px;
+            color: var(--accent-green);
+            margin-bottom: 8px;
+        }
+
+        .code-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: monospace;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .code-btn {
+            padding: 6px 12px;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--accent-green);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .code-btn:hover {
+            background: rgba(16, 185, 129, 0.25);
+        }
+
+        /* 进度时间线 */
+        .timeline {
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: var(--border-subtle);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -22px;
+            top: 2px;
+            width: 12px;
+            height: 12px;
+            background: var(--border-subtle);
+            border-radius: 50%;
+            border: 2px solid var(--bg-card);
+        }
+
+        .timeline-item.active .timeline-dot {
+            background: var(--accent-blue);
+        }
+
+        .timeline-item.completed .timeline-dot {
+            background: var(--accent-green);
+        }
+
+        .timeline-content {
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .timeline-time {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        /* 底部按钮 */
+        .bottom-bar {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-subtle);
+            padding: 16px 20px 32px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(91, 141, 239, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--accent-red);
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        /* 底部安全区域 */
+        .safe-area-bottom {
+            height: 20px;
+        }
+
+        /* Toast提示 */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .toast.success {
+            background: rgba(16, 185, 129, 0.9);
+        }
+
+        .toast.error {
+            background: rgba(239, 68, 68, 0.9);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-top">
+                <div class="back-btn" onclick="history.back()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                    </svg>
+                </div>
+                <div class="header-title">订单详情</div>
+            </div>
+        </header>
+
+        <!-- 主内容 -->
+        <main class="main-content">
+            <!-- 状态卡片 -->
+            <div class="status-card" id="statusCard">
+                <div class="status-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                </div>
+                <div class="status-title" id="statusTitle">待发货</div>
+                <div class="status-desc" id="statusDesc">您的订单正在处理中，请耐心等待</div>
+            </div>
+
+            <!-- 商品信息 -->
+            <div class="info-card">
+                <div class="card-title">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                    </svg>
+                    商品信息
+                </div>
+                <div class="product-info">
+                    <div class="product-image">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                        </svg>
+                    </div>
+                    <div class="product-details">
+                        <div class="product-name" id="productName">千兆WiFi6路由器</div>
+                        <div class="product-type" id="productType">实物商品</div>
+                        <div class="product-points">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            <span id="productPoints">5,000</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">兑换数量</span>
+                    <span class="info-value" id="quantity">1</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">消耗积分</span>
+                    <span class="info-value highlight" id="totalPoints">5,000</span>
+                </div>
+            </div>
+
+            <!-- 收货地址（仅实物商品） -->
+            <div class="info-card" id="addressCard">
+                <div class="card-title">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                    </svg>
+                    收货地址
+                </div>
+                <div class="address-info" id="addressInfo">
+                    <div class="address-header">
+                        <span class="address-name" id="addressName">张三</span>
+                        <span class="address-phone" id="addressPhone">138****5678</span>
+                    </div>
+                    <div class="address-text" id="addressText">广东省深圳市南山区科技园...</div>
+                </div>
+            </div>
+
+            <!-- 卡密信息（仅虚拟商品） -->
+            <div class="info-card" id="codeCard" style="display: none;">
+                <div class="card-title">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    卡密信息
+                </div>
+                <div class="code-section">
+                    <div class="code-label">兑换码</div>
+                    <div class="code-value" id="codeValue">ABCD-1234-EFGH-5678</div>
+                    <div class="code-actions">
+                        <button class="code-btn" onclick="copyCode()">复制卡密</button>
+                        <button class="code-btn" onclick="showUseTip()">使用说明</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 订单信息 -->
+            <div class="info-card">
+                <div class="card-title">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                    </svg>
+                    订单信息
+                </div>
+                <div class="info-row">
+                    <span class="info-label">订单编号</span>
+                    <span class="info-value" id="orderId">ORD20241201001</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">创建时间</span>
+                    <span class="info-value" id="createTime">2024-12-01 14:30:00</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">订单状态</span>
+                    <span class="info-value" id="orderStatus">待发货</span>
+                </div>
+            </div>
+
+            <!-- 进度时间线 -->
+            <div class="info-card" id="timelineCard">
+                <div class="card-title">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                    </svg>
+                    订单进度
+                </div>
+                <div class="timeline" id="timeline">
+                    <!-- 时间线将通过JS动态填充 -->
+                </div>
+            </div>
+
+            <div class="safe-area-bottom"></div>
+        </main>
+
+        <!-- 底部按钮 -->
+        <div class="bottom-bar" id="bottomBar">
+            <!-- 按钮将通过JS动态填充 -->
+        </div>
+    </div>
+
+    <!-- Toast提示 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // 获取URL参数
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                orderId: params.get('id') || ''
+            };
+        }
+
+        // 状态映射
+        const statusMap = {
+            'pending': { title: '待发货', desc: '您的订单正在处理中，请耐心等待' },
+            'shipped': { title: '已发货', desc: '商品已发出，请注意查收' },
+            'delivered': { title: '已送达', desc: '商品已送达，请确认收货' },
+            'completed': { title: '已完成', desc: '订单已完成，感谢您的兑换' }
+        };
+
+        let currentOrder = null;
+
+        // 初始化页面
+        function initPage() {
+            const params = getUrlParams();
+            if (!params.orderId) {
+                showToast('订单不存在', 'error');
+                setTimeout(() => history.back(), 1500);
+                return;
+            }
+
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            currentOrder = orders.find(o => o.id === params.orderId);
+
+            if (!currentOrder) {
+                showToast('订单不存在', 'error');
+                setTimeout(() => history.back(), 1500);
+                return;
+            }
+
+            renderOrderDetail();
+        }
+
+        // 渲染订单详情
+        function renderOrderDetail() {
+            const status = statusMap[currentOrder.status] || statusMap['pending'];
+
+            // 状态卡片
+            document.getElementById('statusTitle').textContent = status.title;
+            document.getElementById('statusDesc').textContent = status.desc;
+
+            // 商品信息
+            document.getElementById('productName').textContent = currentOrder.productName;
+            document.getElementById('productType').textContent = currentOrder.productType === 'virtual' ? '虚拟商品' : '实物商品';
+            if (currentOrder.productType === 'virtual') {
+                document.getElementById('productType').classList.add('virtual');
+            }
+            document.getElementById('productPoints').textContent = currentOrder.points.toLocaleString();
+            document.getElementById('quantity').textContent = currentOrder.quantity;
+            document.getElementById('totalPoints').textContent = currentOrder.points.toLocaleString();
+
+            // 收货地址（仅实物商品）
+            if (currentOrder.productType === 'physical' && currentOrder.address) {
+                document.getElementById('addressName').textContent = currentOrder.address.name;
+                document.getElementById('addressPhone').textContent = currentOrder.address.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
+                document.getElementById('addressText').textContent = 
+                    `${currentOrder.address.province}${currentOrder.address.city}${currentOrder.address.district}${currentOrder.address.detail}`;
+            } else {
+                document.getElementById('addressCard').style.display = 'none';
+            }
+
+            // 卡密信息（仅虚拟商品）
+            if (currentOrder.productType === 'virtual') {
+                document.getElementById('codeCard').style.display = 'block';
+                // 生成模拟卡密
+                const code = generateCode();
+                document.getElementById('codeValue').textContent = code;
+            }
+
+            // 订单信息
+            document.getElementById('orderId').textContent = currentOrder.id;
+            document.getElementById('createTime').textContent = new Date(currentOrder.createTime).toLocaleString('zh-CN');
+            document.getElementById('orderStatus').textContent = status.title;
+
+            // 时间线
+            renderTimeline();
+
+            // 底部按钮
+            renderBottomButtons();
+        }
+
+        // 生成卡密
+        function generateCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    code += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                if (i < 3) code += '-';
+            }
+            return code;
+        }
+
+        // 渲染时间线
+        function renderTimeline() {
+            const timeline = document.getElementById('timeline');
+            const createTime = new Date(currentOrder.createTime);
+
+            let timelineHTML = `
+                <div class="timeline-item completed">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">订单创建成功</div>
+                    <div class="timeline-time">${createTime.toLocaleString('zh-CN')}</div>
+                </div>
+            `;
+
+            if (currentOrder.status === 'pending') {
+                timelineHTML += `
+                    <div class="timeline-item active">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">等待发货</div>
+                        <div class="timeline-time">处理中...</div>
+                    </div>
+                `;
+            } else if (['shipped', 'delivered', 'completed'].includes(currentOrder.status)) {
+                timelineHTML += `
+                    <div class="timeline-item completed">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">商品已发货</div>
+                        <div class="timeline-time">${new Date(createTime.getTime() + 86400000).toLocaleString('zh-CN')}</div>
+                    </div>
+                `;
+            }
+
+            if (['delivered', 'completed'].includes(currentOrder.status)) {
+                timelineHTML += `
+                    <div class="timeline-item completed">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">商品已送达</div>
+                        <div class="timeline-time">${new Date(createTime.getTime() + 172800000).toLocaleString('zh-CN')}</div>
+                    </div>
+                `;
+            }
+
+            if (currentOrder.status === 'completed') {
+                timelineHTML += `
+                    <div class="timeline-item completed">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">订单已完成</div>
+                        <div class="timeline-time">${new Date(createTime.getTime() + 259200000).toLocaleString('zh-CN')}</div>
+                    </div>
+                `;
+            }
+
+            timeline.innerHTML = timelineHTML;
+        }
+
+        // 渲染底部按钮
+        function renderBottomButtons() {
+            const bottomBar = document.getElementById('bottomBar');
+
+            switch (currentOrder.status) {
+                case 'pending':
+                    bottomBar.innerHTML = `
+                        <button class="btn btn-danger" onclick="cancelOrder()">取消订单</button>
+                        <button class="btn btn-primary" onclick="contactService()">联系客服</button>
+                    `;
+                    break;
+                case 'shipped':
+                    bottomBar.innerHTML = `
+                        <button class="btn btn-secondary" onclick="viewLogistics()">查看物流</button>
+                        <button class="btn btn-primary" onclick="confirmReceive()">确认收货</button>
+                    `;
+                    break;
+                case 'delivered':
+                    bottomBar.innerHTML = `
+                        <button class="btn btn-secondary" onclick="viewLogistics()">查看物流</button>
+                        <button class="btn btn-primary" onclick="completeOrder()">完成订单</button>
+                    `;
+                    break;
+                case 'completed':
+                    bottomBar.innerHTML = `
+                        <button class="btn btn-secondary" onclick="buyAgain()">再次兑换</button>
+                        <button class="btn btn-primary" onclick="contactService()">联系客服</button>
+                    `;
+                    break;
+                default:
+                    bottomBar.innerHTML = `
+                        <button class="btn btn-primary" onclick="contactService()">联系客服</button>
+                    `;
+            }
+        }
+
+        // 取消订单
+        function cancelOrder() {
+            if (!confirm('确定要取消该订单吗？取消后积分将退回。')) {
+                return;
+            }
+
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const orderIndex = orders.findIndex(o => o.id === currentOrder.id);
+
+            if (orderIndex !== -1) {
+                // 退回积分
+                let userPoints = parseInt(localStorage.getItem('userPoints') || '2580');
+                userPoints += currentOrder.points;
+                localStorage.setItem('userPoints', userPoints);
+
+                // 删除订单
+                orders.splice(orderIndex, 1);
+                localStorage.setItem('orders', JSON.stringify(orders));
+
+                showToast('订单已取消，积分已退回', 'success');
+                setTimeout(() => history.back(), 1500);
+            }
+        }
+
+        // 联系客服
+        function contactService() {
+            showToast('客服电话：400-888-8888', '');
+        }
+
+        // 查看物流
+        function viewLogistics() {
+            showToast('物流信息功能开发中...', '');
+        }
+
+        // 确认收货
+        function confirmReceive() {
+            if (!confirm('确认已收到商品吗？')) {
+                return;
+            }
+
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const order = orders.find(o => o.id === currentOrder.id);
+
+            if (order) {
+                order.status = 'delivered';
+                localStorage.setItem('orders', JSON.stringify(orders));
+                showToast('已确认收货', 'success');
+                setTimeout(() => location.reload(), 1000);
+            }
+        }
+
+        // 完成订单
+        function completeOrder() {
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const order = orders.find(o => o.id === currentOrder.id);
+
+            if (order) {
+                order.status = 'completed';
+                localStorage.setItem('orders', JSON.stringify(orders));
+                showToast('订单已完成', 'success');
+                setTimeout(() => location.reload(), 1000);
+            }
+        }
+
+        // 再次兑换
+        function buyAgain() {
+            window.location.href = `points-mall.html?product=${encodeURIComponent(currentOrder.productName)}`;
+        }
+
+        // 复制卡密
+        function copyCode() {
+            const code = document.getElementById('codeValue').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('卡密已复制', 'success');
+            }).catch(() => {
+                showToast('复制失败，请手动复制', 'error');
+            });
+        }
+
+        // 显示使用说明
+        function showUseTip() {
+            alert('使用说明：\n1. 复制卡密\n2. 前往对应平台兑换\n3. 输入卡密完成兑换');
+        }
+
+        // 显示Toast提示
+        function showToast(message, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // 页面加载时初始化
+        window.addEventListener('load', initPage);
+    </script>
+</body>
+</html>

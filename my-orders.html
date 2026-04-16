@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的兑换</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --bg-card-hover: rgba(46, 49, 69, 0.75);
+            --accent-blue: #5b8def;
+            --accent-blue-light: #7ca6f3;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-purple: #9b8bf4;
+            --accent-gold: #e3b341;
+            --accent-red: #ef4444;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* 状态标签 */
+        .status-tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .status-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .status-tab {
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .status-tab:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .status-tab.active {
+            background: linear-gradient(135deg, rgba(91, 141, 239, 0.2) 0%, rgba(78, 205, 196, 0.2) 100%);
+            color: var(--text-primary);
+            border-color: var(--accent-blue);
+        }
+
+        /* 主内容 */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* 订单列表 */
+        .order-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .order-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .order-card:hover {
+            border-color: rgba(91, 141, 239, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .order-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .order-id {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            font-family: monospace;
+        }
+
+        .order-status {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .order-status.pending {
+            background: rgba(244, 162, 97, 0.15);
+            color: var(--accent-orange);
+        }
+
+        .order-status.shipped {
+            background: rgba(91, 141, 239, 0.15);
+            color: var(--accent-blue);
+        }
+
+        .order-status.completed {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+        }
+
+        .order-status.delivered {
+            background: rgba(155, 139, 244, 0.15);
+            color: var(--accent-purple);
+        }
+
+        /* 商品信息 */
+        .product-info {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .product-image {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, rgba(91, 141, 239, 0.1) 0%, rgba(78, 205, 196, 0.1) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .product-image svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--text-tertiary);
+        }
+
+        .product-details {
+            flex: 1;
+        }
+
+        .product-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+
+        .product-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .product-points {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .product-points svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--accent-gold);
+        }
+
+        /* 订单底部 */
+        .order-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .order-time {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border: none;
+            color: #fff;
+        }
+
+        .action-btn.primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(91, 141, 239, 0.3);
+        }
+
+        .action-btn.secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+        }
+
+        .action-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .empty-icon svg {
+            width: 48px;
+            height: 48px;
+            fill: var(--text-tertiary);
+        }
+
+        .empty-title {
+            font-size: 16px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .empty-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .empty-btn {
+            padding: 12px 32px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .empty-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(91, 141, 239, 0.4);
+        }
+
+        /* 底部安全区域 */
+        .safe-area-bottom {
+            height: 20px;
+        }
+
+        /* Toast提示 */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .toast.success {
+            background: rgba(16, 185, 129, 0.9);
+        }
+
+        .toast.error {
+            background: rgba(239, 68, 68, 0.9);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-top">
+                <div class="header-left">
+                    <div class="back-btn" onclick="history.back()">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                        </svg>
+                    </div>
+                    <div class="header-title">我的兑换</div>
+                </div>
+            </div>
+            <!-- 状态筛选 -->
+            <div class="status-tabs">
+                <div class="status-tab active" onclick="filterOrders('all')">全部</div>
+                <div class="status-tab" onclick="filterOrders('pending')">待发货</div>
+                <div class="status-tab" onclick="filterOrders('shipped')">已发货</div>
+                <div class="status-tab" onclick="filterOrders('delivered')">已送达</div>
+                <div class="status-tab" onclick="filterOrders('completed')">已完成</div>
+            </div>
+        </header>
+
+        <!-- 主内容 -->
+        <main class="main-content">
+            <div class="order-list" id="orderList">
+                <!-- 订单列表将通过JS动态填充 -->
+            </div>
+
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                    </svg>
+                </div>
+                <div class="empty-title">暂无兑换记录</div>
+                <div class="empty-desc">快去积分商城兑换心仪的商品吧</div>
+                <button class="empty-btn" onclick="goToMall()">去兑换</button>
+            </div>
+
+            <div class="safe-area-bottom"></div>
+        </main>
+    </div>
+
+    <!-- Toast提示 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // 状态映射
+        const statusMap = {
+            'pending': { text: '待发货', class: 'pending' },
+            'shipped': { text: '已发货', class: 'shipped' },
+            'delivered': { text: '已送达', class: 'delivered' },
+            'completed': { text: '已完成', class: 'completed' }
+        };
+
+        let currentFilter = 'all';
+        let allOrders = [];
+
+        // 加载订单数据
+        function loadOrders() {
+            allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+
+            // 渲染订单列表
+            renderOrders();
+        }
+
+        // 渲染订单列表
+        function renderOrders() {
+            const orderList = document.getElementById('orderList');
+            const emptyState = document.getElementById('emptyState');
+
+            // 筛选订单
+            let filteredOrders = allOrders;
+            if (currentFilter !== 'all') {
+                filteredOrders = allOrders.filter(order => order.status === currentFilter);
+            }
+
+            if (filteredOrders.length === 0) {
+                orderList.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            orderList.style.display = 'flex';
+            emptyState.style.display = 'none';
+
+            orderList.innerHTML = filteredOrders.map(order => {
+                const status = statusMap[order.status] || statusMap['pending'];
+                const date = new Date(order.createTime).toLocaleString('zh-CN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                return `
+                    <div class="order-card" onclick="viewOrderDetail('${order.id}')">
+                        <div class="order-header">
+                            <span class="order-id">${order.id}</span>
+                            <span class="order-status ${status.class}">${status.text}</span>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-image">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                                </svg>
+                            </div>
+                            <div class="product-details">
+                                <div class="product-name">${order.productName}</div>
+                                <div class="product-meta">数量：${order.quantity} | ${order.productType === 'virtual' ? '虚拟商品' : '实物商品'}</div>
+                                <div class="product-points">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                    ${order.points.toLocaleString()}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="order-footer">
+                            <span class="order-time">${date}</span>
+                            <div class="order-actions" onclick="event.stopPropagation()">
+                                ${getActionButtons(order)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 获取操作按钮
+        function getActionButtons(order) {
+            switch (order.status) {
+                case 'pending':
+                    return `
+                        <button class="action-btn secondary" onclick="cancelOrder('${order.id}')">取消</button>
+                        <button class="action-btn primary" onclick="viewOrderDetail('${order.id}')">查看</button>
+                    `;
+                case 'shipped':
+                    return `
+                        <button class="action-btn secondary" onclick="viewLogistics('${order.id}')">物流</button>
+                        <button class="action-btn primary" onclick="confirmReceive('${order.id}')">确认收货</button>
+                    `;
+                case 'delivered':
+                    return `
+                        <button class="action-btn secondary" onclick="viewLogistics('${order.id}')">物流</button>
+                        <button class="action-btn primary" onclick="completeOrder('${order.id}')">完成</button>
+                    `;
+                case 'completed':
+                    return `
+                        <button class="action-btn secondary" onclick="buyAgain('${order.productName}')">再次兑换</button>
+                    `;
+                default:
+                    return `<button class="action-btn primary" onclick="viewOrderDetail('${order.id}')">查看</button>`;
+            }
+        }
+
+        // 筛选订单
+        function filterOrders(status) {
+            currentFilter = status;
+
+            // 更新标签样式
+            document.querySelectorAll('.status-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            renderOrders();
+        }
+
+        // 查看订单详情
+        function viewOrderDetail(orderId) {
+            window.location.href = `order-detail.html?id=${orderId}`;
+        }
+
+        // 取消订单
+        function cancelOrder(orderId) {
+            if (!confirm('确定要取消该订单吗？取消后积分将退回。')) {
+                return;
+            }
+
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const orderIndex = orders.findIndex(o => o.id === orderId);
+
+            if (orderIndex !== -1) {
+                // 退回积分
+                let userPoints = parseInt(localStorage.getItem('userPoints') || '2580');
+                userPoints += orders[orderIndex].points;
+                localStorage.setItem('userPoints', userPoints);
+
+                // 删除订单
+                orders.splice(orderIndex, 1);
+                localStorage.setItem('orders', JSON.stringify(orders));
+
+                showToast('订单已取消，积分已退回', 'success');
+                loadOrders();
+            }
+        }
+
+        // 查看物流
+        function viewLogistics(orderId) {
+            showToast('物流信息功能开发中...', '');
+        }
+
+        // 确认收货
+        function confirmReceive(orderId) {
+            if (!confirm('确认已收到商品吗？')) {
+                return;
+            }
+
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const order = orders.find(o => o.id === orderId);
+
+            if (order) {
+                order.status = 'delivered';
+                localStorage.setItem('orders', JSON.stringify(orders));
+                showToast('已确认收货', 'success');
+                loadOrders();
+            }
+        }
+
+        // 完成订单
+        function completeOrder(orderId) {
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const order = orders.find(o => o.id === orderId);
+
+            if (order) {
+                order.status = 'completed';
+                localStorage.setItem('orders', JSON.stringify(orders));
+                showToast('订单已完成', 'success');
+                loadOrders();
+            }
+        }
+
+        // 再次兑换
+        function buyAgain(productName) {
+            window.location.href = `points-mall.html?product=${encodeURIComponent(productName)}`;
+        }
+
+        // 去兑换
+        function goToMall() {
+            window.location.href = 'points-mall.html';
+        }
+
+        // 显示Toast提示
+        function showToast(message, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // 页面加载时
+        window.addEventListener('load', loadOrders);
+
+        // 页面重新获得焦点时刷新
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                loadOrders();
+            }
+        });
+    </script>
+</body>
+</html>

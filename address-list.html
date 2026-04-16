@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>收货地址</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --bg-card-hover: rgba(46, 49, 69, 0.75);
+            --accent-blue: #5b8def;
+            --accent-blue-light: #7ca6f3;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-purple: #9b8bf4;
+            --accent-gold: #e3b341;
+            --accent-red: #ef4444;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .header-action {
+            font-size: 14px;
+            color: var(--accent-blue);
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+
+        .header-action:hover {
+            background: rgba(91, 141, 239, 0.15);
+        }
+
+        /* 主内容 */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* 地址列表 */
+        .address-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .address-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .address-card:hover {
+            border-color: rgba(91, 141, 239, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .address-card.selected {
+            border-color: var(--accent-blue);
+            background: rgba(91, 141, 239, 0.08);
+        }
+
+        .address-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .address-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .address-phone {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .address-tag {
+            padding: 2px 8px;
+            background: rgba(91, 141, 239, 0.15);
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--accent-blue);
+        }
+
+        .address-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .address-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .action-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .action-left input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-blue);
+            cursor: pointer;
+        }
+
+        .action-left span {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .action-left.checked span {
+            color: var(--accent-blue);
+        }
+
+        .action-right {
+            display: flex;
+            gap: 16px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .action-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .empty-icon svg {
+            width: 40px;
+            height: 40px;
+            fill: var(--text-tertiary);
+        }
+
+        .empty-title {
+            font-size: 16px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .empty-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        /* 底部栏 */
+        .bottom-bar {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-subtle);
+            padding: 16px 20px 32px;
+        }
+
+        .add-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(91, 141, 239, 0.4);
+        }
+
+        .add-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: #fff;
+        }
+
+        /* 底部安全区域 */
+        .safe-area-bottom {
+            height: 20px;
+        }
+
+        /* Toast提示 */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .toast.success {
+            background: rgba(16, 185, 129, 0.9);
+        }
+
+        .toast.error {
+            background: rgba(239, 68, 68, 0.9);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-top">
+                <div class="header-left">
+                    <div class="back-btn" onclick="history.back()">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                        </svg>
+                    </div>
+                    <div class="header-title">收货地址</div>
+                </div>
+                <div class="header-action" onclick="goToAddAddress()">新建</div>
+            </div>
+        </header>
+
+        <!-- 主内容 -->
+        <main class="main-content">
+            <div class="address-list" id="addressList">
+                <!-- 地址列表将通过JS动态填充 -->
+            </div>
+
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                    </svg>
+                </div>
+                <div class="empty-title">暂无收货地址</div>
+                <div class="empty-desc">添加收货地址，方便兑换实物商品</div>
+            </div>
+
+            <div class="safe-area-bottom"></div>
+        </main>
+
+        <!-- 底部栏 -->
+        <div class="bottom-bar">
+            <button class="add-btn" onclick="goToAddAddress()">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+                新建收货地址
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast提示 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // 获取URL参数
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                from: params.get('from') || '',
+                selectId: params.get('select') || ''
+            };
+        }
+
+        const params = getUrlParams();
+
+        // 加载地址列表
+        function loadAddresses() {
+            const addresses = JSON.parse(localStorage.getItem('addresses') || '[]');
+            const addressList = document.getElementById('addressList');
+            const emptyState = document.getElementById('emptyState');
+
+            if (addresses.length === 0) {
+                addressList.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            addressList.style.display = 'flex';
+            emptyState.style.display = 'none';
+
+            // 排序：默认地址在前
+            addresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+
+            addressList.innerHTML = addresses.map(address => `
+                <div class="address-card ${params.from === 'exchange' ? 'selectable' : ''}" data-id="${address.id}">
+                    <div class="address-header">
+                        <span class="address-name">${address.name}</span>
+                        <span class="address-phone">${address.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')}</span>
+                        ${address.isDefault ? '<span class="address-tag">默认</span>' : ''}
+                    </div>
+                    <div class="address-text">${address.province}${address.city}${address.district}${address.detail}</div>
+                    <div class="address-actions">
+                        <div class="action-left ${address.isDefault ? 'checked' : ''}" onclick="setDefault('${address.id}', event)">
+                            <input type="radio" ${address.isDefault ? 'checked' : ''} onclick="event.stopPropagation()">
+                            <span>${address.isDefault ? '默认地址' : '设为默认'}</span>
+                        </div>
+                        <div class="action-right">
+                            <div class="action-btn" onclick="editAddress('${address.id}', event)">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                </svg>
+                                编辑
+                            </div>
+                            <div class="action-btn" onclick="deleteAddress('${address.id}', event)">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                                删除
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // 如果是从兑换页面来的，添加点击选择功能
+            if (params.from === 'exchange') {
+                document.querySelectorAll('.address-card').forEach(card => {
+                    card.addEventListener('click', function() {
+                        const addressId = this.dataset.id;
+                        selectAddress(addressId);
+                    });
+                });
+            }
+        }
+
+        // 设置默认地址
+        function setDefault(addressId, event) {
+            event.stopPropagation();
+
+            let addresses = JSON.parse(localStorage.getItem('addresses') || '[]');
+            addresses.forEach(addr => {
+                addr.isDefault = (addr.id === addressId);
+            });
+            localStorage.setItem('addresses', JSON.stringify(addresses));
+
+            showToast('默认地址设置成功', 'success');
+            loadAddresses();
+        }
+
+        // 编辑地址
+        function editAddress(addressId, event) {
+            event.stopPropagation();
+            window.location.href = `address-form.html?id=${addressId}&from=${params.from}`;
+        }
+
+        // 删除地址
+        function deleteAddress(addressId, event) {
+            event.stopPropagation();
+
+            if (!confirm('确定要删除该地址吗？')) {
+                return;
+            }
+
+            let addresses = JSON.parse(localStorage.getItem('addresses') || '[]');
+            addresses = addresses.filter(addr => addr.id !== addressId);
+            localStorage.setItem('addresses', JSON.stringify(addresses));
+
+            showToast('地址已删除', 'success');
+            loadAddresses();
+        }
+
+        // 选择地址（从兑换页面）
+        function selectAddress(addressId) {
+            if (params.from === 'exchange') {
+                // 返回兑换页面并刷新地址
+                history.back();
+            }
+        }
+
+        // 跳转到添加地址页面
+        function goToAddAddress() {
+            window.location.href = `address-form.html?from=${params.from}`;
+        }
+
+        // 显示Toast提示
+        function showToast(message, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // 页面加载时
+        window.addEventListener('load', loadAddresses);
+
+        // 页面重新获得焦点时刷新（从添加/编辑页面返回）
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                loadAddresses();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>添加收货地址</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --bg-card-hover: rgba(46, 49, 69, 0.75);
+            --accent-blue: #5b8def;
+            --accent-blue-light: #7ca6f3;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-purple: #9b8bf4;
+            --accent-gold: #e3b341;
+            --accent-red: #ef4444;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* 主内容 */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* 表单卡片 */
+        .form-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            font-size: 15px;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        /* 地区选择 */
+        .region-select {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .region-item {
+            position: relative;
+        }
+
+        .region-item select {
+            width: 100%;
+            padding: 14px 32px 14px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--text-primary);
+            cursor: pointer;
+            appearance: none;
+            transition: all 0.2s ease;
+        }
+
+        .region-item select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .region-item::after {
+            content: '';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid var(--text-tertiary);
+            pointer-events: none;
+        }
+
+        /* 详细地址 */
+        .textarea-wrapper {
+            position: relative;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            font-size: 15px;
+            color: var(--text-primary);
+            resize: none;
+            min-height: 100px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-textarea::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .char-count {
+            position: absolute;
+            bottom: 10px;
+            right: 12px;
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        /* 默认地址开关 */
+        .default-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-top: 1px solid var(--border-subtle);
+            margin-top: 20px;
+        }
+
+        .default-label {
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+
+        .default-desc {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 4px;
+        }
+
+        .switch {
+            width: 50px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .switch.active {
+            background: var(--accent-blue);
+        }
+
+        .switch-thumb {
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .switch.active .switch-thumb {
+            left: 24px;
+        }
+
+        /* 保存按钮 */
+        .save-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 24px;
+        }
+
+        .save-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(91, 141, 239, 0.4);
+        }
+
+        .save-btn:disabled {
+            background: linear-gradient(135deg, #3a4a5c, #2d3a4a);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 删除按钮 */
+        .delete-btn {
+            width: 100%;
+            padding: 16px;
+            background: rgba(248, 81, 73, 0.15);
+            border: 1px solid rgba(248, 81, 73, 0.3);
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--accent-red);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 12px;
+        }
+
+        .delete-btn:hover {
+            background: rgba(248, 81, 73, 0.25);
+        }
+
+        /* 底部安全区域 */
+        .safe-area-bottom {
+            height: 40px;
+        }
+
+        /* Toast提示 */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .toast.success {
+            background: rgba(16, 185, 129, 0.9);
+        }
+
+        .toast.error {
+            background: rgba(239, 68, 68, 0.9);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-top">
+                <div class="back-btn" onclick="history.back()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                    </svg>
+                </div>
+                <div class="header-title" id="pageTitle">添加收货地址</div>
+            </div>
+        </header>
+
+        <!-- 主内容 -->
+        <main class="main-content">
+            <div class="form-card">
+                <!-- 收货人 -->
+                <div class="form-group">
+                    <label class="form-label">收货人</label>
+                    <input type="text" class="form-input" id="nameInput" placeholder="请输入收货人姓名" maxlength="20">
+                </div>
+
+                <!-- 手机号 -->
+                <div class="form-group">
+                    <label class="form-label">手机号码</label>
+                    <input type="tel" class="form-input" id="phoneInput" placeholder="请输入手机号码" maxlength="11">
+                </div>
+
+                <!-- 所在地区 -->
+                <div class="form-group">
+                    <label class="form-label">所在地区</label>
+                    <div class="region-select">
+                        <div class="region-item">
+                            <select id="provinceSelect" onchange="onProvinceChange()">
+                                <option value="">省/直辖市</option>
+                                <option value="北京市">北京市</option>
+                                <option value="上海市">上海市</option>
+                                <option value="广东省">广东省</option>
+                                <option value="浙江省">浙江省</option>
+                                <option value="江苏省">江苏省</option>
+                                <option value="四川省">四川省</option>
+                            </select>
+                        </div>
+                        <div class="region-item">
+                            <select id="citySelect" onchange="onCityChange()">
+                                <option value="">市</option>
+                            </select>
+                        </div>
+                        <div class="region-item">
+                            <select id="districtSelect">
+                                <option value="">区/县</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 详细地址 -->
+                <div class="form-group">
+                    <label class="form-label">详细地址</label>
+                    <div class="textarea-wrapper">
+                        <textarea class="form-textarea" id="detailInput" placeholder="请输入街道、楼牌号等详细地址" maxlength="100"></textarea>
+                        <span class="char-count"><span id="charCount">0</span>/100</span>
+                    </div>
+                </div>
+
+                <!-- 设为默认地址 -->
+                <div class="default-section">
+                    <div>
+                        <div class="default-label">设为默认地址</div>
+                        <div class="default-desc">每次兑换时将优先使用该地址</div>
+                    </div>
+                    <div class="switch" id="defaultSwitch" onclick="toggleDefault()">
+                        <div class="switch-thumb"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 保存按钮 -->
+            <button class="save-btn" id="saveBtn" onclick="saveAddress()">保存地址</button>
+
+            <!-- 删除按钮（编辑模式显示） -->
+            <button class="delete-btn" id="deleteBtn" onclick="deleteAddress()" style="display: none;">删除地址</button>
+
+            <div class="safe-area-bottom"></div>
+        </main>
+    </div>
+
+    <!-- Toast提示 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // 城市数据（简化版）
+        const cityData = {
+            '北京市': ['北京市'],
+            '上海市': ['上海市'],
+            '广东省': ['广州市', '深圳市', '珠海市', '佛山市', '东莞市'],
+            '浙江省': ['杭州市', '宁波市', '温州市', '嘉兴市'],
+            '江苏省': ['南京市', '苏州市', '无锡市', '常州市'],
+            '四川省': ['成都市', '绵阳市', '德阳市']
+        };
+
+        const districtData = {
+            '北京市': ['朝阳区', '海淀区', '东城区', '西城区', '丰台区'],
+            '上海市': ['浦东新区', '黄浦区', '静安区', '徐汇区', '长宁区'],
+            '广州市': ['天河区', '越秀区', '海珠区', '白云区', '番禺区'],
+            '深圳市': ['福田区', '罗湖区', '南山区', '宝安区', '龙岗区'],
+            '杭州市': ['西湖区', '上城区', '下城区', '江干区', '拱墅区'],
+            '南京市': ['玄武区', '秦淮区', '建邺区', '鼓楼区', '浦口区'],
+            '成都市': ['锦江区', '青羊区', '金牛区', '武侯区', '成华区']
+        };
+
+        // 获取URL参数
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                from: params.get('from') || '',
+                editId: params.get('id') || ''
+            };
+        }
+
+        const params = getUrlParams();
+        let isEditMode = false;
+        let editAddressId = null;
+        let isDefault = false;
+
+        // 初始化页面
+        function initPage() {
+            // 检查是否为编辑模式
+            if (params.editId) {
+                isEditMode = true;
+                editAddressId = params.editId;
+                document.getElementById('pageTitle').textContent = '编辑收货地址';
+                document.getElementById('deleteBtn').style.display = 'block';
+                loadAddressData();
+            }
+
+            // 监听字符计数
+            document.getElementById('detailInput').addEventListener('input', function() {
+                document.getElementById('charCount').textContent = this.value.length;
+            });
+        }
+
+        // 加载地址数据（编辑模式）
+        function loadAddressData() {
+            const addresses = JSON.parse(localStorage.getItem('addresses') || '[]');
+            const address = addresses.find(addr => addr.id === editAddressId);
+
+            if (address) {
+                document.getElementById('nameInput').value = address.name;
+                document.getElementById('phoneInput').value = address.phone;
+                document.getElementById('provinceSelect').value = address.province;
+                onProvinceChange();
+                document.getElementById('citySelect').value = address.city;
+                onCityChange();
+                document.getElementById('districtSelect').value = address.district;
+                document.getElementById('detailInput').value = address.detail;
+                document.getElementById('charCount').textContent = address.detail.length;
+
+                if (address.isDefault) {
+                    toggleDefault();
+                }
+            }
+        }
+
+        // 省份改变
+        function onProvinceChange() {
+            const province = document.getElementById('provinceSelect').value;
+            const citySelect = document.getElementById('citySelect');
+            const districtSelect = document.getElementById('districtSelect');
+
+            citySelect.innerHTML = '<option value="">市</option>';
+            districtSelect.innerHTML = '<option value="">区/县</option>';
+
+            if (province && cityData[province]) {
+                cityData[province].forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city;
+                    option.textContent = city;
+                    citySelect.appendChild(option);
+                });
+            }
+        }
+
+        // 城市改变
+        function onCityChange() {
+            const city = document.getElementById('citySelect').value;
+            const districtSelect = document.getElementById('districtSelect');
+
+            districtSelect.innerHTML = '<option value="">区/县</option>';
+
+            if (city && districtData[city]) {
+                districtData[city].forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    districtSelect.appendChild(option);
+                });
+            }
+        }
+
+        // 切换默认地址
+        function toggleDefault() {
+            isDefault = !isDefault;
+            document.getElementById('defaultSwitch').classList.toggle('active', isDefault);
+        }
+
+        // 保存地址
+        function saveAddress() {
+            const name = document.getElementById('nameInput').value.trim();
+            const phone = document.getElementById('phoneInput').value.trim();
+            const province = document.getElementById('provinceSelect').value;
+            const city = document.getElementById('citySelect').value;
+            const district = document.getElementById('districtSelect').value;
+            const detail = document.getElementById('detailInput').value.trim();
+
+            // 验证
+            if (!name) {
+                showToast('请输入收货人姓名', 'error');
+                return;
+            }
+
+            if (!phone || !/^1[3-9]\d{9}$/.test(phone)) {
+                showToast('请输入正确的手机号码', 'error');
+                return;
+            }
+
+            if (!province || !city || !district) {
+                showToast('请选择完整的所在地区', 'error');
+                return;
+            }
+
+            if (!detail) {
+                showToast('请输入详细地址', 'error');
+                return;
+            }
+
+            // 获取现有地址
+            let addresses = JSON.parse(localStorage.getItem('addresses') || '[]');
+
+            // 如果设为默认，取消其他默认地址
+            if (isDefault) {
+                addresses.forEach(addr => addr.isDefault = false);
+            }
+
+            if (isEditMode) {
+                // 编辑模式
+                const index = addresses.findIndex(addr => addr.id === editAddressId);
+                if (index !== -1) {
+                    addresses[index] = {
+                        ...addresses[index],
+                        name,
+                        phone,
+                        province,
+                        city,
+                        district,
+                        detail,
+                        isDefault
+                    };
+                }
+            } else {
+                // 新增模式
+                // 如果是第一个地址，自动设为默认
+                if (addresses.length === 0) {
+                    isDefault = true;
+                }
+
+                const newAddress = {
+                    id: 'ADDR' + Date.now(),
+                    name,
+                    phone,
+                    province,
+                    city,
+                    district,
+                    detail,
+                    isDefault
+                };
+                addresses.push(newAddress);
+            }
+
+            // 保存到本地存储
+            localStorage.setItem('addresses', JSON.stringify(addresses));
+
+            showToast(isEditMode ? '地址修改成功' : '地址添加成功', 'success');
+
+            // 返回上一页
+            setTimeout(() => {
+                if (params.from === 'exchange') {
+                    history.back();
+                } else {
+                    window.location.href = 'address-list.html';
+                }
+            }, 1500);
+        }
+
+        // 删除地址
+        function deleteAddress() {
+            if (!confirm('确定要删除该地址吗？')) {
+                return;
+            }
+
+            let addresses = JSON.parse(localStorage.getItem('addresses') || '[]');
+            addresses = addresses.filter(addr => addr.id !== editAddressId);
+            localStorage.setItem('addresses', JSON.stringify(addresses));
+
+            showToast('地址已删除', 'success');
+
+            setTimeout(() => {
+                window.location.href = 'address-list.html';
+            }, 1500);
+        }
+
+        // 显示Toast提示
+        function showToast(message, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // 页面加载时初始化
+        window.addEventListener('load', initPage);
+    </script>
+</body>
+</html>

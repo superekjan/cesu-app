@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>兑换成功</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --bg-card-hover: rgba(46, 49, 69, 0.75);
+            --accent-blue: #5b8def;
+            --accent-blue-light: #7ca6f3;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-purple: #9b8bf4;
+            --accent-gold: #e3b341;
+            --accent-red: #ef4444;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* 主内容 */
+        .main-content {
+            flex: 1;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 成功图标 */
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--accent-green), #34d399);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            animation: scaleIn 0.5s ease;
+        }
+
+        @keyframes scaleIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .success-icon svg {
+            width: 50px;
+            height: 50px;
+            fill: #fff;
+        }
+
+        /* 成功标题 */
+        .success-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .success-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        /* 订单卡片 */
+        .order-card {
+            width: 100%;
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 24px;
+        }
+
+        .order-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .order-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .order-id {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-family: monospace;
+        }
+
+        .order-status {
+            padding: 4px 12px;
+            background: rgba(16, 185, 129, 0.15);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--accent-green);
+        }
+
+        /* 商品信息 */
+        .product-info {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(91, 141, 239, 0.1) 0%, rgba(78, 205, 196, 0.1) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .product-image svg {
+            width: 36px;
+            height: 36px;
+            fill: var(--text-tertiary);
+        }
+
+        .product-details {
+            flex: 1;
+        }
+
+        .product-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .product-meta {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .product-points {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .product-points svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--accent-gold);
+        }
+
+        /* 订单信息 */
+        .order-info {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .info-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .info-value.highlight {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent-gold);
+        }
+
+        /* 提示信息 */
+        .tip-section {
+            width: 100%;
+            background: rgba(91, 141, 239, 0.1);
+            border: 1px solid rgba(91, 141, 239, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .tip-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--accent-blue);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tip-title svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--accent-blue);
+        }
+
+        .tip-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 按钮组 */
+        .button-group {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(91, 141, 239, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* 底部安全区域 */
+        .safe-area-bottom {
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-top">
+                <div class="header-title">兑换成功</div>
+            </div>
+        </header>
+
+        <!-- 主内容 -->
+        <main class="main-content">
+            <!-- 成功图标 -->
+            <div class="success-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+            </div>
+
+            <!-- 成功标题 -->
+            <div class="success-title">兑换成功！</div>
+            <div class="success-desc" id="successDesc">
+                您的兑换申请已提交，我们将尽快为您处理
+            </div>
+
+            <!-- 订单卡片 -->
+            <div class="order-card">
+                <div class="order-header">
+                    <div>
+                        <div class="order-label">订单编号</div>
+                        <div class="order-id" id="orderId">ORD20241201001</div>
+                    </div>
+                    <div class="order-status">待发货</div>
+                </div>
+
+                <div class="product-info">
+                    <div class="product-image">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                        </svg>
+                    </div>
+                    <div class="product-details">
+                        <div class="product-name" id="productName">千兆WiFi6路由器</div>
+                        <div class="product-meta" id="productMeta">数量：1</div>
+                        <div class="product-points">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            <span id="productPoints">5,000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-info">
+                    <div class="info-row">
+                        <span class="info-label">兑换时间</span>
+                        <span class="info-value" id="orderTime">2024-12-01 14:30:00</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">扣除积分</span>
+                        <span class="info-value highlight" id="deductPoints">-5,000</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 提示信息 -->
+            <div class="tip-section" id="tipSection">
+                <div class="tip-title">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                    </svg>
+                    温馨提示
+                </div>
+                <div class="tip-text" id="tipText">
+                    实物商品将在3-5个工作日内发货，请保持手机畅通以便接收物流信息。
+                </div>
+            </div>
+
+            <!-- 按钮组 -->
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="viewOrder()">查看订单</button>
+                <button class="btn btn-secondary" onclick="continueShopping()">继续兑换</button>
+            </div>
+
+            <div class="safe-area-bottom"></div>
+        </main>
+    </div>
+
+    <script>
+        // 获取URL参数
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                orderId: params.get('orderId') || ''
+            };
+        }
+
+        // 初始化页面
+        function initPage() {
+            const params = getUrlParams();
+            
+            if (params.orderId) {
+                // 加载订单信息
+                const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+                const order = orders.find(o => o.id === params.orderId);
+
+                if (order) {
+                    document.getElementById('orderId').textContent = order.id;
+                    document.getElementById('productName').textContent = order.productName;
+                    document.getElementById('productMeta').textContent = `数量：${order.quantity}`;
+                    document.getElementById('productPoints').textContent = order.points.toLocaleString();
+                    document.getElementById('orderTime').textContent = new Date(order.createTime).toLocaleString('zh-CN');
+                    document.getElementById('deductPoints').textContent = '-' + order.points.toLocaleString();
+
+                    // 根据商品类型显示不同提示
+                    if (order.productType === 'virtual') {
+                        document.getElementById('successDesc').textContent = '卡密将发送至您的手机，请注意查收';
+                        document.querySelector('.order-status').textContent = '已发放';
+                        document.getElementById('tipText').textContent = '虚拟商品卡密已发送至您的绑定手机，请注意查收短信。如有问题请联系客服。';
+                    }
+                }
+            }
+        }
+
+        // 查看订单 - 跳转到我的兑换页面
+        function viewOrder() {
+            window.location.href = 'my-orders.html';
+        }
+
+        // 继续兑换 - 跳转到积分商城页面
+        function continueShopping() {
+            window.location.href = 'points-mall.html';
+        }
+
+        // 页面加载时初始化
+        window.addEventListener('load', initPage);
+    </script>
+</body>
+</html>

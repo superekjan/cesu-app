@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>确认兑换</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --bg-card-hover: rgba(46, 49, 69, 0.75);
+            --accent-blue: #5b8def;
+            --accent-blue-light: #7ca6f3;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-purple: #9b8bf4;
+            --accent-gold: #e3b341;
+            --accent-red: #ef4444;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* 主内容 */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* 商品卡片 */
+        .product-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 20px;
+        }
+
+        .product-header {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .product-image {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, rgba(91, 141, 239, 0.1) 0%, rgba(78, 205, 196, 0.1) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .product-image svg {
+            width: 48px;
+            height: 48px;
+            fill: var(--text-tertiary);
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-name {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .product-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: rgba(91, 141, 239, 0.15);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--accent-blue);
+            margin-bottom: 12px;
+        }
+
+        .product-type svg {
+            width: 12px;
+            height: 12px;
+            fill: var(--accent-blue);
+        }
+
+        .product-type.virtual {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+        }
+
+        .product-type.virtual svg {
+            fill: var(--accent-green);
+        }
+
+        .product-points {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--accent-gold);
+        }
+
+        .product-points svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--accent-gold);
+        }
+
+        .product-stock {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        /* 分隔线 */
+        .divider {
+            height: 1px;
+            background: var(--border-subtle);
+            margin: 16px 0;
+        }
+
+        /* 数量选择 */
+        .quantity-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .quantity-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .quantity-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border-subtle);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quantity-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-blue);
+        }
+
+        .quantity-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .quantity-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--text-primary);
+        }
+
+        .quantity-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            min-width: 40px;
+            text-align: center;
+        }
+
+        /* 用户信息 */
+        .user-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--accent-blue);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-avatar svg {
+            width: 24px;
+            height: 24px;
+            fill: #fff;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .user-phone {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .user-points {
+            text-align: right;
+        }
+
+        .points-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-bottom: 4px;
+        }
+
+        .points-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .points-value svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--accent-gold);
+        }
+
+        /* 地址区域 */
+        .address-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 20px;
+        }
+
+        .address-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .address-content {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .address-empty {
+            text-align: center;
+            padding: 24px;
+        }
+
+        .address-empty svg {
+            width: 48px;
+            height: 48px;
+            fill: var(--text-tertiary);
+            margin-bottom: 12px;
+        }
+
+        .address-empty-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .add-address-btn {
+            padding: 10px 24px;
+            background: rgba(91, 141, 239, 0.15);
+            border: 1px solid var(--accent-blue);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--accent-blue);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .add-address-btn:hover {
+            background: rgba(91, 141, 239, 0.25);
+        }
+
+        .address-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .address-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(91, 141, 239, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .address-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--accent-blue);
+        }
+
+        .address-details {
+            flex: 1;
+        }
+
+        .address-name-phone {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .address-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .address-phone {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .address-tag {
+            padding: 2px 8px;
+            background: rgba(91, 141, 239, 0.15);
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--accent-blue);
+        }
+
+        .address-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .address-arrow {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-tertiary);
+            flex-shrink: 0;
+        }
+
+        /* 虚拟商品提示 */
+        .virtual-tip {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .virtual-tip-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--accent-green);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .virtual-tip-title svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--accent-green);
+        }
+
+        .virtual-tip-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* 兑换说明 */
+        .notice-section {
+            background: rgba(244, 162, 97, 0.1);
+            border: 1px solid rgba(244, 162, 97, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .notice-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--accent-orange);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .notice-title svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--accent-orange);
+        }
+
+        .notice-list {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            padding-left: 16px;
+        }
+
+        .notice-list li {
+            margin-bottom: 4px;
+        }
+
+        /* 底部栏 */
+        .bottom-bar {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-subtle);
+            padding: 16px 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .bottom-info {
+            flex: 1;
+        }
+
+        .bottom-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-bottom: 4px;
+        }
+
+        .bottom-points {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .bottom-points svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--accent-gold);
+        }
+
+        .exchange-btn {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .exchange-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(91, 141, 239, 0.4);
+        }
+
+        .exchange-btn:disabled {
+            background: linear-gradient(135deg, #3a4a5c, #2d3a4a);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 底部安全区域 */
+        .safe-area-bottom {
+            height: 20px;
+        }
+
+        /* Toast提示 */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .toast.success {
+            background: rgba(16, 185, 129, 0.9);
+        }
+
+        .toast.error {
+            background: rgba(239, 68, 68, 0.9);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-top">
+                <div class="back-btn" onclick="history.back()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                    </svg>
+                </div>
+                <div class="header-title">确认兑换</div>
+            </div>
+        </header>
+
+        <!-- 主内容 -->
+        <main class="main-content">
+            <!-- 商品信息 -->
+            <div class="product-card">
+                <div class="product-header">
+                    <div class="product-image" id="productImage">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                        </svg>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-name" id="productName">千兆WiFi6路由器</div>
+                        <div class="product-type" id="productType">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>
+                            </svg>
+                            实物商品
+                        </div>
+                        <div class="product-points">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            <span id="productPoints">5,000</span>
+                        </div>
+                        <div class="product-stock" id="productStock">剩余 23 件</div>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="quantity-section">
+                    <span class="quantity-label">兑换数量</span>
+                    <div class="quantity-control">
+                        <button class="quantity-btn" id="minusBtn" onclick="changeQuantity(-1)" disabled>
+                            <svg viewBox="0 0 24 24">
+                                <path d="M19 13H5v-2h14v2z"/>
+                            </svg>
+                        </button>
+                        <span class="quantity-value" id="quantityValue">1</span>
+                        <button class="quantity-btn" id="plusBtn" onclick="changeQuantity(1)">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 用户信息 -->
+            <div class="user-section">
+                <div class="section-title">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                    兑换账户
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                        </svg>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">张先生</div>
+                        <div class="user-phone" id="userPhone">138****5678</div>
+                    </div>
+                    <div class="user-points">
+                        <div class="points-label">可用积分</div>
+                        <div class="points-value">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            <span id="userPoints">2,580</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 收货地址（仅实物商品显示） -->
+            <div class="address-section" id="addressSection">
+                <div class="address-header">
+                    <div class="section-title">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                        收货地址
+                    </div>
+                </div>
+                <div class="address-content" id="addressContent">
+                    <!-- 地址内容将通过JS动态填充 -->
+                </div>
+            </div>
+
+            <!-- 虚拟商品提示（仅虚拟商品显示） -->
+            <div class="virtual-tip" id="virtualTip" style="display: none;">
+                <div class="virtual-tip-title">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                    </svg>
+                    虚拟商品说明
+                </div>
+                <div class="virtual-tip-text">
+                    兑换成功后，卡密将发送至您的手机，请注意查收。虚拟商品一经兑换不支持退款。
+                </div>
+            </div>
+
+            <!-- 兑换说明 -->
+            <div class="notice-section">
+                <div class="notice-title">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v2z"/>
+                    </svg>
+                    兑换须知
+                </div>
+                <ul class="notice-list">
+                    <li>兑换成功后，积分将立即扣除</li>
+                    <li>实物商品将在3-5个工作日内发货</li>
+                    <li>请确保收货地址准确无误</li>
+                    <li>如有问题请联系客服：400-888-8888</li>
+                </ul>
+            </div>
+
+            <div class="safe-area-bottom"></div>
+        </main>
+
+        <!-- 底部栏 -->
+        <div class="bottom-bar">
+            <div class="bottom-info">
+                <div class="bottom-label">合计积分</div>
+                <div class="bottom-points">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    <span id="totalPoints">5,000</span>
+                </div>
+            </div>
+            <button class="exchange-btn" id="exchangeBtn" onclick="confirmExchange()">确认兑换</button>
+        </div>
+    </div>
+
+    <!-- Toast提示 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // 获取URL参数
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                name: params.get('name') || '千兆WiFi6路由器',
+                points: parseInt(params.get('points')) || 5000,
+                stock: parseInt(params.get('stock')) || 23,
+                type: params.get('type') || 'physical', // physical 或 virtual
+                image: params.get('image') || ''
+            };
+        }
+
+        // 全局变量
+        let product = getUrlParams();
+        let quantity = 1;
+        let userPoints = 2580;
+        let defaultAddress = null;
+
+        // 初始化页面
+        function initPage() {
+            // 更新商品信息
+            document.getElementById('productName').textContent = product.name;
+            document.getElementById('productPoints').textContent = product.points.toLocaleString();
+            document.getElementById('productStock').textContent = `剩余 ${product.stock} 件`;
+
+            // 更新商品类型显示
+            const typeEl = document.getElementById('productType');
+            if (product.type === 'virtual') {
+                typeEl.classList.add('virtual');
+                typeEl.innerHTML = `
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    虚拟商品
+                `;
+                document.getElementById('addressSection').style.display = 'none';
+                document.getElementById('virtualTip').style.display = 'block';
+            }
+
+            // 加载用户积分
+            const savedPoints = localStorage.getItem('userPoints');
+            if (savedPoints) {
+                userPoints = parseInt(savedPoints);
+            }
+            document.getElementById('userPoints').textContent = userPoints.toLocaleString();
+
+            // 加载用户手机号
+            const boundPhone = localStorage.getItem('boundPhone');
+            if (boundPhone) {
+                document.getElementById('userPhone').textContent = boundPhone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
+            }
+
+            // 加载默认地址
+            loadDefaultAddress();
+
+            // 更新总价
+            updateTotal();
+        }
+
+        // 加载默认地址
+        function loadDefaultAddress() {
+            const addresses = JSON.parse(localStorage.getItem('addresses') || '[]');
+            defaultAddress = addresses.find(addr => addr.isDefault) || addresses[0];
+
+            const addressContent = document.getElementById('addressContent');
+
+            if (defaultAddress) {
+                addressContent.innerHTML = `
+                    <div class="address-info" onclick="goToAddressList()">
+                        <div class="address-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                            </svg>
+                        </div>
+                        <div class="address-details">
+                            <div class="address-name-phone">
+                                <span class="address-name">${defaultAddress.name}</span>
+                                <span class="address-phone">${defaultAddress.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')}</span>
+                                ${defaultAddress.isDefault ? '<span class="address-tag">默认</span>' : ''}
+                            </div>
+                            <div class="address-text">${defaultAddress.province}${defaultAddress.city}${defaultAddress.district}${defaultAddress.detail}</div>
+                        </div>
+                        <svg class="address-arrow" viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                        </svg>
+                    </div>
+                `;
+            } else {
+                addressContent.innerHTML = `
+                    <div class="address-empty">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                        <div class="address-empty-text">暂无收货地址</div>
+                        <button class="add-address-btn" onclick="goToAddAddress()">添加收货地址</button>
+                    </div>
+                `;
+            }
+        }
+
+        // 修改数量
+        function changeQuantity(delta) {
+            const newQuantity = quantity + delta;
+            if (newQuantity < 1) return;
+            if (newQuantity > product.stock) {
+                showToast('库存不足', 'error');
+                return;
+            }
+
+            quantity = newQuantity;
+            document.getElementById('quantityValue').textContent = quantity;
+            document.getElementById('minusBtn').disabled = quantity === 1;
+            updateTotal();
+        }
+
+        // 更新总价
+        function updateTotal() {
+            const total = product.points * quantity;
+            document.getElementById('totalPoints').textContent = total.toLocaleString();
+
+            // 检查积分是否足够
+            const exchangeBtn = document.getElementById('exchangeBtn');
+            if (total > userPoints) {
+                exchangeBtn.disabled = true;
+                exchangeBtn.textContent = '积分不足';
+            } else {
+                exchangeBtn.disabled = false;
+                exchangeBtn.textContent = '确认兑换';
+            }
+        }
+
+        // 确认兑换
+        function confirmExchange() {
+            // 检查实物商品是否有地址
+            if (product.type === 'physical' && !defaultAddress) {
+                showToast('请先添加收货地址', 'error');
+                return;
+            }
+
+            const total = product.points * quantity;
+            if (total > userPoints) {
+                showToast('积分不足', 'error');
+                return;
+            }
+
+            // 扣除积分
+            userPoints -= total;
+            localStorage.setItem('userPoints', userPoints);
+
+            // 创建订单
+            const order = {
+                id: 'ORD' + Date.now(),
+                productName: product.name,
+                productType: product.type,
+                quantity: quantity,
+                points: total,
+                status: 'pending',
+                createTime: new Date().toISOString(),
+                address: product.type === 'physical' ? defaultAddress : null
+            };
+
+            // 保存订单
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            orders.unshift(order);
+            localStorage.setItem('orders', JSON.stringify(orders));
+
+            showToast('兑换成功！', 'success');
+
+            // 跳转到成功页面
+            setTimeout(() => {
+                window.location.href = `exchange-success.html?orderId=${order.id}`;
+            }, 1500);
+        }
+
+        // 跳转到添加地址页面
+        function goToAddAddress() {
+            window.location.href = 'address-form.html?from=exchange';
+        }
+
+        // 跳转到地址列表
+        function goToAddressList() {
+            window.location.href = 'address-list.html?from=exchange';
+        }
+
+        // 显示Toast提示
+        function showToast(message, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // 页面加载时初始化
+        window.addEventListener('load', initPage);
+    </script>
+</body>
+</html>
