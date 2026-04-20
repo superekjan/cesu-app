@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>信号检测</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --bg-card-hover: rgba(46, 49, 69, 0.75);
+            --accent-blue: #5b8def;
+            --accent-blue-light: #7ca6f3;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-purple: #9b8bf4;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .signal-info {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-subtle);
+            text-align: center;
+        }
+
+        .signal-value {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 4px;
+        }
+
+        .signal-unit {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .signal-label {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        .signal-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: rgba(78, 205, 196, 0.15);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--accent-cyan);
+            margin-top: 8px;
+        }
+
+        .signal-status::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+        }
+
+        .signal-status.stopped::before {
+            background: var(--text-tertiary);
+        }
+
+        .signal-status.stopped {
+            background: rgba(107, 114, 128, 0.15);
+            color: var(--text-tertiary);
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .chart-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-time {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 200px;
+            margin-bottom: 8px;
+        }
+
+        .chart-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .chart-grid line {
+            stroke: rgba(255, 255, 255, 0.05);
+            stroke-width: 1;
+        }
+
+        .chart-line {
+            fill: none;
+            stroke: url(#signalLineGradient);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .chart-area {
+            fill: url(#signalAreaGradient);
+        }
+
+        .chart-y-unit {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: rotate(-90deg) translateX(-50%);
+            transform-origin: left center;
+            font-size: 10px;
+            color: var(--text-tertiary);
+            white-space: nowrap;
+        }
+
+        .chart-x-title {
+            text-align: right;
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .chart-x-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--text-tertiary);
+            margin-top: 4px;
+        }
+
+        .stats-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .stats-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .stat-value.max { color: var(--accent-green); }
+        .stat-value.min { color: var(--accent-orange); }
+        .stat-value.avg { color: var(--accent-blue); }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .action-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(91, 141, 239, 0.4);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        .action-btn.stop {
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-red, #e74c3c));
+        }
+
+        .action-btn.stop:hover {
+            box-shadow: 0 8px 20px rgba(244, 162, 97, 0.4);
+        }
+
+        .action-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: #fff;
+        }
+
+        .safe-area-bottom {
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-top">
+                <div class="header-left">
+                    <div class="back-btn" onclick="location.href='toolbox.html'">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                        </svg>
+                    </div>
+                    <div class="header-title">信号检测</div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="signal-info">
+                <div class="signal-value" id="currentSignal">-45</div>
+                <div class="signal-unit">dBm</div>
+                <div class="signal-label">当前信号强度</div>
+                <div class="signal-status stopped" id="signalStatus">
+                    等待开始
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <span class="chart-title">信号强度趋势</span>
+                    <span class="chart-time" id="chartTime">00:00</span>
+                </div>
+                <div class="chart-container">
+                    <svg class="chart-svg" viewBox="0 0 340 160" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="signalLineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#4ecdc4;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#5b8def;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="signalAreaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#4ecdc4;stop-opacity:0.3" />
+                                <stop offset="100%" style="stop-color:#4ecdc4;stop-opacity:0" />
+                            </linearGradient>
+                        </defs>
+                        <g class="chart-grid">
+                            <line x1="40" y1="20" x2="340" y2="20"/>
+                            <line x1="40" y1="55" x2="340" y2="55"/>
+                            <line x1="40" y1="90" x2="340" y2="90"/>
+                            <line x1="40" y1="125" x2="340" y2="125"/>
+                            <line x1="40" y1="145" x2="340" y2="145"/>
+                        </g>
+                        <path class="chart-area" id="signalArea" d="M 40,145 L 40,145 L 340,145 L 340,145 Z"/>
+                        <path class="chart-line" id="signalLine" d="M 40,145 L 340,145"/>
+                    </svg>
+                    <span class="chart-y-unit">强度(dBm)</span>
+                </div>
+                <div class="chart-x-labels">
+                    <span>0s</span>
+                    <span>10s</span>
+                    <span>20s</span>
+                    <span>30s</span>
+                </div>
+                <div class="chart-x-title">时长(s)</div>
+            </div>
+
+            <div class="stats-card">
+                <div class="stats-title">采集统计</div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value max" id="maxSignal">-30</div>
+                        <div class="stat-label">最大值</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value min" id="minSignal">-60</div>
+                        <div class="stat-label">最小值</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value avg" id="avgSignal">-45</div>
+                        <div class="stat-label">平均值</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="action-btn" id="actionBtn" onclick="toggleDetection()">
+                <svg viewBox="0 0 24 24" id="btnIcon">
+                    <path d="M8 5v14l11-7z"/>
+                </svg>
+                <span id="btnText">开始检测</span>
+            </button>
+
+            <div class="safe-area-bottom"></div>
+        </main>
+    </div>
+
+    <script>
+        let isDetecting = false;
+        let detectionInterval = null;
+        let signalData = [];
+        let maxSignals = 60;
+        let startTime = null;
+        let elapsedSeconds = 0;
+
+        function toggleDetection() {
+            if (isDetecting) {
+                stopDetection();
+            } else {
+                startDetection();
+            }
+        }
+
+        function startDetection() {
+            isDetecting = true;
+            signalData = [];
+            elapsedSeconds = 0;
+            startTime = Date.now();
+
+            document.getElementById('actionBtn').classList.add('stop');
+            document.getElementById('btnIcon').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+            document.getElementById('btnText').textContent = '停止检测';
+            document.getElementById('signalStatus').classList.remove('stopped');
+            document.getElementById('signalStatus').textContent = '检测中...';
+
+            document.getElementById('maxSignal').textContent = '--';
+            document.getElementById('minSignal').textContent = '--';
+            document.getElementById('avgSignal').textContent = '--';
+
+            detectionInterval = setInterval(() => {
+                const signal = Math.round(-35 - Math.random() * 30);
+                signalData.push(signal);
+                if (signalData.length > maxSignals) {
+                    signalData.shift();
+                }
+                updateChart();
+                updateStats();
+                elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+                document.getElementById('chartTime').textContent = formatTime(elapsedSeconds);
+            }, 500);
+        }
+
+        function stopDetection() {
+            isDetecting = false;
+            clearInterval(detectionInterval);
+
+            document.getElementById('actionBtn').classList.remove('stop');
+            document.getElementById('btnIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+            document.getElementById('btnText').textContent = '重新检测';
+            document.getElementById('signalStatus').classList.add('stopped');
+            document.getElementById('signalStatus').textContent = '已停止';
+        }
+
+        function updateChart() {
+            if (signalData.length === 0) return;
+
+            const svg = document.querySelector('.chart-svg');
+            const width = 300;
+            const height = 125;
+            const xStep = width / (maxSignals - 1);
+
+            let linePath = '';
+            let areaPath = '';
+
+            signalData.forEach((signal, index) => {
+                const x = 40 + index * xStep;
+                const y = mapSignalToY(signal);
+                if (index === 0) {
+                    linePath = `M ${x},${y}`;
+                    areaPath = `M ${x},145 L ${x},${y}`;
+                } else {
+                    linePath += ` L ${x},${y}`;
+                    areaPath += ` L ${x},${y}`;
+                }
+            });
+
+            const lastX = 40 + (signalData.length - 1) * xStep;
+            areaPath += ` L ${lastX},145 Z`;
+
+            document.getElementById('signalLine').setAttribute('d', linePath);
+            document.getElementById('signalArea').setAttribute('d', areaPath);
+
+            const currentSignal = signalData[signalData.length - 1];
+            document.getElementById('currentSignal').textContent = currentSignal;
+        }
+
+        function mapSignalToY(signal) {
+            const minSignal = -80;
+            const maxSignal = -20;
+            const height = 125;
+            const ratio = (signal - minSignal) / (maxSignal - minSignal);
+            return 145 - ratio * height;
+        }
+
+        function updateStats() {
+            if (signalData.length === 0) return;
+
+            const max = Math.max(...signalData);
+            const min = Math.min(...signalData);
+            const avg = Math.round(signalData.reduce((a, b) => a + b, 0) / signalData.length);
+
+            document.getElementById('maxSignal').textContent = max;
+            document.getElementById('minSignal').textContent = min;
+            document.getElementById('avgSignal').textContent = avg;
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+    </script>
+</body>
+</html>

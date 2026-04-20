@@ -129,6 +129,108 @@
             fill: var(--accent-blue);
         }
 
+        .tool-icon.signal {
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.2), rgba(91, 141, 239, 0.2));
+        }
+
+        .tool-icon.signal svg {
+            fill: var(--accent-cyan);
+        }
+
+        .tool-icon.scan {
+            background: linear-gradient(135deg, rgba(155, 139, 244, 0.2), rgba(91, 141, 239, 0.2));
+        }
+
+        .tool-icon.scan svg {
+            fill: var(--accent-purple);
+        }
+
+        /* WiFi信息卡片 */
+        .wifi-info-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .wifi-info-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .wifi-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .wifi-icon-wrap {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wifi-icon-wrap svg {
+            width: 24px;
+            height: 24px;
+            fill: #fff;
+        }
+
+        .wifi-ssid {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .wifi-status {
+            font-size: 12px;
+            color: var(--accent-green);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .wifi-status::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-green);
+        }
+
+        .wifi-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .wifi-detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .wifi-detail-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .wifi-detail-value {
+            font-size: 13px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
         .tool-info {
             flex: 1;
         }
@@ -211,6 +313,39 @@
 
         <!-- 主内容 -->
         <main class="main-content">
+            <!-- WiFi信息卡片 -->
+            <div class="wifi-info-card">
+                <div class="wifi-info-header">
+                    <div class="wifi-name">
+                        <div class="wifi-icon-wrap">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
+                            </svg>
+                        </div>
+                        <span class="wifi-ssid">TP-LINK_5G_XXXX</span>
+                    </div>
+                    <span class="wifi-status">已连接</span>
+                </div>
+                <div class="wifi-details">
+                    <div class="wifi-detail-item">
+                        <span class="wifi-detail-label">信号强度</span>
+                        <span class="wifi-detail-value">-45 dBm</span>
+                    </div>
+                    <div class="wifi-detail-item">
+                        <span class="wifi-detail-label">频段</span>
+                        <span class="wifi-detail-value">5 GHz</span>
+                    </div>
+                    <div class="wifi-detail-item">
+                        <span class="wifi-detail-label">信道</span>
+                        <span class="wifi-detail-value">149</span>
+                    </div>
+                    <div class="wifi-detail-item">
+                        <span class="wifi-detail-label">网关地址</span>
+                        <span class="wifi-detail-value">192.168.1.1</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- 网络测速卡片 -->
             <div class="tool-card" onclick="location.href='wifi-diagnosis.html'">
                 <div class="tool-header">
@@ -267,6 +402,36 @@
                     <div class="tool-info">
                         <div class="tool-name">WiFi检测</div>
                         <div class="tool-desc">检测WiFi信号强度和网络详情</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 信号检测卡片 -->
+            <div class="tool-card" onclick="location.href='signal-detection.html'">
+                <div class="tool-header">
+                    <div class="tool-icon signal">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
+                        </svg>
+                    </div>
+                    <div class="tool-info">
+                        <div class="tool-name">信号检测</div>
+                        <div class="tool-desc">实时监测WiFi信号强度变化</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 内网扫描卡片 -->
+            <div class="tool-card" onclick="location.href='network-scan.html'">
+                <div class="tool-header">
+                    <div class="tool-icon scan">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                        </svg>
+                    </div>
+                    <div class="tool-info">
+                        <div class="tool-name">内网扫描</div>
+                        <div class="tool-desc">扫描内网中的设备信息</div>
                     </div>
                 </div>
             </div>
