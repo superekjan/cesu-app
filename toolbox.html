@@ -63,94 +63,118 @@
             padding: 20px;
         }
 
-        /* 工具卡片 */
-        .tool-card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 24px;
+        /* 工具卡片网格 */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
             margin-bottom: 16px;
-            border: 1px solid var(--border-subtle);
-            cursor: pointer;
-            transition: all 0.3s ease;
         }
 
-        .tool-card:hover {
-            background: var(--bg-card-hover);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+        /* 工具卡片 */
+        .tool-card {
+            padding: 12px 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .tool-card:hover .tool-icon {
+            transform: scale(1.1);
+        }
+
+        .tool-card:active {
+            transform: scale(0.95);
         }
 
         .tool-header {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 16px;
+            gap: 10px;
         }
 
         .tool-icon {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        .tool-icon.speedtest {
-            background: linear-gradient(135deg, rgba(93, 190, 141, 0.2), rgba(78, 205, 196, 0.2));
-        }
-
-        .tool-icon.ping {
-            background: linear-gradient(135deg, rgba(91, 141, 239, 0.2), rgba(78, 205, 196, 0.2));
-        }
-
-        .tool-icon.video {
-            background: linear-gradient(135deg, rgba(244, 162, 97, 0.2), rgba(155, 139, 244, 0.2));
-        }
-
-        .tool-icon.wifi {
-            background: linear-gradient(135deg, rgba(91, 141, 239, 0.2), rgba(155, 139, 244, 0.2));
+            margin-bottom: 6px;
+            transition: transform 0.2s ease;
         }
 
         .tool-icon svg {
-            width: 24px;
-            height: 24px;
-            fill: var(--accent-blue);
+            width: 20px;
+            height: 20px;
+            fill: var(--text-primary);
+            opacity: 0.8;
+        }
+
+        .tool-icon.speedtest {
+            background: rgba(93, 190, 141, 0.15);
         }
 
         .tool-icon.speedtest svg {
             fill: var(--accent-green);
+            opacity: 1;
+        }
+
+        .tool-icon.ping {
+            background: rgba(91, 141, 239, 0.15);
+        }
+
+        .tool-icon.ping svg {
+            fill: var(--accent-blue);
+            opacity: 1;
+        }
+
+        .tool-icon.video {
+            background: rgba(244, 162, 97, 0.15);
         }
 
         .tool-icon.video svg {
             fill: var(--accent-orange);
+            opacity: 1;
+        }
+
+        .tool-icon.wifi {
+            background: rgba(91, 141, 239, 0.15);
         }
 
         .tool-icon.wifi svg {
             fill: var(--accent-blue);
+            opacity: 1;
         }
 
         .tool-icon.signal {
-            background: linear-gradient(135deg, rgba(78, 205, 196, 0.2), rgba(91, 141, 239, 0.2));
+            background: rgba(78, 205, 196, 0.15);
         }
 
         .tool-icon.signal svg {
             fill: var(--accent-cyan);
+            opacity: 1;
         }
 
         .tool-icon.scan {
-            background: linear-gradient(135deg, rgba(155, 139, 244, 0.2), rgba(91, 141, 239, 0.2));
+            background: rgba(155, 139, 244, 0.15);
         }
 
         .tool-icon.scan svg {
             fill: var(--accent-purple);
+            opacity: 1;
         }
 
         /* WiFi信息卡片 */
         .wifi-info-card {
             background: var(--bg-card);
-            border-radius: 16px;
+            border-radius: 12px;
             padding: 16px;
-            margin-bottom: 16px;
+            margin-bottom: 24px;
             border: 1px solid var(--border-subtle);
         }
 
@@ -232,19 +256,23 @@
         }
 
         .tool-info {
-            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
         }
 
         .tool-name {
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 12px;
+            font-weight: 500;
             color: var(--text-primary);
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .tool-desc {
-            font-size: 13px;
-            color: var(--text-secondary);
+            font-size: 10px;
+            color: var(--text-tertiary);
+            line-height: 1.2;
         }
 
         /* 底部导航 */
@@ -346,92 +374,95 @@
                 </div>
             </div>
 
-            <!-- 网络测速卡片 -->
-            <div class="tool-card" onclick="location.href='wifi-diagnosis.html'">
-                <div class="tool-header">
-                    <div class="tool-icon speedtest">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                        </svg>
-                    </div>
-                    <div class="tool-info">
-                        <div class="tool-name">网络测速</div>
-                        <div class="tool-desc">测试网络速度和连接质量</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Ping测试卡片 -->
-            <div class="tool-card" onclick="location.href='ping-diagnosis.html'">
-                <div class="tool-header">
-                    <div class="tool-icon ping">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                        </svg>
-                    </div>
-                    <div class="tool-info">
-                        <div class="tool-name">Ping测试</div>
-                        <div class="tool-desc">检测网络延迟和丢包情况</div>
+            <!-- 工具网格 -->
+            <div class="tools-grid">
+                <!-- 网络测速卡片 -->
+                <div class="tool-card" onclick="location.href='wifi-diagnosis.html'">
+                    <div class="tool-header">
+                        <div class="tool-icon speedtest">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">网络测速</div>
+                            <div class="tool-desc">测试网络速度</div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- 视频测试卡片 -->
-            <div class="tool-card">
-                <div class="tool-header">
-                    <div class="tool-icon video">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
-                        </svg>
-                    </div>
-                    <div class="tool-info">
-                        <div class="tool-name">视频测试</div>
-                        <div class="tool-desc">检测视频流畅度和缓冲性能</div>
+                <!-- Ping测试卡片 -->
+                <div class="tool-card" onclick="location.href='ping-diagnosis.html'">
+                    <div class="tool-header">
+                        <div class="tool-icon ping">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">Ping测试</div>
+                            <div class="tool-desc">检测网络延迟</div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- WiFi检测卡片 -->
-            <div class="tool-card" onclick="location.href='wifi-check.html'">
-                <div class="tool-header">
-                    <div class="tool-icon wifi">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
-                        </svg>
-                    </div>
-                    <div class="tool-info">
-                        <div class="tool-name">WiFi检测</div>
-                        <div class="tool-desc">检测WiFi信号强度和网络详情</div>
+                <!-- 视频测试卡片 -->
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-icon video">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                            </svg>
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">视频测试</div>
+                            <div class="tool-desc">检测视频性能</div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- 信号检测卡片 -->
-            <div class="tool-card" onclick="location.href='signal-detection.html'">
-                <div class="tool-header">
-                    <div class="tool-icon signal">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
-                        </svg>
-                    </div>
-                    <div class="tool-info">
-                        <div class="tool-name">信号检测</div>
-                        <div class="tool-desc">实时监测WiFi信号强度变化</div>
+                <!-- WiFi检测卡片 -->
+                <div class="tool-card" onclick="location.href='wifi-check.html'">
+                    <div class="tool-header">
+                        <div class="tool-icon wifi">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
+                            </svg>
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">WiFi检测</div>
+                            <div class="tool-desc">检测WiFi详情</div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- 内网扫描卡片 -->
-            <div class="tool-card" onclick="location.href='network-scan.html'">
-                <div class="tool-header">
-                    <div class="tool-icon scan">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                        </svg>
+                <!-- 信号检测卡片 -->
+                <div class="tool-card" onclick="location.href='signal-detection.html'">
+                    <div class="tool-header">
+                        <div class="tool-icon signal">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
+                            </svg>
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">信号检测</div>
+                            <div class="tool-desc">监测信号变化</div>
+                        </div>
                     </div>
-                    <div class="tool-info">
-                        <div class="tool-name">内网扫描</div>
-                        <div class="tool-desc">扫描内网中的设备信息</div>
+                </div>
+
+                <!-- 内网扫描卡片 -->
+                <div class="tool-card" onclick="location.href='network-scan.html'">
+                    <div class="tool-header">
+                        <div class="tool-icon scan">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                            </svg>
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">内网扫描</div>
+                            <div class="tool-desc">扫描内网设备</div>
+                        </div>
                     </div>
                 </div>
             </div>
