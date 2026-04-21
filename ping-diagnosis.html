@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PING诊断</title>
+    <title>PING测试</title>
     <style>
         * {
             margin: 0;
@@ -45,117 +45,358 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            padding-bottom: calc(80px + env(safe-area-inset-bottom));
         }
 
+        /* 头部 */
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
 
         /* 主内容 */
         .main-content {
             flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 网络状态 */
+        .network-status {
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
+            gap: 10px;
+            margin-bottom: 40px;
         }
 
-        .page-title {
-            font-size: 24px;
-            color: var(--text-primary);
+        .status-label {
+            font-size: 14px;
+            color: var(--text-secondary);
         }
 
-        /* 底部导航 */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(22, 27, 34, 0.98);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border-subtle);
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0 calc(12px + env(safe-area-inset-bottom));
-            z-index: 100;
-            max-width: 480px;
-            margin: 0 auto;
+        .status-badge {
+            padding: 4px 12px;
+            background: rgba(93, 190, 141, 0.2);
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--accent-green);
+            border: 1px solid rgba(93, 190, 141, 0.3);
         }
 
-        .nav-item {
+        /* WiFi图标区域 */
+        .wifi-section {
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
-            padding: 6px 20px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            border-radius: 12px;
+            justify-content: center;
+            margin-bottom: 40px;
         }
 
-        .nav-item:hover {
-            background: rgba(255, 255, 255, 0.05);
+        .wifi-icon {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 16px;
         }
 
-        .nav-item.active {
-            background: rgba(88, 166, 255, 0.1);
-        }
-
-        .nav-item.active .nav-icon {
+        .wifi-icon svg {
+            width: 100%;
+            height: 100%;
             fill: var(--accent-blue);
         }
 
-        .nav-item.active .nav-label {
+        .signal-info {
+            font-size: 14px;
             color: var(--accent-blue);
+            text-align: center;
         }
 
-        .nav-icon {
-            width: 24px;
-            height: 24px;
+        /* 定时测试状态卡片 */
+        .schedule-status-card {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .schedule-status-card:hover {
+            border-color: rgba(155, 139, 244, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .schedule-status-card:active {
+            transform: scale(0.98);
+        }
+
+        .schedule-status-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(155, 139, 244, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 14px;
+        }
+
+        .schedule-status-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: var(--accent-purple);
+        }
+
+        .schedule-status-info {
+            flex: 1;
+        }
+
+        .schedule-status-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .schedule-status-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .schedule-status-value.active {
+            color: var(--accent-purple);
+        }
+
+        .schedule-status-arrow {
+            width: 20px;
+            height: 20px;
             fill: var(--text-tertiary);
-            transition: all 0.2s ease;
         }
 
-        .nav-label {
-            font-size: 11px;
+        /* 按钮区域 */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(91, 141, 239, 0.4);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        .action-btn.secondary {
+            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+        }
+
+        .action-btn.secondary:hover {
+            box-shadow: 0 8px 20px rgba(58, 123, 213, 0.4);
+        }
+
+        /* 提示文字 */
+        .hint-text {
+            text-align: center;
+            font-size: 13px;
             color: var(--text-tertiary);
-            transition: all 0.2s ease;
+            margin-bottom: 20px;
+        }
+
+        .safe-area-bottom {
+            height: 20px;
+        }
+
+        /* 检测结果区域 */
+        .result-section {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        .result-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .result-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .result-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .result-value.good {
+            color: var(--accent-green);
+        }
+
+        .result-value.warning {
+            color: var(--accent-orange);
+        }
+
+        .result-value.bad {
+            color: var(--accent-red, #ef4444);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 主内容 -->
+        <header class="header">
+            <div class="header-top">
+                <div class="back-btn" onclick="location.href='toolbox.html'">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                    </svg>
+                </div>
+                <div class="header-title">PING测试</div>
+            </div>
+        </header>
+
         <main class="main-content">
-            <div class="page-title">PING诊断页面</div>
+            <div class="network-status">
+                <span class="status-label">当前网络状态</span>
+                <span class="status-badge" id="networkStatus">已连接Wi-Fi: X-WRT_4236_5G</span>
+            </div>
+
+            <div class="wifi-section">
+                <div class="wifi-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
+                    </svg>
+                </div>
+                <div class="signal-info" id="signalInfo">信号: 较强 | 292</div>
+            </div>
+
+            <div class="schedule-status-card" id="scheduleStatusCard" onclick="location.href='ping-schedule.html'">
+                <div class="schedule-status-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                    </svg>
+                </div>
+                <div class="schedule-status-info">
+                    <div class="schedule-status-label">定时测试</div>
+                    <div class="schedule-status-value" id="scheduleStatusValue">未开启</div>
+                </div>
+                <svg class="schedule-status-arrow" viewBox="0 0 24 24">
+                    <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                </svg>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn" onclick="location.href='ping-quick.html'">一键检测</button>
+                <button class="action-btn secondary" onclick="location.href='ping-custom.html'">自定义检测</button>
+            </div>
+
+            <div class="hint-text">一键检查您的家庭网络健康状况，快速找出问题根源</div>
+
+            <div class="safe-area-bottom"></div>
         </main>
     </div>
 
-    <!-- 底部导航 -->
-    <nav class="bottom-nav">
-        <a href="index.html" class="nav-item">
-            <svg class="nav-icon" viewBox="0 0 24 24">
-                <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
-            </svg>
-            <span class="nav-label">WiFi诊断</span>
-        </a>
-        <a href="toolbox.html" class="nav-item">
-            <svg class="nav-icon" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-            </svg>
-            <span class="nav-label">工具箱</span>
-        </a>
-        <a href="knowledge-base.html" class="nav-item">
-            <svg class="nav-icon" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
-            </svg>
-            <span class="nav-label">知识库</span>
-        </a>
-        <a href="profile.html" class="nav-item">
-            <svg class="nav-icon" viewBox="0 0 24 24">
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-            </svg>
-            <span class="nav-label">我的</span>
-        </a>
-    </nav>
+    <script>
+        function updateScheduleStatus() {
+            const schedules = JSON.parse(localStorage.getItem('pingSchedules') || '[]');
+            const statusValue = document.getElementById('scheduleStatusValue');
+
+            if (schedules.length > 0) {
+                const nextSchedule = schedules[0];
+                const hourStr = String(nextSchedule.hour).padStart(2, '0');
+                const minStr = String(nextSchedule.minute).padStart(2, '0');
+                statusValue.textContent = `每天 ${hourStr}:${minStr}`;
+                statusValue.classList.add('active');
+            } else {
+                statusValue.textContent = '未开启';
+                statusValue.classList.remove('active');
+            }
+        }
+
+        updateScheduleStatus();
+        setInterval(updateScheduleStatus, 5000);
+    </script>
 </body>
 </html>

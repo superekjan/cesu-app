@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>预约测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --bg-card-hover: rgba(46, 49, 69, 0.75);
+            --accent-blue: #5b8def;
+            --accent-blue-light: #7ca6f3;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-purple: #9b8bf4;
+            --accent-red: #ef4444;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .schedule-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 24px;
+        }
+
+        .time-picker-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .time-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .time-inputs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .time-input {
+            width: 60px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: center;
+            outline: none;
+        }
+
+        .time-input:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .time-separator {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .repeat-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .repeat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .toggle-switch.active {
+            background: var(--accent-blue);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s ease;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(20px);
+        }
+
+        .target-section {
+            margin-bottom: 20px;
+        }
+
+        .target-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .target-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .target-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .target-option:hover {
+            border-color: rgba(91, 141, 239, 0.3);
+        }
+
+        .target-option.active {
+            border-color: var(--accent-blue);
+            background: rgba(91, 141, 239, 0.1);
+        }
+
+        .target-option-radio {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--text-tertiary);
+            border-radius: 50%;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .target-option.active .target-option-radio {
+            border-color: var(--accent-blue);
+        }
+
+        .target-option.active .target-option-radio::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+        }
+
+        .target-option-content {
+            flex: 1;
+        }
+
+        .target-option-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .target-option-host {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 2px;
+        }
+
+        .custom-target-input {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .custom-target-input.show {
+            display: block;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--text-primary);
+            outline: none;
+        }
+
+        .input-field:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .input-field::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(91, 141, 239, 0.4);
+        }
+
+        .save-btn:active {
+            transform: translateY(0);
+        }
+
+        .schedules-section {
+            margin-bottom: 24px;
+        }
+
+        .schedule-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .schedule-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+        }
+
+        .schedule-time {
+            width: 70px;
+            text-align: center;
+        }
+
+        .schedule-time-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .schedule-time-period {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .schedule-info {
+            flex: 1;
+            margin-left: 16px;
+        }
+
+        .schedule-target {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .schedule-status {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .schedule-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .schedule-action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .schedule-action-btn.delete {
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .schedule-action-btn.delete:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        .schedule-action-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--accent-red);
+        }
+
+        .records-section {
+            margin-bottom: 24px;
+        }
+
+        .record-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .record-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .record-time {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .record-badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .record-badge.good {
+            background: rgba(93, 190, 141, 0.15);
+            color: var(--accent-green);
+        }
+
+        .record-badge.warning {
+            background: rgba(244, 162, 97, 0.15);
+            color: var(--accent-orange);
+        }
+
+        .record-badge.bad {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-red);
+        }
+
+        .record-target {
+            font-size: 13px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .record-stats {
+            display: flex;
+            gap: 16px;
+        }
+
+        .record-stat {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .record-stat span {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-tertiary);
+            font-size: 14px;
+        }
+
+        .safe-area-bottom {
+            height: 20px;
+        }
+
+        .view-records-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--accent-purple);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .view-records-btn:hover {
+            background: rgba(155, 139, 244, 0.1);
+            border-color: rgba(155, 139, 244, 0.3);
+        }
+
+        .view-records-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--accent-purple);
+        }
+
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-top">
+                <div class="back-btn" onclick="location.href='ping-diagnosis.html'">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                    </svg>
+                </div>
+                <div class="header-title">预约测试</div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="schedule-card">
+                <div class="section-title">设置预约时间</div>
+                <div class="time-picker-row">
+                    <span class="time-label">每天</span>
+                    <div class="time-inputs">
+                        <input type="number" class="time-input" id="hourInput" min="0" max="23" value="8" placeholder="时">
+                        <span class="time-separator">:</span>
+                        <input type="number" class="time-input" id="minuteInput" min="0" max="59" value="0" placeholder="分">
+                    </div>
+                </div>
+
+                <div class="repeat-toggle">
+                    <span class="repeat-label">每天重复</span>
+                    <div class="toggle-switch active" id="repeatToggle" onclick="toggleRepeat()"></div>
+                </div>
+
+                <div class="target-section">
+                    <div class="target-label">测试目标</div>
+                    <div class="target-options">
+                        <div class="target-option active" onclick="selectTarget('default', this)">
+                            <div class="target-option-radio"></div>
+                            <div class="target-option-content">
+                                <div class="target-option-name">默认目标</div>
+                                <div class="target-option-host">8.8.8.8 / 114.114.114.114</div>
+                            </div>
+                        </div>
+                        <div class="target-option" onclick="selectTarget('baidu', this)">
+                            <div class="target-option-radio"></div>
+                            <div class="target-option-content">
+                                <div class="target-option-name">百度</div>
+                                <div class="target-option-host">www.baidu.com</div>
+                            </div>
+                        </div>
+                        <div class="target-option" onclick="selectTarget('taobao', this)">
+                            <div class="target-option-radio"></div>
+                            <div class="target-option-content">
+                                <div class="target-option-name">淘宝</div>
+                                <div class="target-option-host">www.taobao.com</div>
+                            </div>
+                        </div>
+                        <div class="target-option" onclick="selectTarget('jd', this)">
+                            <div class="target-option-radio"></div>
+                            <div class="target-option-content">
+                                <div class="target-option-name">京东</div>
+                                <div class="target-option-host">www.jd.com</div>
+                            </div>
+                        </div>
+                        <div class="target-option" onclick="selectTarget('custom', this)">
+                            <div class="target-option-radio"></div>
+                            <div class="target-option-content">
+                                <div class="target-option-name">自定义</div>
+                                <div class="target-option-host">输入IP或域名</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="custom-target-input" id="customTargetInput">
+                        <input type="text" class="input-field" id="customHostInput" placeholder="请输入IP地址或域名">
+                    </div>
+                </div>
+
+                <button class="save-btn" onclick="saveSchedule()">保存预约</button>
+            </div>
+
+            <div class="schedules-section">
+                <div class="section-title">预约列表</div>
+                <div class="schedule-list" id="scheduleList"></div>
+            </div>
+
+            <div class="records-section">
+                <div class="section-title">测试记录</div>
+                <div class="record-list" id="recordList"></div>
+            </div>
+
+            <button class="view-records-btn" onclick="location.href='ping-schedule-results.html'">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/>
+                </svg>
+                查看全部测试记录
+            </button>
+
+            <div class="safe-area-bottom"></div>
+        </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let selectedTarget = 'default';
+        let isRepeat = true;
+        let schedules = JSON.parse(localStorage.getItem('pingSchedules') || '[]');
+        let records = JSON.parse(localStorage.getItem('pingRecords') || '[]');
+
+        function toggleRepeat() {
+            isRepeat = !isRepeat;
+            document.getElementById('repeatToggle').classList.toggle('active', isRepeat);
+        }
+
+        function selectTarget(target, element) {
+            selectedTarget = target;
+            document.querySelectorAll('.target-option').forEach(opt => {
+                opt.classList.remove('active');
+            });
+            element.classList.add('active');
+
+            const customInput = document.getElementById('customTargetInput');
+            if (target === 'custom') {
+                customInput.classList.add('show');
+            } else {
+                customInput.classList.remove('show');
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        function saveSchedule() {
+            const hour = parseInt(document.getElementById('hourInput').value);
+            const minute = parseInt(document.getElementById('minuteInput').value);
+
+            if (isNaN(hour) || hour < 0 || hour > 23) {
+                showToast('请输入正确的小时（0-23）');
+                return;
+            }
+
+            if (isNaN(minute) || minute < 0 || minute > 59) {
+                showToast('请输入正确的分钟（0-59）');
+                return;
+            }
+
+            let targetHost = '';
+            let targetName = '';
+
+            switch (selectedTarget) {
+                case 'default':
+                    targetHost = '8.8.8.8, 114.114.114.114';
+                    targetName = '默认目标';
+                    break;
+                case 'baidu':
+                    targetHost = 'www.baidu.com';
+                    targetName = '百度';
+                    break;
+                case 'taobao':
+                    targetHost = 'www.taobao.com';
+                    targetName = '淘宝';
+                    break;
+                case 'jd':
+                    targetHost = 'www.jd.com';
+                    targetName = '京东';
+                    break;
+                case 'custom':
+                    targetHost = document.getElementById('customHostInput').value.trim();
+                    targetName = targetHost;
+                    if (!targetHost) {
+                        showToast('请输入自定义测试目标');
+                        return;
+                    }
+                    break;
+            }
+
+            const schedule = {
+                id: Date.now(),
+                hour: hour,
+                minute: minute,
+                isRepeat: isRepeat,
+                target: targetHost,
+                targetName: targetName,
+                enabled: true,
+                createdAt: new Date().toISOString()
+            };
+
+            schedules.push(schedule);
+            localStorage.setItem('pingSchedules', JSON.stringify(schedules));
+
+            showToast('预约保存成功');
+            renderSchedules();
+
+            document.getElementById('hourInput').value = hour;
+            document.getElementById('minuteInput').value = minute;
+        }
+
+        function deleteSchedule(id) {
+            schedules = schedules.filter(s => s.id !== id);
+            localStorage.setItem('pingSchedules', JSON.stringify(schedules));
+            showToast('预约已删除');
+            renderSchedules();
+        }
+
+        function renderSchedules() {
+            const list = document.getElementById('scheduleList');
+            if (schedules.length === 0) {
+                list.innerHTML = '<div class="empty-state">暂无预约</div>';
+                return;
+            }
+
+            list.innerHTML = schedules.map(schedule => {
+                const hourStr = String(schedule.hour).padStart(2, '0');
+                const minStr = String(schedule.minute).padStart(2, '0');
+                const period = schedule.hour >= 12 ? '下午' : '上午';
+                return `
+                    <div class="schedule-item">
+                        <div class="schedule-time">
+                            <div class="schedule-time-value">${hourStr}:${minStr}</div>
+                            <div class="schedule-time-period">${period}</div>
+                        </div>
+                        <div class="schedule-info">
+                            <div class="schedule-target">${schedule.targetName}</div>
+                            <div class="schedule-status">${schedule.isRepeat ? '每天重复' : '仅一次'}</div>
+                        </div>
+                        <div class="schedule-actions">
+                            <div class="schedule-action-btn delete" onclick="deleteSchedule(${schedule.id})">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function runScheduledTest(schedule) {
+            const avgPing = Math.round(20 + Math.random() * 80);
+            const lossRate = (Math.random() * 5).toFixed(1);
+            const minPing = Math.round(avgPing * 0.6);
+            const maxPing = Math.round(avgPing * 1.5);
+
+            let status = 'good';
+            if (avgPing > 100 || lossRate > 5) status = 'bad';
+            else if (avgPing > 50 || lossRate > 2) status = 'warning';
+
+            const record = {
+                id: Date.now(),
+                scheduleId: schedule.id,
+                target: schedule.target,
+                targetName: schedule.targetName,
+                avgPing: avgPing,
+                minPing: minPing,
+                maxPing: maxPing,
+                lossRate: parseFloat(lossRate),
+                status: status,
+                testedAt: new Date().toISOString()
+            };
+
+            records.unshift(record);
+            if (records.length > 50) {
+                records = records.slice(0, 50);
+            }
+            localStorage.setItem('pingRecords', JSON.stringify(records));
+            renderRecords();
+        }
+
+        function renderRecords() {
+            const list = document.getElementById('recordList');
+            if (records.length === 0) {
+                list.innerHTML = '<div class="empty-state">暂无测试记录</div>';
+                return;
+            }
+
+            list.innerHTML = records.map(record => {
+                const date = new Date(record.testedAt);
+                const timeStr = `${date.getMonth() + 1}/${date.getDate()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+                return `
+                    <div class="record-item">
+                        <div class="record-header">
+                            <div class="record-time">${timeStr}</div>
+                            <div class="record-badge ${record.status}">
+                                ${record.status === 'good' ? '优秀' : record.status === 'warning' ? '一般' : '较差'}
+                            </div>
+                        </div>
+                        <div class="record-target">${record.targetName} (${record.target})</div>
+                        <div class="record-stats">
+                            <div class="record-stat">平均延迟: <span>${record.avgPing}ms</span></div>
+                            <div class="record-stat">丢包率: <span>${record.lossRate}%</span></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function simulateScheduledTests() {
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
+
+            schedules.forEach(schedule => {
+                if (schedule.enabled && schedule.hour === currentHour && schedule.minute === currentMinute) {
+                    runScheduledTest(schedule);
+                }
+            });
+        }
+
+        renderSchedules();
+        renderRecords();
+
+        setInterval(simulateScheduledTests, 60000);
+    </script>
+</body>
+</html>

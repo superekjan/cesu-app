@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>一键PING测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --bg-card-hover: rgba(46, 49, 69, 0.75);
+            --accent-blue: #5b8def;
+            --accent-blue-light: #7ca6f3;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-purple: #9b8bf4;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* 主内容 */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 网络信息 */
+        .network-info {
+            margin-bottom: 30px;
+        }
+
+        .network-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .diagnosis-time {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* 状态图标 */
+        .status-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .status-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .status-icon.good {
+            background: rgba(93, 190, 141, 0.15);
+        }
+
+        .status-icon.warning {
+            background: rgba(244, 162, 97, 0.15);
+        }
+
+        .status-icon.bad {
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .status-icon svg {
+            width: 48px;
+            height: 48px;
+        }
+
+        .status-icon.good svg {
+            fill: var(--accent-green);
+        }
+
+        .status-icon.warning svg {
+            fill: var(--accent-orange);
+        }
+
+        .status-icon.bad svg {
+            fill: #ef4444;
+        }
+
+        .status-text {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .status-text.good {
+            color: var(--accent-green);
+        }
+
+        .status-text.warning {
+            color: var(--accent-orange);
+        }
+
+        .status-text.bad {
+            color: #ef4444;
+        }
+
+        /* 智能建议 */
+        .suggestion-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 20px;
+        }
+
+        .suggestion-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .suggestion-content {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 诊断详情 */
+        .diagnosis-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 20px;
+        }
+
+        .diagnosis-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .diagnosis-list {
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .diagnosis-list::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: linear-gradient(180deg, var(--accent-blue) 0%, var(--accent-cyan) 100%);
+            border-radius: 1px;
+        }
+
+        .diagnosis-item {
+            position: relative;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .diagnosis-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .diagnosis-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 6px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            border: 2px solid var(--bg-primary);
+        }
+
+        .diagnosis-item.completed::before {
+            background: var(--accent-green);
+        }
+
+        .diagnosis-info {
+            flex: 1;
+        }
+
+        .diagnosis-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .diagnosis-detail {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .diagnosis-badge {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .diagnosis-badge.excellent {
+            background: rgba(93, 190, 141, 0.15);
+            color: var(--accent-green);
+        }
+
+        .diagnosis-badge.good {
+            background: rgba(91, 141, 239, 0.15);
+            color: var(--accent-blue);
+        }
+
+        .diagnosis-badge.warning {
+            background: rgba(244, 162, 97, 0.15);
+            color: var(--accent-orange);
+        }
+
+        .diagnosis-badge.bad {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        /* 重新检测按钮 */
+        .action-buttons {
+            margin-top: auto;
+            padding-bottom: 20px;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(91, 141, 239, 0.4);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        .safe-area-bottom {
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-top">
+                <div class="back-btn" onclick="location.href='ping-diagnosis.html'">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                    </svg>
+                </div>
+                <div class="header-title">一键PING测试</div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="network-info">
+                <div class="network-name" id="networkName">X-WRT_4236_5G</div>
+                <div class="diagnosis-time" id="diagnosisTime">诊断时间：2026-04-21 09:33:27</div>
+            </div>
+
+            <div class="status-section">
+                <div class="status-icon good" id="statusIcon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                </div>
+                <div class="status-text good" id="statusText">您的网络健康良好</div>
+            </div>
+
+            <div class="suggestion-card">
+                <div class="suggestion-title">智能建议</div>
+                <div class="suggestion-content" id="suggestionContent">
+                    您的网络整体质量很好，各个环节的延迟都很低且没有丢包。可以放心用于视频会议、在线游戏等高要求应用。保持当前网络设置即可。
+                </div>
+            </div>
+
+            <div class="diagnosis-card">
+                <div class="diagnosis-title">诊断详情</div>
+                <div class="diagnosis-list">
+                    <div class="diagnosis-item completed">
+                        <div class="diagnosis-info">
+                            <div class="diagnosis-name">内网网络</div>
+                            <div class="diagnosis-detail" id="lanDetail">ping: 7.85ms  丢包率: 0%</div>
+                        </div>
+                        <div class="diagnosis-badge excellent" id="lanBadge">优秀</div>
+                    </div>
+                    <div class="diagnosis-item completed">
+                        <div class="diagnosis-info">
+                            <div class="diagnosis-name">运营商网络</div>
+                            <div class="diagnosis-detail" id="ispDetail">ping: 8.64ms  丢包率: 0%</div>
+                        </div>
+                        <div class="diagnosis-badge excellent" id="ispBadge">优秀</div>
+                    </div>
+                    <div class="diagnosis-item completed">
+                        <div class="diagnosis-info">
+                            <div class="diagnosis-name">服务端网络</div>
+                            <div class="diagnosis-detail" id="serverDetail">ping: 12.26ms  丢包率: 0%</div>
+                        </div>
+                        <div class="diagnosis-badge excellent" id="serverBadge">优秀</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn" onclick="retest()">重新检测</button>
+            </div>
+
+            <div class="safe-area-bottom"></div>
+        </main>
+    </div>
+
+    <script>
+        function updateTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('diagnosisTime').textContent = `诊断时间：${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+
+        function generateRandomResult() {
+            const lanPing = (Math.random() * 10 + 5).toFixed(2);
+            const ispPing = (Math.random() * 15 + 8).toFixed(2);
+            const serverPing = (Math.random() * 20 + 10).toFixed(2);
+            const lanLoss = (Math.random() * 2).toFixed(1);
+            const ispLoss = (Math.random() * 3).toFixed(1);
+            const serverLoss = (Math.random() * 5).toFixed(1);
+
+            document.getElementById('lanDetail').textContent = `ping: ${lanPing}ms  丢包率: ${lanLoss}%`;
+            document.getElementById('ispDetail').textContent = `ping: ${ispPing}ms  丢包率: ${ispLoss}%`;
+            document.getElementById('serverDetail').textContent = `ping: ${serverPing}ms  丢包率: ${serverLoss}%`;
+
+            updateBadge('lanBadge', parseFloat(lanPing), parseFloat(lanLoss));
+            updateBadge('ispBadge', parseFloat(ispPing), parseFloat(ispLoss));
+            updateBadge('serverBadge', parseFloat(serverPing), parseFloat(serverLoss));
+
+            const avgPing = (parseFloat(lanPing) + parseFloat(ispPing) + parseFloat(serverPing)) / 3;
+            const avgLoss = (parseFloat(lanLoss) + parseFloat(ispLoss) + parseFloat(serverLoss)) / 3;
+
+            updateOverallStatus(avgPing, avgLoss);
+        }
+
+        function updateBadge(badgeId, ping, loss) {
+            const badge = document.getElementById(badgeId);
+            if (ping < 20 && loss < 1) {
+                badge.className = 'diagnosis-badge excellent';
+                badge.textContent = '优秀';
+            } else if (ping < 50 && loss < 3) {
+                badge.className = 'diagnosis-badge good';
+                badge.textContent = '良好';
+            } else if (ping < 100 && loss < 5) {
+                badge.className = 'diagnosis-badge warning';
+                badge.textContent = '一般';
+            } else {
+                badge.className = 'diagnosis-badge bad';
+                badge.textContent = '较差';
+            }
+        }
+
+        function updateOverallStatus(avgPing, avgLoss) {
+            const statusIcon = document.getElementById('statusIcon');
+            const statusText = document.getElementById('statusText');
+            const suggestionContent = document.getElementById('suggestionContent');
+
+            if (avgPing < 30 && avgLoss < 2) {
+                statusIcon.className = 'status-icon good';
+                statusText.className = 'status-text good';
+                statusText.textContent = '您的网络健康良好';
+                suggestionContent.textContent = '您的网络整体质量很好，各个环节的延迟都很低且没有丢包。可以放心用于视频会议、在线游戏等高要求应用。保持当前网络设置即可。';
+            } else if (avgPing < 60 && avgLoss < 5) {
+                statusIcon.className = 'status-icon warning';
+                statusText.className = 'status-text warning';
+                statusText.textContent = '您的网络状态一般';
+                suggestionContent.textContent = '您的网络存在轻微延迟或少量丢包，建议检查路由器位置或重启网络设备。对于普通网页浏览和视频观看影响不大。';
+            } else {
+                statusIcon.className = 'status-icon bad';
+                statusText.className = 'status-text bad';
+                statusText.textContent = '您的网络状态较差';
+                suggestionContent.textContent = '您的网络延迟较高或丢包严重，建议检查网络连接、重启路由器或联系运营商。可能会影响视频通话和在线游戏体验。';
+            }
+        }
+
+        function retest() {
+            updateTime();
+            generateRandomResult();
+        }
+
+        // 初始化
+        updateTime();
+        generateRandomResult();
+    </script>
+</body>
+</html>
