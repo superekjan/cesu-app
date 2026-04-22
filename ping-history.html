@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PING测试历史</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --bg-card-hover: rgba(46, 49, 69, 0.75);
+            --accent-blue: #5b8def;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-purple: #9b8bf4;
+            --accent-red: #ef4444;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .record-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .record-card:hover {
+            border-color: rgba(91, 141, 239, 0.3);
+        }
+
+        .record-card.expanded {
+            border-color: rgba(91, 141, 239, 0.5);
+        }
+
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .record-header.expanded {
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .record-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .toggle-arrow {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-tertiary);
+            transition: transform 0.2s ease;
+        }
+
+        .record-card.expanded .toggle-arrow {
+            transform: rotate(180deg);
+        }
+
+        .record-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .record-summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex: 1;
+        }
+
+        .record-details {
+            display: none;
+        }
+
+        .record-card.expanded .record-summary {
+            display: none;
+        }
+
+        .record-card.expanded .record-details {
+            display: block;
+        }
+
+        .record-summary-stats {
+            display: flex;
+            gap: 16px;
+        }
+
+        .summary-stat {
+            text-align: center;
+        }
+
+        .summary-stat-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .summary-stat-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .record-target {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .record-time {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .record-badge {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .record-badge.excellent {
+            background: rgba(93, 190, 141, 0.15);
+            color: var(--accent-green);
+        }
+
+        .record-badge.good {
+            background: rgba(91, 141, 239, 0.15);
+            color: var(--accent-blue);
+        }
+
+        .record-badge.warning {
+            background: rgba(244, 162, 97, 0.15);
+            color: var(--accent-orange);
+        }
+
+        .record-badge.bad {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-red);
+        }
+
+        .record-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 12px 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-value.good {
+            color: var(--accent-green);
+        }
+
+        .stat-value.warning {
+            color: var(--accent-orange);
+        }
+
+        .stat-value.bad {
+            color: var(--accent-red);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .record-detail-list {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .record-detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .record-detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .record-detail-label {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        .record-detail-value {
+            font-size: 13px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(91, 141, 239, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .empty-icon svg {
+            width: 40px;
+            height: 40px;
+            fill: var(--accent-blue);
+            opacity: 0.6;
+        }
+
+        .empty-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .empty-desc {
+            font-size: 14px;
+            color: var(--text-tertiary);
+        }
+
+        .safe-area-bottom {
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-top">
+                <div class="back-btn" onclick="location.href='ping-diagnosis.html'">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                    </svg>
+                </div>
+                <div class="header-title">PING测试历史</div>
+            </div>
+        </header>
+
+        <main class="main-content" id="mainContent">
+            <div class="section-title">测试记录</div>
+        </main>
+
+        <div class="safe-area-bottom"></div>
+    </div>
+
+    <script>
+        function toggleRecord(card) {
+            card.classList.toggle('expanded');
+        }
+
+        function formatDateTime(isoString) {
+            const date = new Date(isoString);
+            const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            const timeStr = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+            return { dateStr, timeStr };
+        }
+
+        function renderRecords() {
+            const mainContent = document.getElementById('mainContent');
+            const sectionTitle = mainContent.querySelector('.section-title');
+
+            const demoRecords = [
+                {
+                    id: 'demo1',
+                    target: 'www.baidu.com',
+                    targetName: '百度',
+                    avgPing: 25,
+                    minPing: 18,
+                    maxPing: 32,
+                    lossRate: 0,
+                    jitter: 3.2,
+                    sentPackets: 20,
+                    recvPackets: 20,
+                    status: 'excellent',
+                    testedAt: new Date().toISOString()
+                },
+                {
+                    id: 'demo2',
+                    target: 'www.taobao.com',
+                    targetName: '淘宝',
+                    avgPing: 68,
+                    minPing: 52,
+                    maxPing: 89,
+                    lossRate: 2,
+                    jitter: 8.5,
+                    sentPackets: 20,
+                    recvPackets: 19,
+                    status: 'good',
+                    testedAt: new Date(Date.now() - 3600000).toISOString()
+                },
+                {
+                    id: 'demo3',
+                    target: 'www.jd.com',
+                    targetName: '京东',
+                    avgPing: 115,
+                    minPing: 98,
+                    maxPing: 156,
+                    lossRate: 5,
+                    jitter: 12.3,
+                    sentPackets: 20,
+                    recvPackets: 19,
+                    status: 'warning',
+                    testedAt: new Date(Date.now() - 86400000).toISOString()
+                }
+            ];
+
+            const storedRecords = JSON.parse(localStorage.getItem('pingHistoryRecords') || '[]');
+            const allRecords = [...storedRecords, ...demoRecords];
+
+            if (allRecords.length === 0) {
+                mainContent.innerHTML = `
+                    ${sectionTitle.outerHTML}
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+                            </svg>
+                        </div>
+                        <div class="empty-title">暂无测试记录</div>
+                        <div class="empty-desc">开始PING测试后，记录将显示在这里</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const recordsHTML = allRecords.map(record => {
+                const { dateStr, timeStr } = formatDateTime(record.testedAt);
+                let badgeClass = '';
+                let badgeText = '';
+                let pingClass = '';
+
+                if (record.avgPing < 50 && record.lossRate < 1) {
+                    badgeClass = 'excellent';
+                    badgeText = '网络优秀';
+                    pingClass = 'good';
+                } else if (record.avgPing < 100 && record.lossRate < 5) {
+                    badgeClass = 'good';
+                    badgeText = '网络良好';
+                    pingClass = 'warning';
+                } else if (record.avgPing < 150) {
+                    badgeClass = 'warning';
+                    badgeText = '网络一般';
+                    pingClass = 'warning';
+                } else {
+                    badgeClass = 'bad';
+                    badgeText = '网络较差';
+                    pingClass = 'bad';
+                }
+
+                return `
+                    <div class="record-card" onclick="toggleRecord(this)">
+                        <div class="record-header">
+                            <div class="record-toggle">
+                                <svg class="toggle-arrow" viewBox="0 0 24 24">
+                                    <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                                </svg>
+                                <div class="record-info">
+                                    <div class="record-target">${record.targetName}</div>
+                                    <div class="record-time">${dateStr} ${timeStr}</div>
+                                </div>
+                            </div>
+                            <div class="record-summary-stats">
+                                <div class="summary-stat">
+                                    <div class="summary-stat-value ${pingClass}">${record.avgPing}ms</div>
+                                    <div class="summary-stat-label">平均延迟</div>
+                                </div>
+                                <div class="record-badge ${badgeClass}">${badgeText}</div>
+                            </div>
+                        </div>
+                        <div class="record-details">
+                            <div class="record-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value ${pingClass}">${record.avgPing}ms</div>
+                                    <div class="stat-label">平均延迟</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">${record.minPing}ms</div>
+                                    <div class="stat-label">最小延迟</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">${record.maxPing}ms</div>
+                                    <div class="stat-label">最大延迟</div>
+                                </div>
+                            </div>
+                            <div class="record-detail-list">
+                                <div class="record-detail-item">
+                                    <span class="record-detail-label">目标地址</span>
+                                    <span class="record-detail-value">${record.target}</span>
+                                </div>
+                                <div class="record-detail-item">
+                                    <span class="record-detail-label">丢包率</span>
+                                    <span class="record-detail-value ${record.lossRate > 0 ? 'warning' : ''}">${record.lossRate}%</span>
+                                </div>
+                                <div class="record-detail-item">
+                                    <span class="record-detail-label">抖动</span>
+                                    <span class="record-detail-value">${record.jitter}ms</span>
+                                </div>
+                                <div class="record-detail-item">
+                                    <span class="record-detail-label">发送/接收</span>
+                                    <span class="record-detail-value">${record.sentPackets}/${record.recvPackets}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            mainContent.innerHTML = sectionTitle.outerHTML + recordsHTML;
+        }
+
+        renderRecords();
+    </script>
+</body>
+</html>
