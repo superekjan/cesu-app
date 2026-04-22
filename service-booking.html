@@ -705,6 +705,231 @@
                 padding: 16px;
             }
         }
+
+        /* 日期时间选择器 */
+        .picker-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .picker-modal.show {
+            display: flex;
+        }
+
+        .picker-content {
+            width: 100%;
+            max-width: 480px;
+            background: rgba(38, 41, 58, 1);
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .picker-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .picker-close {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .picker-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .picker-close svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-secondary);
+        }
+
+        .picker-section {
+            margin-bottom: 20px;
+        }
+
+        .picker-section-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .date-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .date-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .date-item {
+            flex-shrink: 0;
+            width: 70px;
+            padding: 12px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .date-item:hover {
+            border-color: rgba(91, 141, 239, 0.3);
+        }
+
+        .date-item.active {
+            background: rgba(91, 141, 239, 0.15);
+            border-color: var(--accent-blue);
+        }
+
+        .date-item.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .date-item.full {
+            opacity: 0.5;
+            pointer-events: none;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .date-item.full .date-num {
+            color: var(--accent-red);
+        }
+
+        .date-item.full .date-week {
+            color: var(--accent-red);
+        }
+
+        .date-day {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-bottom: 4px;
+        }
+
+        .date-num {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .date-item.active .date-num {
+            color: var(--accent-blue);
+        }
+
+        .date-week {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .time-item {
+            padding: 14px 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .time-item:hover {
+            border-color: rgba(91, 141, 239, 0.3);
+        }
+
+        .time-item.active {
+            background: rgba(91, 141, 239, 0.15);
+            border-color: var(--accent-blue);
+        }
+
+        .time-item.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .time-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .time-item.active .time-value {
+            color: var(--accent-blue);
+        }
+
+        .time-period {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .picker-confirm-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .picker-confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(91, 141, 239, 0.4);
+        }
+
+        .picker-confirm-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
     </style>
 </head>
 <body>
@@ -846,15 +1071,15 @@
                             </svg>
                             138****5678
                         </div>
-                        <div class="technician-time-box">
+                        <div class="technician-time-box" onclick="showDateTimePicker()">
                             <div class="technician-time-icon">
                                 <svg viewBox="0 0 24 24">
                                     <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
                                 </svg>
                             </div>
                             <div class="technician-time-content">
-                                <div class="technician-time-label">预计上门时间</div>
-                                <div class="technician-time-value">今日 14:00-16:00</div>
+                                <div class="technician-time-label">预约上门时间</div>
+                                <div class="technician-time-value" id="bookingTimeValue">请选择日期和时间段</div>
                             </div>
                         </div>
                     </div>
@@ -1068,6 +1293,188 @@
                 }
             }, 100);
         };
+
+        let selectedDate = null;
+        let selectedTime = null;
+
+        const timeSlots = [
+            { value: '09:00-12:00', label: '09:00', period: '上午' },
+            { value: '15:00-18:00', label: '15:00', period: '下午' }
+        ];
+
+        const bookedSlots = {
+            tomorrow: ['09:00-12:00', '15:00-18:00']
+        };
+
+        function showDateTimePicker() {
+            selectedDate = null;
+            selectedTime = null;
+            document.getElementById('pickerConfirmBtn').disabled = true;
+
+            renderDatePicker();
+            renderTimePicker();
+
+            document.getElementById('dateTimePicker').classList.add('show');
+
+            setTimeout(() => {
+                const firstSelectable = document.querySelector('.date-item:not(.full):not(.disabled)');
+                if (firstSelectable) {
+                    selectDate(firstSelectable);
+                }
+            }, 100);
+        }
+
+        function closeDateTimePicker() {
+            document.getElementById('dateTimePicker').classList.remove('show');
+        }
+
+        function isDateFull(date) {
+            const dateStr = date.toISOString().split('T')[0];
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toISOString().split('T')[0];
+            return dateStr === tomorrowStr;
+        }
+
+        function renderDatePicker() {
+            const dateScroll = document.getElementById('dateScroll');
+            const today = new Date();
+            const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+
+            let html = '';
+            for (let i = 0; i < 14; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() + i);
+
+                const day = weekDays[date.getDay()];
+                const num = date.getDate();
+                const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                const isFull = isDateFull(date);
+
+                html += `
+                    <div class="date-item ${isFull ? 'full' : ''}" data-date="${date.toISOString()}" onclick="selectDate(this)" style="cursor:pointer">
+                        <div class="date-day">${day}</div>
+                        <div class="date-num">${num}</div>
+                        <div class="date-week">${isFull ? '已满' : (isWeekend ? '周末' : '工作日')}</div>
+                    </div>
+                `;
+            }
+            dateScroll.innerHTML = html;
+        }
+
+        function isSlotBooked(date, slotValue) {
+            const dateStr = date.toISOString().split('T')[0];
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toISOString().split('T')[0];
+            if (dateStr === tomorrowStr) {
+                return bookedSlots.tomorrow.includes(slotValue);
+            }
+            return false;
+        }
+
+        function renderTimePicker() {
+            const timeGrid = document.getElementById('timeGrid');
+            const currentHour = new Date().getHours();
+
+            let html = '';
+            timeSlots.forEach((slot, index) => {
+                let disabled = '';
+                let bookedText = '';
+
+                if (selectedDate) {
+                    const selected = new Date(selectedDate);
+                    if (isSlotBooked(selected, slot.value)) {
+                        disabled = 'disabled';
+                        bookedText = '已满';
+                    }
+                } else {
+                    if (slot.value === '09:00-12:00' && currentHour >= 9) {
+                        disabled = 'disabled';
+                    } else if (slot.value === '15:00-18:00' && currentHour >= 15) {
+                        disabled = 'disabled';
+                    }
+                }
+
+                html += `
+                    <div class="time-item ${disabled}" data-time="${slot.value}" onclick="selectTime(this)" ${disabled ? '' : 'style="cursor:pointer"'}>
+                        <div class="time-value">${slot.label} ${bookedText}</div>
+                        <div class="time-period">${slot.period}</div>
+                    </div>
+                `;
+            });
+            timeGrid.innerHTML = html;
+        }
+
+        function selectDate(element) {
+            if (element.classList.contains('full')) return;
+
+            document.querySelectorAll('.date-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+            selectedDate = element.dataset.date;
+            selectedTime = null;
+
+            renderTimePicker();
+            updateConfirmBtn();
+        }
+
+        function selectTime(element) {
+            if (element.classList.contains('disabled')) return;
+
+            document.querySelectorAll('.time-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+            selectedTime = element.dataset.time;
+            updateConfirmBtn();
+        }
+
+        function updateConfirmBtn() {
+            document.getElementById('pickerConfirmBtn').disabled = !(selectedDate && selectedTime);
+        }
+
+        function confirmDateTime() {
+            if (!selectedDate || !selectedTime) return;
+
+            const date = new Date(selectedDate);
+            const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+            const dayName = weekDays[date.getDay()];
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+
+            const timeDisplay = `${month}月${day}日 ${dayName} ${selectedTime}`;
+            document.getElementById('bookingTimeValue').textContent = timeDisplay;
+
+            closeDateTimePicker();
+        }
     </script>
+
+    <!-- 日期时间选择器弹窗 -->
+    <div class="picker-modal" id="dateTimePicker">
+        <div class="picker-content">
+            <div class="picker-header">
+                <div class="picker-title">选择预约时间</div>
+                <div class="picker-close" onclick="closeDateTimePicker()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="picker-section">
+                <div class="picker-section-title">选择日期</div>
+                <div class="date-scroll" id="dateScroll"></div>
+            </div>
+
+            <div class="picker-section">
+                <div class="picker-section-title">选择时间段</div>
+                <div class="time-grid" id="timeGrid"></div>
+            </div>
+
+            <button class="picker-confirm-btn" id="pickerConfirmBtn" onclick="confirmDateTime()" disabled>确认选择</button>
+        </div>
+    </div>
 </body>
 </html>
