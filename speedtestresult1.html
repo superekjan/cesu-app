@@ -100,6 +100,14 @@
             border-top: 1px solid var(--border-subtle);
         }
 
+        .report-content .metrics-grid {
+            gap: 8px;
+        }
+
+        .report-content .metric-item {
+            padding: 0 10px 8px;
+        }
+
         /* 分类指标卡片 */
         .metrics-section {
             display: flex;
@@ -405,70 +413,38 @@
         }
 
         .report-group {
-            padding: 4px 0;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .report-group:last-child {
+            border-bottom: none;
         }
 
         .group-title {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
-            color: var(--text-secondary);
+            color: var(--text-primary);
             margin-bottom: 12px;
         }
 
         .group-icon {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-        }
-
-        .group-icon.terminal {
-            background: var(--accent-blue);
-        }
-
-        .group-icon.gateway {
-            background: var(--accent-purple);
-        }
-
-        .group-icon.quality {
-            background: var(--accent-cyan);
-        }
-
-        .group-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px 16px;
-        }
-
-        .info-item {
+            width: 28px;
+            height: 28px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: center;
+            background: rgba(91, 141, 239, 0.15);
+            border-radius: 6px;
         }
 
-        .info-label {
-            font-size: 13px;
-            color: var(--text-tertiary);
-        }
-
-        .info-value {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        .info-value .unit {
-            color: var(--text-tertiary);
-            font-weight: 400;
-            font-size: 11px;
-        }
-
-        .group-divider {
-            height: 1px;
-            background: var(--border-subtle);
-            margin: 12px 0;
+        .group-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--accent-blue);
         }
 
         /* 故障预约入口 */
@@ -668,84 +644,89 @@
                     </svg>
                 </div>
                 <div class="report-content">
-                    <!-- 终端连接 -->
                     <div class="report-group">
                         <div class="group-title">
-                            <span class="group-icon terminal"></span>
+                            <span class="group-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                                </svg>
+                            </span>
                             终端连接
                         </div>
-                        <div class="group-grid">
-                            <div class="info-item">
-                                <div class="info-label">WiFi速率</div>
-                                <div class="info-value">1200 <span class="unit">Mbps</span></div>
+                        <div class="metrics-grid">
+                            <div class="metric-item">
+                                <div class="metric-label">WiFi速率</div>
+                                <div class="metric-value">1200<span class="unit">Mbps</span></div>
                             </div>
-                            <div class="info-item">
-                                <div class="info-label">WiFi频段</div>
-                                <div class="info-value">5 <span class="unit">GHz</span></div>
+                            <div class="metric-item">
+                                <div class="metric-label">WiFi频段</div>
+                                <div class="metric-value">5<span class="unit">GHz</span></div>
                             </div>
-                            <div class="info-item">
-                                <div class="info-label">WiFi信号</div>
-                                <div class="info-value">-50 <span class="unit">dBm</span></div>
+                            <div class="metric-item">
+                                <div class="metric-label">WiFi信号</div>
+                                <div class="metric-value">-50<span class="unit">dBm</span></div>
                             </div>
-                            <div class="info-item">
-                                <div class="info-label">WiFi干扰</div>
-                                <div class="info-value">较少</div>
+                            <div class="metric-item">
+                                <div class="metric-label">WiFi干扰</div>
+                                <div class="metric-value small">较少</div>
                             </div>
-                            <div class="info-item">
-                                <div class="info-label">型号版本</div>
-                                <div class="info-value">V2.1.5</div>
+                            <div class="metric-item">
+                                <div class="metric-label">型号版本</div>
+                                <div class="metric-value small">V2.1.5</div>
                             </div>
-                            <div class="info-item">
-                                <div class="info-label">型号名称</div>
-                                <div class="info-value">AX3000</div>
+                            <div class="metric-item">
+                                <div class="metric-label">型号名称</div>
+                                <div class="metric-value small">AX3000</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="group-divider"></div>
-
-                    <!-- 网关信息 -->
                     <div class="report-group">
                         <div class="group-title">
-                            <span class="group-icon gateway"></span>
+                            <span class="group-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>
+                                </svg>
+                            </span>
                             网关信息
                         </div>
-                        <div class="group-grid">
-                            <div class="info-item">
-                                <div class="info-label">网关厂家</div>
-                                <div class="info-value">华为</div>
+                        <div class="metrics-grid">
+                            <div class="metric-item">
+                                <div class="metric-label">网关厂家</div>
+                                <div class="metric-value small">华为</div>
                             </div>
-                            <div class="info-item">
-                                <div class="info-label">WiFi名称</div>
-                                <div class="info-value">ChinaNet-5G</div>
+                            <div class="metric-item">
+                                <div class="metric-label">WiFi名称</div>
+                                <div class="metric-value small">ChinaNet-5G</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="group-divider"></div>
-
-                    <!-- 内网质量 -->
                     <div class="report-group">
                         <div class="group-title">
-                            <span class="group-icon quality"></span>
+                            <span class="group-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                            </span>
                             内网质量
                         </div>
-                        <div class="group-grid">
-                            <div class="info-item">
-                                <div class="info-label">上行</div>
-                                <div class="info-value">4.68 <span class="unit">MB/s</span></div>
+                        <div class="metrics-grid">
+                            <div class="metric-item">
+                                <div class="metric-label">上行</div>
+                                <div class="metric-value">4.68<span class="unit">MB/s</span></div>
                             </div>
-                            <div class="info-item">
-                                <div class="info-label">下行</div>
-                                <div class="info-value">4.68 <span class="unit">MB/s</span></div>
+                            <div class="metric-item">
+                                <div class="metric-label">下行</div>
+                                <div class="metric-value">4.68<span class="unit">MB/s</span></div>
                             </div>
-                            <div class="info-item">
-                                <div class="info-label">内网时延</div>
-                                <div class="info-value">4 <span class="unit">ms</span></div>
+                            <div class="metric-item">
+                                <div class="metric-label">内网时延</div>
+                                <div class="metric-value">4<span class="unit">ms</span></div>
                             </div>
-                            <div class="info-item">
-                                <div class="info-label">外网时延</div>
-                                <div class="info-value">10 <span class="unit">ms</span></div>
+                            <div class="metric-item">
+                                <div class="metric-label">外网时延</div>
+                                <div class="metric-value">10<span class="unit">ms</span></div>
                             </div>
                         </div>
                     </div>
