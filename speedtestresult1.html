@@ -173,6 +173,8 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
+            overflow: hidden;
+            min-width: 0;
         }
 
         .metric-label {
@@ -197,6 +199,14 @@
 
         .metric-value.small {
             font-size: 13px;
+        }
+
+        .metric-value.text-ellipsis {
+            display: block;
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         /* AI诊断区域 */
@@ -693,11 +703,15 @@
                         <div class="metrics-grid">
                             <div class="metric-item">
                                 <div class="metric-label">网关厂家</div>
-                                <div class="metric-value small">华为</div>
+                                <div class="metric-value small text-ellipsis" onclick="toggleEllipsis(this)" title="SHEN ZHEN NUO XIN CHENG TECHNOLOGY">SHEN ZHEN NUO XIN CHENG TECHNOLOGY</div>
                             </div>
                             <div class="metric-item">
                                 <div class="metric-label">WiFi名称</div>
                                 <div class="metric-value small">ChinaNet-5G</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">终端连接数</div>
+                                <div class="metric-value small">2</div>
                             </div>
                         </div>
                     </div>
@@ -762,6 +776,17 @@
     <script>
         function toggleReport() {
             document.getElementById('reportSection').classList.toggle('expanded');
+        }
+
+        function toggleEllipsis(el) {
+            el.classList.toggle('expanded');
+            if (el.classList.contains('expanded')) {
+                el.style.whiteSpace = 'normal';
+                el.style.wordBreak = 'break-all';
+            } else {
+                el.style.whiteSpace = 'nowrap';
+                el.style.wordBreak = 'normal';
+            }
         }
 
         // 跳转到故障预约页面
