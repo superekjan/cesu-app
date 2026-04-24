@@ -163,12 +163,127 @@
             color: var(--text-tertiary);
             transition: all 0.2s ease;
         }
+
+        .wifi-info-card {
+            background: transparent;
+            padding: 0 0 16px 0;
+            margin-bottom: 20px;
+            width: 100%;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .wifi-info-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .wifi-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .wifi-icon-wrap {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wifi-icon-wrap svg {
+            width: 18px;
+            height: 18px;
+            fill: #fff;
+        }
+
+        .wifi-ssid {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .wifi-status {
+            font-size: 12px;
+            color: var(--accent-green);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .wifi-status::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-green);
+        }
+
+        .wifi-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+
+        .wifi-detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 8px;
+        }
+
+        .wifi-detail-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .wifi-detail-value {
+            font-size: 13px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- 主内容 -->
         <main class="main-content">
+            <div class="wifi-info-card">
+                <div class="wifi-info-header">
+                    <div class="wifi-name">
+                        <div class="wifi-icon-wrap">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
+                            </svg>
+                        </div>
+                        <span class="wifi-ssid">TP-LINK_5G_XXXX</span>
+                    </div>
+                    <span class="wifi-status">已连接</span>
+                </div>
+                <div class="wifi-details">
+                    <div class="wifi-detail-item">
+                        <span class="wifi-detail-label">信号强度</span>
+                        <span class="wifi-detail-value">-45 dBm</span>
+                    </div>
+                    <div class="wifi-detail-item">
+                        <span class="wifi-detail-label">频段</span>
+                        <span class="wifi-detail-value">5 GHz</span>
+                    </div>
+                    <div class="wifi-detail-item">
+                        <span class="wifi-detail-label">信道</span>
+                        <span class="wifi-detail-value">149</span>
+                    </div>
+                    <div class="wifi-detail-item">
+                        <span class="wifi-detail-label">网关地址</span>
+                        <span class="wifi-detail-value">192.168.1.1</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="wifi-icon-large">
                 <svg viewBox="0 0 24 24">
                     <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
