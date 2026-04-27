@@ -278,46 +278,7 @@
             font-weight: 500;
         }
 
-        .wifi-chart-card {
-            background: transparent;
-            padding: 12px 0;
-            margin-top: 8px;
-        }
-
-        .wifi-chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .wifi-chart-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .wifi-chart-time {
-            font-size: 11px;
-            color: var(--text-tertiary);
-        }
-
-        .wifi-chart-container {
-            position: relative;
-            height: 60px;
-        }
-
-        .wifi-chart-line {
-            fill: none;
-            stroke: url(#wifiSignalLineGradient);
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .wifi-chart-area {
-            fill: url(#wifiSignalAreaGradient);
-        }
+        
 
         .tool-info {
             display: flex;
@@ -452,28 +413,6 @@
                         <span class="wifi-detail-value">192.168.1.100</span>
                     </div>
                 </div>
-                <div class="wifi-chart-card">
-                    <div class="wifi-chart-header">
-                        <span class="wifi-chart-title">信号强度趋势</span>
-                        <span class="wifi-chart-time" id="wifiChartTime">00:00</span>
-                    </div>
-                    <div class="wifi-chart-container">
-                        <svg class="wifi-chart-svg" viewBox="0 0 280 80" preserveAspectRatio="none">
-                            <defs>
-                                <linearGradient id="wifiSignalLineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" style="stop-color:#4ecdc4;stop-opacity:1" />
-                                    <stop offset="100%" style="stop-color:#5b8def;stop-opacity:1" />
-                                </linearGradient>
-                                <linearGradient id="wifiSignalAreaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" style="stop-color:#4ecdc4;stop-opacity:0.3" />
-                                    <stop offset="100%" style="stop-color:#4ecdc4;stop-opacity:0" />
-                                </linearGradient>
-                            </defs>
-                            <path class="wifi-chart-area" id="wifiSignalArea" d="M 0,80 L 0,80 L 280,80 L 280,80 Z"/>
-                            <path class="wifi-chart-line" id="wifiSignalLine" d="M 0,80 L 280,80"/>
-                        </svg>
-                    </div>
-                </div>
             </div>
 
             <!-- 工具网格 -->
@@ -600,73 +539,5 @@
             <span class="nav-label">我的</span>
         </a>
     </nav>
-
-    <script>
-        let wifiSignalData = [];
-        let wifiChartInterval = null;
-        let wifiStartTime = null;
-        let wifiElapsedSeconds = 0;
-        const maxWifiSignals = 15;
-
-        function initWifiChart() {
-            wifiSignalData = [];
-            wifiElapsedSeconds = 0;
-            wifiStartTime = Date.now();
-            updateWifiChart();
-            if (wifiChartInterval) clearInterval(wifiChartInterval);
-            wifiChartInterval = setInterval(() => {
-                wifiElapsedSeconds++;
-                document.getElementById('wifiChartTime').textContent = formatTime(wifiElapsedSeconds);
-                const signal = Math.round(-40 - Math.random() * 30);
-                wifiSignalData.push(signal);
-                if (wifiSignalData.length > maxWifiSignals) {
-                    wifiSignalData.shift();
-                }
-                updateWifiChart();
-            }, 1000);
-        }
-
-        function updateWifiChart() {
-            const signalLine = document.getElementById('wifiSignalLine');
-            const signalArea = document.getElementById('wifiSignalArea');
-            if (!signalLine || !signalArea || wifiSignalData.length < 2) return;
-
-            const width = 280;
-            const height = 50;
-            const xStep = width / (maxWifiSignals - 1);
-            const yMin = -100;
-            const yMax = -20;
-
-            let linePath = '';
-            let areaPath = '';
-            const startX = 0;
-
-            wifiSignalData.forEach((val, i) => {
-                const x = startX + i * xStep;
-                const y = height - ((val - yMin) / (yMax - yMin)) * height;
-                if (i === 0) {
-                    linePath = `M ${x},${y}`;
-                    areaPath = `M ${x},${height} L ${x},${y}`;
-                } else {
-                    linePath += ` L ${x},${y}`;
-                    areaPath += ` L ${x},${y}`;
-                }
-            });
-
-            const lastX = startX + (wifiSignalData.length - 1) * xStep;
-            areaPath += ` L ${lastX},${height} Z`;
-
-            signalLine.setAttribute('d', linePath);
-            signalArea.setAttribute('d', areaPath);
-        }
-
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-        }
-
-        document.addEventListener('DOMContentLoaded', initWifiChart);
-    </script>
 </body>
 </html>

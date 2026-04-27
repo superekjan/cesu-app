@@ -390,16 +390,43 @@
 
         .report-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 12px;
             padding: 16px 20px;
             cursor: pointer;
+        }
+
+        .report-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .report-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: #fff;
+        }
+
+        .report-title-group {
+            flex: 1;
         }
 
         .report-title {
             font-size: 15px;
             font-weight: 600;
             color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .report-subtitle {
+            font-size: 12px;
+            color: var(--text-tertiary);
         }
 
         .report-arrow {
@@ -648,7 +675,15 @@
             <!-- 检测报告 -->
             <div class="report-section" id="reportSection">
                 <div class="report-header" onclick="toggleReport()">
-                    <div class="report-title">检测报告</div>
+                    <div class="report-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                        </svg>
+                    </div>
+                    <div class="report-title-group">
+                        <div class="report-title">检测报告</div>
+                        <div class="report-subtitle">详细检测数据记录</div>
+                    </div>
                     <svg class="report-arrow" viewBox="0 0 24 24">
                         <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
                     </svg>
