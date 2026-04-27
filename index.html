@@ -63,6 +63,12 @@
             font-size: 24px;
             color: var(--text-primary);
             font-weight: 600;
+            transition: all 0.5s ease;
+        }
+
+        .page-title.hiding {
+            opacity: 0;
+            transform: translateY(20px);
         }
 
         .wifi-icon-large {
@@ -74,12 +80,50 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 20px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                        height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                        margin 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                        background 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .wifi-icon-large.testing {
+            width: 140px;
+            height: 140px;
+            margin-bottom: 15px;
         }
 
         .wifi-icon-large svg {
             width: 60px;
             height: 60px;
             fill: var(--accent-blue);
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                        height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                        fill 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .wifi-icon-large.testing svg {
+            width: 70px;
+            height: 70px;
+            fill: var(--accent-cyan);
+        }
+
+        .main-title {
+            font-size: 24px;
+            color: var(--text-primary);
+            font-weight: 600;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            margin-bottom: 20px;
+        }
+
+        .main-title.testing {
+            font-size: 20px;
+            transform: translateY(5px);
+        }
+
+        .main-title.fade-out {
+            opacity: 0;
+            transform: translateY(-5px);
         }
 
         .start-test-btn {
@@ -92,7 +136,7 @@
             font-weight: 600;
             cursor: pointer;
             box-shadow: 0 4px 20px rgba(0, 114, 255, 0.4);
-            transition: all 0.3s ease;
+            transition: opacity 0.5s ease, transform 0.5s ease;
             font-family: inherit;
         }
 
@@ -105,30 +149,10 @@
             transform: translateY(0);
         }
 
-        /* 诊断中状态 */
-        .testing-area {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 30px;
-            width: 100%;
-            max-width: 340px;
-        }
-
-        .testing-area.active {
-            display: flex;
-        }
-
-        .wifi-testing-icon {
-            width: 100px;
-            height: 100px;
-            position: relative;
-        }
-
-        .wifi-testing-icon svg {
-            width: 100%;
-            height: 100%;
-            fill: var(--accent-cyan);
+        .start-test-btn.hidden {
+            opacity: 0;
+            transform: scale(0.9);
+            pointer-events: none;
         }
 
         .wifi-pulse {
@@ -141,15 +165,19 @@
             border-radius: 50%;
             border: 2px solid var(--accent-cyan);
             opacity: 0;
+        }
+
+        .wifi-icon-large.testing .wifi-pulse {
             animation: wifiPulse 2s ease-out infinite;
+            animation-delay: 0.3s;
         }
 
         .wifi-pulse:nth-child(2) {
-            animation-delay: 0.6s;
+            animation-delay: 0.9s;
         }
 
         .wifi-pulse:nth-child(3) {
-            animation-delay: 1.2s;
+            animation-delay: 1.5s;
         }
 
         @keyframes wifiPulse {
@@ -165,18 +193,19 @@
             }
         }
 
-        .testing-title {
-            font-size: 22px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
         .progress-bar-container {
             width: 100%;
+            max-width: 280px;
             height: 6px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 3px;
             overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.5s ease 0.4s;
+        }
+
+        .progress-bar-container.show {
+            opacity: 1;
         }
 
         .progress-bar {
@@ -184,7 +213,7 @@
             width: 0%;
             background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
             border-radius: 3px;
-            transition: width 0.3s ease;
+            transition: width 0.5s ease;
         }
 
         .testing-steps {
@@ -193,6 +222,12 @@
             gap: 8px;
             flex-wrap: wrap;
             justify-content: center;
+            opacity: 0;
+            transition: opacity 0.5s ease 0.5s;
+        }
+
+        .testing-steps.show {
+            opacity: 1;
         }
 
         .step-item {
@@ -201,7 +236,7 @@
             gap: 6px;
             font-size: 13px;
             color: var(--text-tertiary);
-            transition: color 0.3s ease;
+            transition: color 0.4s ease;
         }
 
         .step-item.active {
@@ -217,7 +252,7 @@
             height: 8px;
             border-radius: 50%;
             background: var(--text-tertiary);
-            transition: background 0.3s ease;
+            transition: background 0.4s ease, box-shadow 0.4s ease;
         }
 
         .step-item.active .step-dot {
@@ -293,6 +328,12 @@
             margin-bottom: 20px;
             width: 100%;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .wifi-info-card.hiding {
+            opacity: 0;
+            transform: translateY(-15px);
         }
 
         .wifi-info-header {
@@ -375,7 +416,7 @@
     <div class="container">
         <!-- 主内容 -->
         <main class="main-content">
-            <div class="wifi-info-card">
+            <div class="wifi-info-card" id="wifiInfoCard">
                 <div class="wifi-info-header">
                     <div class="wifi-name">
                         <div class="wifi-icon-wrap">
@@ -389,44 +430,35 @@
                 </div>
             </div>
 
-            <div class="wifi-icon-large" id="idleIcon">
+            <div class="wifi-icon-large" id="wifiIcon">
                 <svg viewBox="0 0 24 24">
                     <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
                 </svg>
+                <div class="wifi-pulse"></div>
+                <div class="wifi-pulse"></div>
+                <div class="wifi-pulse"></div>
             </div>
-            <div class="page-title" id="idleTitle">WiFi诊断</div>
+            <div class="main-title" id="mainTitle">WiFi诊断</div>
             <button class="start-test-btn" id="startBtn" onclick="startWiFiTest()">开始测试</button>
-
-            <div class="testing-area" id="testingArea">
-                <div class="wifi-testing-icon">
-                    <div class="wifi-pulse"></div>
-                    <div class="wifi-pulse"></div>
-                    <div class="wifi-pulse"></div>
-                    <svg viewBox="0 0 24 24">
-                        <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
-                    </svg>
+            <div class="progress-bar-container" id="progressBarContainer">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="testing-steps" id="testingSteps">
+                <div class="step-item active" id="step1">
+                    <span class="step-dot"></span>
+                    <span>获取WiFi信息</span>
                 </div>
-                <div class="testing-title">WiFi诊断中</div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar" id="progressBar"></div>
+                <div class="step-item" id="step2">
+                    <span class="step-dot"></span>
+                    <span>测速</span>
                 </div>
-                <div class="testing-steps">
-                    <div class="step-item active" id="step1">
-                        <span class="step-dot"></span>
-                        <span>获取WiFi信息</span>
-                    </div>
-                    <div class="step-item" id="step2">
-                        <span class="step-dot"></span>
-                        <span>测速</span>
-                    </div>
-                    <div class="step-item" id="step3">
-                        <span class="step-dot"></span>
-                        <span>连通性测试</span>
-                    </div>
-                    <div class="step-item" id="step4">
-                        <span class="step-dot"></span>
-                        <span>信道分析</span>
-                    </div>
+                <div class="step-item" id="step3">
+                    <span class="step-dot"></span>
+                    <span>连通性测试</span>
+                </div>
+                <div class="step-item" id="step4">
+                    <span class="step-dot"></span>
+                    <span>信道分析</span>
                 </div>
             </div>
         </main>
@@ -434,40 +466,63 @@
 
     <script>
         function startWiFiTest() {
-            document.getElementById('idleIcon').style.display = 'none';
-            document.getElementById('idleTitle').style.display = 'none';
-            document.getElementById('startBtn').style.display = 'none';
-            document.getElementById('testingArea').classList.add('active');
+            var wifiIcon = document.getElementById('wifiIcon');
+            var mainTitle = document.getElementById('mainTitle');
+            var startBtn = document.getElementById('startBtn');
+            var wifiInfoCard = document.getElementById('wifiInfoCard');
+            var progressBarContainer = document.getElementById('progressBarContainer');
+            var testingSteps = document.getElementById('testingSteps');
 
-            const steps = [
+            wifiIcon.classList.add('testing');
+            mainTitle.classList.add('fade-out');
+            startBtn.classList.add('hidden');
+            wifiInfoCard.classList.add('hiding');
+
+            setTimeout(function() {
+                mainTitle.textContent = 'WiFi诊断中';
+                mainTitle.classList.remove('fade-out');
+                mainTitle.classList.add('testing');
+            }, 400);
+
+            setTimeout(function() {
+                progressBarContainer.classList.add('show');
+            }, 500);
+
+            setTimeout(function() {
+                testingSteps.classList.add('show');
+            }, 600);
+
+            var steps = [
                 { id: 'step1', progress: 15 },
                 { id: 'step2', progress: 40 },
                 { id: 'step3', progress: 70 },
                 { id: 'step4', progress: 100 }
             ];
 
-            let currentStep = 0;
-            const progressBar = document.getElementById('progressBar');
+            var currentStep = 0;
+            var progressBar = document.getElementById('progressBar');
 
             function runStep() {
                 if (currentStep > 0) {
-                    document.getElementById(steps[currentStep - 1].id).classList.remove('active');
-                    document.getElementById(steps[currentStep - 1].id).classList.add('completed');
+                    var prevStep = document.getElementById(steps[currentStep - 1].id);
+                    prevStep.classList.remove('active');
+                    prevStep.classList.add('completed');
                 }
 
                 if (currentStep < steps.length) {
-                    document.getElementById(steps[currentStep].id).classList.add('active');
+                    var currentStepEl = document.getElementById(steps[currentStep].id);
+                    currentStepEl.classList.add('active');
                     progressBar.style.width = steps[currentStep].progress + '%';
                     currentStep++;
                     setTimeout(runStep, 1500);
                 } else {
-                    setTimeout(() => {
+                    setTimeout(function() {
                         location.href = 'speedtestresult1.html';
                     }, 500);
                 }
             }
 
-            runStep();
+            setTimeout(runStep, 600);
         }
     </script>
 
@@ -498,25 +553,5 @@
             <span class="nav-label">我的</span>
         </a>
     </nav>
-
-    <script>
-        function startWiFiTest() {
-            // 生成WiFi测试结果数据
-            const wifiResults = {
-                signalStrength: Math.floor(Math.random() * 40) + 60, // 60-100
-                channel: [1, 6, 11][Math.floor(Math.random() * 3)],
-                frequency: '2.4GHz / 5GHz',
-                security: 'WPA2-PSK',
-                interference: Math.floor(Math.random() * 30),
-                speed: Math.floor(Math.random() * 200) + 100
-            };
-            
-            // 保存结果到本地存储
-            localStorage.setItem('wifiTestResults', JSON.stringify(wifiResults));
-            
-            // 直接跳转到结果页面
-            window.location.href = 'speedtestresult1.html';
-        }
-    </script>
 </body>
 </html>
