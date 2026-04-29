@@ -161,22 +161,20 @@
         }
 
         .knowledge-thumb {
-            width: 70px;
+            width: 50px;
             height: 50px;
-            border-radius: 4px;
-            background: linear-gradient(135deg, rgba(91, 141, 239, 0.15) 0%, rgba(78, 205, 196, 0.15) 100%);
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(91, 141, 239, 0.2) 0%, rgba(78, 205, 196, 0.2) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            overflow: hidden;
         }
 
-        .knowledge-thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 4px;
+        .knowledge-thumb svg {
+            width: 28px;
+            height: 28px;
+            fill: var(--accent-cyan);
         }
 
         /* 详情弹窗 */
@@ -624,19 +622,26 @@
             
             // 保留轮播图，只渲染知识列表项
             const itemsHTML = filteredData.map((item, index) => {
-                // 使用 ico_1 到 ico_8 循环分配图片
-                const icoIndex = (index % 8) + 1;
+                const iconMap = {
+                    9: '<svg viewBox="0 0 24 24"><path d="M4 11h5V5H4v6zm0 7h5v-6H4v6zm6 0h5v-6h-5v6zm6 0h5v-6h-5v6zm-6-7h5V5h-5v6zm6-6v6h5V5h-5z"/></svg>',
+                    10: '<svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>',
+                    11: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>',
+                    12: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2zm6 8h-2v-2h-2v2h4v-4h-2v2z"/></svg>',
+                    13: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>',
+                    14: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>'
+                };
                 const clickHandler = item.link ? `openArticle('${item.link}')` : `showDetail(${item.id})`;
                 return `
-                <div class="knowledge-item" onclick="${clickHandler}">
-                    <div class="knowledge-text">
-                        <div class="knowledge-title">${item.title}</div>
+                    <div class="knowledge-item" onclick="${clickHandler}">
+                        <div class="knowledge-text">
+                            <div class="knowledge-title">${item.title}</div>
+                        </div>
+                        <div class="knowledge-thumb">
+                            ${iconMap[item.id] || ''}
+                        </div>
                     </div>
-                    <div class="knowledge-thumb">
-                        <img src="img/ico_${icoIndex}.png" alt="${item.title}">
-                    </div>
-                </div>
-            `}).join('');
+                `;
+            }).join('');
 
             // 保留轮播图，只更新列表项
             const carousel = document.getElementById('adCarousel');
