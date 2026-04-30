@@ -161,20 +161,22 @@
         }
 
         .knowledge-thumb {
-            width: 50px;
+            width: 70px;
             height: 50px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, rgba(91, 141, 239, 0.2) 0%, rgba(78, 205, 196, 0.2) 100%);
+            border-radius: 4px;
+            background: linear-gradient(135deg, rgba(91, 141, 239, 0.15) 0%, rgba(78, 205, 196, 0.15) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            overflow: hidden;
         }
 
-        .knowledge-thumb svg {
-            width: 28px;
-            height: 28px;
-            fill: var(--accent-cyan);
+        .knowledge-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
         }
 
         /* 详情弹窗 */
@@ -429,6 +431,7 @@
             {
                 id: 9,
                 title: '什么是内网网络？',
+                icon: '1',
                 category: 'basic',
                 categoryName: '基础知识',
                 summary: '内网（局域网）是指在一定范围内组建的私有网络，家庭和办公室中的网络都属于内网。',
@@ -456,6 +459,7 @@
             {
                 id: 10,
                 title: 'WiFi频道2.4G/5G的区别',
+                icon: '2',
                 category: 'basic',
                 categoryName: '基础知识',
                 summary: '2.4GHz覆盖广但速度慢，5GHz速度快但覆盖小，根据实际需求选择合适的频段。',
@@ -480,6 +484,7 @@
             {
                 id: 11,
                 title: '什么是WiFi 6协议？',
+                icon: '3',
                 category: 'basic',
                 categoryName: '基础知识',
                 summary: 'WiFi 6是最新的无线网络标准，提供更高的速度、更低的延迟和更好的并发性能。',
@@ -505,6 +510,7 @@
             {
                 id: 12,
                 title: '路由器基本知识',
+                icon: '4',
                 category: 'device',
                 categoryName: '设备维护',
                 summary: '了解路由器的基本功能、设置方法和维护技巧，让你的网络更稳定高效。',
@@ -531,6 +537,7 @@
             {
                 id: 13,
                 title: '网速太慢怎么办？',
+                icon: '5',
                 category: 'speed',
                 categoryName: '网速优化',
                 summary: '从路由器设置、设备连接到带宽检查，系统性地排查和解决网速慢的问题。',
@@ -553,6 +560,7 @@
             {
                 id: 14,
                 title: '常见的网络问题',
+                icon: '6',
                 category: 'basic',
                 categoryName: '基础知识',
                 summary: '了解常见网络问题的原因和解决方法，自己就能轻松解决大部分网络故障。',
@@ -621,27 +629,18 @@
             }
             
             // 保留轮播图，只渲染知识列表项
-            const itemsHTML = filteredData.map((item, index) => {
-                const iconMap = {
-                    9: '<svg viewBox="0 0 24 24"><path d="M4 11h5V5H4v6zm0 7h5v-6H4v6zm6 0h5v-6h-5v6zm6 0h5v-6h-5v6zm-6-7h5V5h-5v6zm6-6v6h5V5h-5z"/></svg>',
-                    10: '<svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>',
-                    11: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>',
-                    12: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2zm6 8h-2v-2h-2v2h4v-4h-2v2z"/></svg>',
-                    13: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>',
-                    14: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>'
-                };
+            const itemsHTML = filteredData.map((item) => {
                 const clickHandler = item.link ? `openArticle('${item.link}')` : `showDetail(${item.id})`;
                 return `
-                    <div class="knowledge-item" onclick="${clickHandler}">
-                        <div class="knowledge-text">
-                            <div class="knowledge-title">${item.title}</div>
-                        </div>
-                        <div class="knowledge-thumb">
-                            ${iconMap[item.id] || ''}
-                        </div>
+                <div class="knowledge-item" onclick="${clickHandler}">
+                    <div class="knowledge-text">
+                        <div class="knowledge-title">${item.title}</div>
                     </div>
-                `;
-            }).join('');
+                    <div class="knowledge-thumb">
+                        <img src="img/ico_${item.icon}.png" alt="${item.title}">
+                    </div>
+                </div>
+            `}).join('');
 
             // 保留轮播图，只更新列表项
             const carousel = document.getElementById('adCarousel');
