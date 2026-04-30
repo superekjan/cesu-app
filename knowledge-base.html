@@ -431,7 +431,6 @@
             {
                 id: 9,
                 title: '什么是内网网络？',
-                icon: '1',
                 category: 'basic',
                 categoryName: '基础知识',
                 summary: '内网（局域网）是指在一定范围内组建的私有网络，家庭和办公室中的网络都属于内网。',
@@ -459,7 +458,6 @@
             {
                 id: 10,
                 title: 'WiFi频道2.4G/5G的区别',
-                icon: '2',
                 category: 'basic',
                 categoryName: '基础知识',
                 summary: '2.4GHz覆盖广但速度慢，5GHz速度快但覆盖小，根据实际需求选择合适的频段。',
@@ -484,7 +482,6 @@
             {
                 id: 11,
                 title: '什么是WiFi 6协议？',
-                icon: '3',
                 category: 'basic',
                 categoryName: '基础知识',
                 summary: 'WiFi 6是最新的无线网络标准，提供更高的速度、更低的延迟和更好的并发性能。',
@@ -510,7 +507,6 @@
             {
                 id: 12,
                 title: '路由器基本知识',
-                icon: '4',
                 category: 'device',
                 categoryName: '设备维护',
                 summary: '了解路由器的基本功能、设置方法和维护技巧，让你的网络更稳定高效。',
@@ -537,7 +533,6 @@
             {
                 id: 13,
                 title: '网速太慢怎么办？',
-                icon: '5',
                 category: 'speed',
                 categoryName: '网速优化',
                 summary: '从路由器设置、设备连接到带宽检查，系统性地排查和解决网速慢的问题。',
@@ -560,7 +555,6 @@
             {
                 id: 14,
                 title: '常见的网络问题',
-                icon: '6',
                 category: 'basic',
                 categoryName: '基础知识',
                 summary: '了解常见网络问题的原因和解决方法，自己就能轻松解决大部分网络故障。',
@@ -629,7 +623,8 @@
             }
             
             // 保留轮播图，只渲染知识列表项
-            const itemsHTML = filteredData.map((item) => {
+            const itemsHTML = filteredData.map((item, index) => {
+                const icoIndex = index + 1;
                 const clickHandler = item.link ? `openArticle('${item.link}')` : `showDetail(${item.id})`;
                 return `
                 <div class="knowledge-item" onclick="${clickHandler}">
@@ -637,7 +632,7 @@
                         <div class="knowledge-title">${item.title}</div>
                     </div>
                     <div class="knowledge-thumb">
-                        <img src="img/ico_${item.icon}.png" alt="${item.title}">
+                        <img src="img/ico_${icoIndex}.svg" alt="${item.title}">
                     </div>
                 </div>
             `}).join('');
