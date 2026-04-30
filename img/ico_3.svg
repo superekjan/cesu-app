@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 50">
-  <rect width="70" height="50" fill="#ffffff"/>
-  <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9z" fill="#5b8def"/>
-  <path d="M5 15l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 15z" fill="#4ecdc4"/>
-  <path d="M9 21l2 2c0.76-0.76 2.24-0.76 3 0l2-2C14.14 13.14 10.87 13.14 9 21z" fill="#5dbe8d"/>
-  <text x="35" y="42" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#5b8def" text-anchor="middle">WiFi 6</text>
-</svg>
