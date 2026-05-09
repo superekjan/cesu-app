@@ -388,6 +388,16 @@
             gap: 12px;
         }
 
+        .action-buttons.single {
+            display: flex;
+            justify-content: center;
+        }
+
+        .action-buttons.single .btn {
+            flex: 1;
+            max-width: calc(50% - 6px);
+        }
+
         .btn {
             flex: 1;
             padding: 14px 24px;
@@ -411,6 +421,17 @@
             box-shadow: 0 6px 20px rgba(0, 114, 255, 0.5);
         }
 
+        .btn-success {
+            background: linear-gradient(270deg, #00c6a0 0%, #00a060 100%);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(0, 160, 96, 0.4);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 160, 96, 0.5);
+        }
+
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
             color: var(--text-primary);
@@ -419,6 +440,137 @@
 
         .btn-secondary:hover {
             background: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        /* 反馈弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 360px;
+            border: 1px solid var(--border-subtle);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .modal-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .feedback-textarea {
+            width: 100%;
+            height: 120px;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--text-primary);
+            resize: none;
+            outline: none;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            margin-bottom: 8px;
+        }
+
+        .feedback-textarea:focus {
+            border-color: var(--accent-blue);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .feedback-textarea::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .char-count {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-family: inherit;
+        }
+
+        .modal-btn.cancel {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-secondary);
+        }
+
+        .modal-btn.cancel:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .modal-btn.confirm {
+            background: linear-gradient(270deg, #00c6a0 0%, #00a060 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0, 160, 96, 0.25);
+        }
+
+        .modal-btn.confirm:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 160, 96, 0.35);
+        }
+
+        .modal-btn.confirm:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
 
         /* 底部安全区域 */
@@ -625,31 +777,136 @@
 
         <!-- 操作按钮 -->
         <div class="action-section">
-            <div class="action-buttons">
+            <div class="action-buttons" id="actionButtons">
                 <button class="btn btn-secondary" onclick="contactUser()">联系用户</button>
-                <button class="btn btn-primary" onclick="startProcessing()">开始处理</button>
+                <button class="btn btn-primary" id="processBtn" onclick="startProcessing()">开始处理</button>
+            </div>
+        </div>
+
+        <!-- 反馈弹窗 -->
+        <div class="modal-overlay" id="feedbackModal">
+            <div class="modal-content">
+                <div class="modal-title">完成工单</div>
+                <div class="modal-subtitle">请记录本次工单的处理情况</div>
+                <textarea class="feedback-textarea" id="feedbackText" placeholder="请输入工单处理反馈..." maxlength="500" oninput="updateCharCount()"></textarea>
+                <div class="char-count"><span id="charCount">0</span>/500</div>
+                <div class="modal-buttons">
+                    <button class="modal-btn cancel" onclick="closeFeedbackModal()">取消</button>
+                    <button class="modal-btn confirm" id="confirmCompleteBtn" onclick="confirmComplete()">确认完成</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 查看用户报告
+        let workOrderStatus = 'pending';
+
         function viewUserReport() {
             window.location.href = 'report-detail.html?type=diagnosis&id=1';
         }
 
-        // 联系用户
         function contactUser() {
             window.location.href = 'tel:13800135678';
         }
 
-        // 开始处理
         function startProcessing() {
             if (confirm('确认开始处理此工单？')) {
+                workOrderStatus = 'processing';
+                updateWorkOrderUI();
                 alert('工单状态已更新为"处理中"');
-                // 更新页面状态
             }
         }
+
+        function updateWorkOrderUI() {
+            const statusCard = document.querySelector('.status-card');
+            const statusIcon = statusCard.querySelector('.status-icon');
+            const statusTitle = statusCard.querySelector('.status-title');
+            const statusDesc = statusCard.querySelector('.status-desc');
+            const actionButtons = document.getElementById('actionButtons');
+            const processBtn = document.getElementById('processBtn');
+
+            if (workOrderStatus === 'processing') {
+                statusIcon.classList.remove('pending');
+                statusIcon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>';
+                statusIcon.querySelector('svg').style.fill = 'var(--accent-green)';
+                statusTitle.textContent = '处理中';
+                statusDesc.textContent = '工单编号：WO20240320001';
+
+                actionButtons.classList.add('single');
+                processBtn.classList.remove('btn-primary');
+                processBtn.classList.add('btn-success');
+                processBtn.textContent = '完成工单';
+                processBtn.onclick = showFeedbackModal;
+            }
+        }
+
+        function showFeedbackModal() {
+            const modal = document.getElementById('feedbackModal');
+            const textarea = document.getElementById('feedbackText');
+            textarea.value = '';
+            document.getElementById('charCount').textContent = '0';
+            modal.classList.add('show');
+            setTimeout(() => textarea.focus(), 300);
+        }
+
+        function closeFeedbackModal() {
+            const modal = document.getElementById('feedbackModal');
+            modal.classList.remove('show');
+        }
+
+        function updateCharCount() {
+            const textarea = document.getElementById('feedbackText');
+            document.getElementById('charCount').textContent = textarea.value.length;
+        }
+
+        function confirmComplete() {
+            const feedback = document.getElementById('feedbackText').value.trim();
+
+            if (!feedback) {
+                alert('请输入工单处理反馈');
+                return;
+            }
+
+            const modal = document.getElementById('feedbackModal');
+            modal.classList.remove('show');
+
+            const statusCard = document.querySelector('.status-card');
+            const statusIcon = statusCard.querySelector('.status-icon');
+            const statusTitle = statusCard.querySelector('.status-title');
+
+            statusIcon.classList.remove('pending');
+            statusIcon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+            statusIcon.querySelector('svg').style.fill = 'var(--accent-green)';
+            statusIcon.style.background = 'rgba(16, 185, 129, 0.2)';
+            statusTitle.textContent = '已完成';
+
+            const actionButtons = document.getElementById('actionButtons');
+            actionButtons.innerHTML = '<button class="btn btn-secondary" onclick="viewWorkOrderHistory()">查看工单记录</button>';
+
+            localStorage.setItem('workorder_feedback_' + Date.now(), JSON.stringify({
+                orderId: 'WO20240320001',
+                feedback: feedback,
+                completedAt: new Date().toISOString()
+            }));
+
+            alert('工单已完成！\n\n反馈内容：' + feedback);
+        }
+
+        function viewWorkOrderHistory() {
+            window.location.href = 'workorder-list.html';
+        }
+
+        document.getElementById('feedbackModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeFeedbackModal();
+            }
+        });
+
+        document.getElementById('feedbackText').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                confirmComplete();
+            }
+        });
     </script>
 </body>
 </html>
