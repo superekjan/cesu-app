@@ -1,0 +1,2295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>视频知识库</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #131524;
+            --bg-secondary: #131524;
+            --bg-card: rgba(38, 41, 58, 0.65);
+            --bg-card-hover: rgba(46, 49, 69, 0.75);
+            --accent-blue: #5b8def;
+            --accent-blue-light: #7ca6f3;
+            --accent-cyan: #4ecdc4;
+            --accent-green: #5dbe8d;
+            --accent-orange: #f4a261;
+            --accent-purple: #9b8bf4;
+            --accent-red: #f85149;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9aa3b2;
+            --text-tertiary: #6b7280;
+            --border-subtle: rgba(91, 141, 239, 0.15);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 30px;
+        }
+
+        .header {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .upload-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            border: none;
+            border-radius: 20px;
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(155, 139, 244, 0.4);
+        }
+
+        .upload-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: white;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 0 20px;
+        }
+
+        .category-section {
+            padding: 20px 0 8px;
+        }
+
+        .category-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 4px 0;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .category-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-chip {
+            padding: 8px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .category-chip:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+
+        .category-chip.active {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            border-color: transparent;
+            color: white;
+        }
+
+        .sort-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0 8px;
+        }
+
+        .sort-label {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        .sort-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .sort-option {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            padding: 4px 0;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .sort-option.active {
+            color: var(--accent-purple);
+            border-bottom-color: var(--accent-purple);
+        }
+
+        .video-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-bottom: 20px;
+        }
+
+        .video-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .video-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .video-thumbnail {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .video-card:hover .play-overlay {
+            opacity: 1;
+        }
+
+        .play-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .play-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--accent-purple);
+            margin-left: 3px;
+        }
+
+        .video-duration {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            padding: 2px 8px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 4px;
+            font-size: 12px;
+            color: white;
+        }
+
+        .video-type-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .badge-install {
+            background: rgba(91, 141, 239, 0.85);
+            color: white;
+        }
+
+        .badge-repair {
+            background: rgba(248, 81, 73, 0.85);
+            color: white;
+        }
+
+        .badge-config {
+            background: rgba(78, 205, 196, 0.85);
+            color: white;
+        }
+
+        .badge-train {
+            background: rgba(155, 139, 244, 0.85);
+            color: white;
+        }
+
+        .badge-other {
+            background: rgba(244, 162, 97, 0.85);
+            color: white;
+        }
+
+        .video-info {
+            padding: 12px 14px;
+        }
+
+        .video-title {
+            font-size: 15px;
+            font-weight: 500;
+            line-height: 1.4;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .video-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .video-meta-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .video-views {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .video-views svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--text-tertiary);
+        }
+
+        .video-views.hot svg {
+            fill: var(--accent-orange);
+        }
+
+        .video-views.hot span {
+            color: var(--accent-orange);
+        }
+
+        .video-date {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .video-uploader {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .empty-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--text-tertiary);
+        }
+
+        .empty-text {
+            font-size: 14px;
+            color: var(--text-tertiary);
+            margin-bottom: 20px;
+        }
+
+        .upload-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 200;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .upload-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .upload-content {
+            width: 100%;
+            max-width: 480px;
+            background: var(--bg-secondary);
+            border-radius: 24px 24px 0 0;
+            padding: 24px 20px 40px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .upload-modal.show .upload-content {
+            transform: translateY(0);
+        }
+
+        .upload-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .upload-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .upload-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .upload-close svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-purple);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%239aa3b2' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            cursor: pointer;
+        }
+
+        .form-select:focus {
+            border-color: var(--accent-purple);
+        }
+
+        .file-upload-area {
+            width: 100%;
+            padding: 30px 20px;
+            background: var(--bg-card);
+            border: 2px dashed var(--border-subtle);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--accent-purple);
+            background: rgba(155, 139, 244, 0.05);
+        }
+
+        .file-upload-area.has-file {
+            border-color: var(--accent-green);
+            border-style: solid;
+        }
+
+        .file-upload-icon {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 10px;
+            background: rgba(155, 139, 244, 0.15);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .file-upload-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: var(--accent-purple);
+        }
+
+        .file-upload-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .file-upload-hint {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .file-name {
+            font-size: 13px;
+            color: var(--accent-green);
+            margin-top: 8px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            box-shadow: 0 6px 20px rgba(155, 139, 244, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .video-player-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .video-player-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .player-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .player-close svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        .player-container {
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .player-video {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .player-video video {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+        }
+
+        .player-placeholder {
+            text-align: center;
+        }
+
+        .player-placeholder svg {
+            width: 64px;
+            height: 64px;
+            fill: var(--text-tertiary);
+        }
+
+        .player-placeholder p {
+            color: var(--text-tertiary);
+            margin-top: 12px;
+            font-size: 14px;
+        }
+
+        .player-info {
+            padding: 16px;
+        }
+
+        .player-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .player-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .video-card {
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .video-card:nth-child(2) { animation-delay: 0.05s; }
+        .video-card:nth-child(3) { animation-delay: 0.1s; }
+        .video-card:nth-child(4) { animation-delay: 0.15s; }
+        .video-card:nth-child(5) { animation-delay: 0.2s; }
+
+        .tab-section {
+            display: flex;
+            gap: 0;
+            margin-bottom: 4px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .tab-item.active {
+            color: var(--text-primary);
+        }
+
+        .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 20%;
+            right: 20%;
+            height: 2px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            border-radius: 1px;
+        }
+
+        .tab-item .tab-count {
+            display: inline-block;
+            min-width: 18px;
+            height: 18px;
+            line-height: 18px;
+            padding: 0 5px;
+            background: var(--bg-card);
+            border-radius: 9px;
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-left: 4px;
+            vertical-align: 1px;
+        }
+
+        .tab-item.active .tab-count {
+            background: rgba(155, 139, 244, 0.2);
+            color: var(--accent-purple);
+        }
+
+        .my-video-section {
+            display: none;
+        }
+
+        .my-video-section.active {
+            display: block;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .status-badge svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        .status-pending {
+            background: rgba(244, 162, 97, 0.15);
+            color: var(--accent-orange);
+        }
+
+        .status-pending svg {
+            fill: var(--accent-orange);
+        }
+
+        .status-approved {
+            background: rgba(93, 190, 141, 0.15);
+            color: var(--accent-green);
+        }
+
+        .status-approved svg {
+            fill: var(--accent-green);
+        }
+
+        .status-rejected {
+            background: rgba(248, 81, 73, 0.15);
+            color: var(--accent-red);
+        }
+
+        .status-rejected svg {
+            fill: var(--accent-red);
+        }
+
+        .reject-reason {
+            font-size: 12px;
+            color: var(--accent-red);
+            margin-top: 6px;
+            padding: 6px 10px;
+            background: rgba(248, 81, 73, 0.08);
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+
+        .review-notice {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 12px 14px;
+            background: rgba(244, 162, 97, 0.08);
+            border: 1px solid rgba(244, 162, 97, 0.2);
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .review-notice svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--accent-orange);
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .review-notice-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .review-notice-text strong {
+            color: var(--accent-orange);
+        }
+
+        .upload-success-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 250;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .upload-success-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .success-content {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 32px 24px;
+            text-align: center;
+            border: 1px solid var(--border-subtle);
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .upload-success-modal.show .success-content {
+            transform: scale(1);
+        }
+
+        .success-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 16px;
+            background: rgba(93, 190, 141, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .success-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: var(--accent-green);
+        }
+
+        .success-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .success-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .success-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .my-video-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .my-video-card:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .my-video-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .my-video-title {
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .my-video-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .my-video-meta span {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .my-video-meta svg {
+            width: 13px;
+            height: 13px;
+            fill: var(--text-tertiary);
+        }
+
+        .delete-btn {
+            padding: 4px 10px;
+            background: rgba(248, 81, 73, 0.1);
+            border: 1px solid rgba(248, 81, 73, 0.2);
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--accent-red);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: rgba(248, 81, 73, 0.2);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+            line-height: 1.5;
+        }
+
+        .form-textarea:focus {
+            border-color: var(--accent-purple);
+        }
+
+        .form-textarea::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .upload-progress {
+            display: none;
+            margin-top: 12px;
+        }
+
+        .upload-progress.show {
+            display: block;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-card);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6px;
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .video-preview-area {
+            display: none;
+            margin-top: 12px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+            position: relative;
+        }
+
+        .video-preview-area.show {
+            display: block;
+        }
+
+        .video-preview-area video {
+            width: 100%;
+            max-height: 200px;
+            display: block;
+        }
+
+        .preview-remove {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            background: rgba(0, 0, 0, 0.6);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .preview-remove svg {
+            width: 16px;
+            height: 16px;
+            fill: white;
+        }
+
+        .my-stats {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .my-stat-item {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 12px 10px;
+            text-align: center;
+        }
+
+        .my-stat-num {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .my-stat-num.pending-num {
+            color: var(--accent-orange);
+        }
+
+        .my-stat-num.approved-num {
+            color: var(--accent-green);
+        }
+
+        .my-stat-num.rejected-num {
+            color: var(--accent-red);
+        }
+
+        .my-stat-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .reupload-btn {
+            padding: 4px 10px;
+            background: rgba(155, 139, 244, 0.1);
+            border: 1px solid rgba(155, 139, 244, 0.2);
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--accent-purple);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .reupload-btn:hover {
+            background: rgba(155, 139, 244, 0.2);
+        }
+
+        .admin-panel {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 400;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .admin-panel.show {
+            display: flex;
+        }
+
+        .admin-content {
+            width: 100%;
+            max-width: 480px;
+            background: var(--bg-secondary);
+            border-radius: 24px 24px 0 0;
+            padding: 24px 20px 40px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .admin-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .admin-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-title svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--accent-orange);
+        }
+
+        .admin-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .admin-close svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--text-secondary);
+        }
+
+        .admin-video-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+
+        .admin-video-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .admin-video-title {
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .admin-video-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-bottom: 10px;
+        }
+
+        .admin-video-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 10px;
+            padding: 8px 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .admin-approve-btn {
+            padding: 8px 18px;
+            background: linear-gradient(135deg, var(--accent-green), #3db878);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .admin-approve-btn:hover {
+            box-shadow: 0 4px 12px rgba(93, 190, 141, 0.4);
+        }
+
+        .admin-reject-btn {
+            padding: 8px 18px;
+            background: rgba(248, 81, 73, 0.15);
+            border: 1px solid rgba(248, 81, 73, 0.3);
+            border-radius: 10px;
+            color: var(--accent-red);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .admin-reject-btn:hover {
+            background: rgba(248, 81, 73, 0.25);
+        }
+
+        .admin-reject-form {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .admin-reject-form.show {
+            display: block;
+        }
+
+        .admin-reject-input {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(248, 81, 73, 0.05);
+            border: 1px solid rgba(248, 81, 73, 0.2);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 13px;
+            outline: none;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 60px;
+            margin-bottom: 8px;
+        }
+
+        .admin-reject-input:focus {
+            border-color: var(--accent-red);
+        }
+
+        .admin-reject-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .admin-reject-submit {
+            padding: 6px 14px;
+            background: var(--accent-red);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .admin-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-tertiary);
+        }
+
+        .admin-empty svg {
+            width: 48px;
+            height: 48px;
+            fill: var(--text-tertiary);
+            margin-bottom: 12px;
+        }
+
+        .admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 500;
+            background: rgba(244, 162, 97, 0.15);
+            color: var(--accent-orange);
+            margin-left: 8px;
+        }
+
+        .admin-badge svg {
+            width: 12px;
+            height: 12px;
+            fill: var(--accent-orange);
+        }
+
+        .submit-btn.uploading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .file-info {
+            display: none;
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: rgba(93, 190, 141, 0.08);
+            border: 1px solid rgba(93, 190, 141, 0.15);
+            border-radius: 10px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .file-info.show {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-info svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--accent-green);
+            flex-shrink: 0;
+        }
+
+        .file-info-text {
+            flex: 1;
+        }
+
+        .file-info-size {
+            color: var(--text-tertiary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-top">
+                <div class="back-btn" onclick="goBack()">
+                    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </div>
+                <div class="header-title">视频知识库</div>
+                <button class="upload-btn" onclick="showUploadModal()">
+                    <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    上传
+                </button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="tab-section">
+                <div class="tab-item active" data-tab="browse" onclick="switchTab('browse', this)">
+                    视频库<span class="tab-count" id="browseCount">0</span>
+                </div>
+                <div class="tab-item" data-tab="my" onclick="switchTab('my', this)">
+                    我上传的<span class="tab-count" id="myCount">0</span>
+                </div>
+            </div>
+
+            <div class="my-video-section active" id="browseSection">
+                <div class="category-section">
+                    <div class="category-scroll" id="categoryScroll">
+                        <div class="category-chip active" data-category="all" onclick="filterCategory('all', this)">全部</div>
+                        <div class="category-chip" data-category="install" onclick="filterCategory('install', this)">安装规范</div>
+                        <div class="category-chip" data-category="repair" onclick="filterCategory('repair', this)">故障维修</div>
+                        <div class="category-chip" data-category="config" onclick="filterCategory('config', this)">配置调试</div>
+                        <div class="category-chip" data-category="train" onclick="filterCategory('train', this)">技能培训</div>
+                        <div class="category-chip" data-category="other" onclick="filterCategory('other', this)">其他</div>
+                    </div>
+                </div>
+
+                <div class="sort-bar">
+                    <span class="sort-label">共 <span id="videoCount">0</span> 个视频</span>
+                    <div class="sort-options">
+                        <span class="sort-option active" data-sort="views" onclick="sortVideos('views', this)">按点击量</span>
+                        <span class="sort-option" data-sort="date" onclick="sortVideos('date', this)">按时间</span>
+                    </div>
+                </div>
+
+                <div class="video-list" id="videoList"></div>
+            </div>
+
+            <div class="my-video-section" id="mySection">
+                <div class="review-notice">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                    <div class="review-notice-text">
+                        上传的视频需经<strong>管理员审核</strong>通过后才会显示在视频库中。审核通常在1-2个工作日内完成，请耐心等待。
+                    </div>
+                </div>
+                <div class="my-stats" id="myStats">
+                    <div class="my-stat-item">
+                        <div class="my-stat-num pending-num" id="statPending">0</div>
+                        <div class="my-stat-label">审核中</div>
+                    </div>
+                    <div class="my-stat-item">
+                        <div class="my-stat-num approved-num" id="statApproved">0</div>
+                        <div class="my-stat-label">已通过</div>
+                    </div>
+                    <div class="my-stat-item">
+                        <div class="my-stat-num rejected-num" id="statRejected">0</div>
+                        <div class="my-stat-label">未通过</div>
+                    </div>
+                </div>
+                <div id="myVideoList"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="upload-modal" id="uploadModal">
+        <div class="upload-content">
+            <div class="upload-header">
+                <h2 class="upload-title">上传视频</h2>
+                <button class="upload-close" onclick="closeUploadModal()">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">视频标题</label>
+                <input type="text" class="form-input" id="videoTitle" placeholder="请输入视频标题" maxlength="50">
+            </div>
+            <div class="form-group">
+                <label class="form-label">视频描述</label>
+                <textarea class="form-textarea" id="videoDesc" placeholder="请输入视频描述，如内容摘要、适用场景等" maxlength="200"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">视频分类</label>
+                <select class="form-select" id="videoCategory">
+                    <option value="install">安装规范</option>
+                    <option value="repair">故障维修</option>
+                    <option value="config">配置调试</option>
+                    <option value="train">技能培训</option>
+                    <option value="other">其他</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">选择视频文件</label>
+                <div class="file-upload-area" id="fileUploadArea" onclick="document.getElementById('videoFile').click()">
+                    <div class="file-upload-icon">
+                        <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+                    </div>
+                    <p class="file-upload-text">点击选择视频文件</p>
+                    <p class="file-upload-hint">支持 MP4、MOV、AVI 格式，最大 500MB</p>
+                    <p class="file-name" id="fileName" style="display:none"></p>
+                </div>
+                <input type="file" id="videoFile" accept="video/mp4,video/quicktime,video/x-msvideo,video/*" style="display:none" onchange="handleFileSelect(this)">
+                <div class="file-info" id="fileInfo">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    <div class="file-info-text">
+                        <span id="fileInfoName"></span>
+                        <span class="file-info-size" id="fileInfoSize"></span>
+                    </div>
+                </div>
+                <div class="video-preview-area" id="videoPreview">
+                    <video id="previewVideo" controls></video>
+                    <button class="preview-remove" onclick="removePreview()">
+                        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="upload-progress" id="uploadProgress">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressBarFill"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="progressLabel">正在上传...</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+            </div>
+            <div class="review-notice" style="margin-bottom: 0; margin-top: 4px;">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                <div class="review-notice-text">
+                    视频上传后需经<strong>管理员审核</strong>通过后才会公开展示
+                </div>
+            </div>
+            <button class="submit-btn" id="submitBtn" onclick="uploadVideo()">提交审核</button>
+        </div>
+    </div>
+
+    <div class="upload-success-modal" id="successModal">
+        <div class="success-content">
+            <div class="success-icon">
+                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            </div>
+            <div class="success-title">提交成功</div>
+            <div class="success-desc">视频已提交审核，管理员审核通过后将显示在视频库中</div>
+            <button class="success-btn" onclick="closeSuccessModal()">我知道了</button>
+        </div>
+    </div>
+
+    <div class="video-player-modal" id="playerModal">
+        <button class="player-close" onclick="closePlayerModal()">
+            <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+        <div class="player-container">
+            <div class="player-video" id="playerVideo">
+                <div class="player-placeholder">
+                    <svg viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
+                    <p>视频播放区域</p>
+                </div>
+            </div>
+            <div class="player-info">
+                <div class="player-title" id="playerTitle"></div>
+                <div class="player-meta">
+                    <span id="playerViews"></span>
+                    <span id="playerDate"></span>
+                    <span id="playerUploader"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-content">
+            <div class="admin-header">
+                <div class="admin-title">
+                    <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                    审核管理
+                    <span class="admin-badge" id="adminBadge">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                        <span id="adminBadgeCount">0</span> 待审核
+                    </span>
+                </div>
+                <button class="admin-close" onclick="closeAdminPanel()">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div id="adminVideoList"></div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'video_knowledge_base';
+        const MY_VIDEOS_KEY = 'my_uploaded_videos';
+        const ADMIN_KEY = 'admin_review_mode';
+        const categoryMap = {
+            install: { name: '安装规范', badge: 'badge-install' },
+            repair: { name: '故障维修', badge: 'badge-repair' },
+            config: { name: '配置调试', badge: 'badge-config' },
+            train: { name: '技能培训', badge: 'badge-train' },
+            other: { name: '其他', badge: 'badge-other' }
+        };
+
+        const statusMap = {
+            pending: { name: '审核中', cls: 'status-pending', icon: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>' },
+            approved: { name: '已通过', cls: 'status-approved', icon: '<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>' },
+            rejected: { name: '未通过', cls: 'status-rejected', icon: '<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>' }
+        };
+
+        let currentCategory = 'all';
+        let currentSort = 'views';
+        let currentTab = 'browse';
+        let adminLongPressTimer = null;
+        let selectedFile = null;
+
+        function getVideos() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            if (data) {
+                let videos = JSON.parse(data);
+                let needsSave = false;
+                videos = videos.map(function(v) {
+                    if (!v.status) {
+                        v.status = 'approved';
+                        needsSave = true;
+                    }
+                    if (!v.description) {
+                        v.description = '';
+                        needsSave = true;
+                    }
+                    return v;
+                });
+                if (needsSave) {
+                    saveVideos(videos);
+                }
+                return videos;
+            }
+            const defaultVideos = [
+                { id: 'v1', title: '光纤入户安装规范流程详解', category: 'install', views: 1256, date: '2024-03-15', uploader: '张工', duration: '12:30', status: 'approved', description: '详细讲解光纤入户的标准化安装流程，包括入户布线、熔接操作和终端安装等关键步骤。' },
+                { id: 'v2', title: '路由器常见故障排查与维修指南', category: 'repair', views: 983, date: '2024-03-12', uploader: '李工', duration: '08:45', status: 'approved', description: '针对路由器常见故障提供系统化排查方法，涵盖指示灯异常、无法上网、WiFi不稳定等问题。' },
+                { id: 'v3', title: 'WiFi6路由器配置与优化教程', category: 'config', views: 2341, date: '2024-03-10', uploader: '王工', duration: '15:20', status: 'approved', description: 'WiFi6路由器的完整配置教程，包括基础设置、信道优化、QoS配置等进阶内容。' },
+                { id: 'v4', title: '装维人员安全操作规范培训', category: 'train', views: 3567, date: '2024-03-08', uploader: '赵工', duration: '20:15', status: 'approved', description: '装维人员必须掌握的安全操作规范，包括高空作业、用电安全和防护装备使用。' },
+                { id: 'v5', title: '光猫故障诊断与更换操作', category: 'repair', views: 876, date: '2024-03-05', uploader: '陈工', duration: '10:30', status: 'approved', description: '光猫故障的诊断流程和更换操作演示，帮助快速定位和解决光猫相关问题。' },
+                { id: 'v6', title: '家庭网络布线标准与实操', category: 'install', views: 1543, date: '2024-03-03', uploader: '张工', duration: '18:40', status: 'approved', description: '家庭网络布线的国家标准解读和实际操作演示，确保布线质量和美观度。' },
+                { id: 'v7', title: 'IPTV机顶盒安装调试全流程', category: 'config', views: 654, date: '2024-02-28', uploader: '刘工', duration: '09:55', status: 'approved', description: 'IPTV机顶盒从安装到调试的完整流程，包括信号检测、频道配置和遥控器配对。' },
+                { id: 'v8', title: '装维服务礼仪与沟通技巧', category: 'train', views: 4210, date: '2024-02-25', uploader: '赵工', duration: '25:10', status: 'approved', description: '提升装维人员服务质量的培训课程，重点讲解上门服务的礼仪规范和客户沟通技巧。' },
+                { id: 'v9', title: '网速慢问题定位与解决方法', category: 'repair', views: 1890, date: '2024-02-20', uploader: '李工', duration: '11:20', status: 'approved', description: '系统化排查网速慢问题的方法，从线路检测到设备优化，全面覆盖各类原因。' },
+                { id: 'v10', title: '智能家居设备联网配置指南', category: 'other', views: 432, date: '2024-02-18', uploader: '王工', duration: '07:30', status: 'approved', description: '常见智能家居设备的联网配置方法，包括智能音箱、摄像头和门锁等设备。' }
+            ];
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultVideos));
+            return defaultVideos;
+        }
+
+        function saveVideos(videos) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(videos));
+        }
+
+        function getMyVideos() {
+            const data = localStorage.getItem(MY_VIDEOS_KEY);
+            if (data) {
+                let videos = JSON.parse(data);
+                let needsSave = false;
+                videos = videos.map(function(v) {
+                    if (!v.status) {
+                        v.status = 'pending';
+                        needsSave = true;
+                    }
+                    if (!v.description) {
+                        v.description = '';
+                        needsSave = true;
+                    }
+                    return v;
+                });
+                if (needsSave) {
+                    saveMyVideos(videos);
+                }
+                return videos;
+            }
+            const defaults = [
+                { id: 'my1', title: '光纤熔接操作演示', category: 'install', views: 0, date: '2024-03-18', uploader: '我', duration: '15:00', status: 'pending', fileName: '光纤熔接.mp4', description: '光纤熔接的完整操作演示，包括剥线、清洁、切割和熔接步骤。' },
+                { id: 'my2', title: '路由器恢复出厂设置方法', category: 'config', views: 56, date: '2024-03-10', uploader: '我', duration: '05:30', status: 'approved', fileName: '路由器重置.mp4', description: '各品牌路由器恢复出厂设置的详细操作方法。' },
+                { id: 'my3', title: '网线制作与测试教程', category: 'train', views: 0, date: '2024-03-05', uploader: '我', duration: '12:00', status: 'rejected', rejectReason: '视频画质不清晰，请重新上传高清版本', fileName: '网线制作.mp4', description: 'T568B标准网线制作和测试的完整教程。' }
+            ];
+            localStorage.setItem(MY_VIDEOS_KEY, JSON.stringify(defaults));
+            return defaults;
+        }
+
+        function saveMyVideos(videos) {
+            localStorage.setItem(MY_VIDEOS_KEY, JSON.stringify(videos));
+        }
+
+        function formatViews(num) {
+            if (num >= 10000) return (num / 10000).toFixed(1) + '万';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+            return num.toString();
+        }
+
+        function switchTab(tab, el) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('browseSection').classList.toggle('active', tab === 'browse');
+            document.getElementById('mySection').classList.toggle('active', tab === 'my');
+            if (tab === 'browse') {
+                renderVideoList();
+            } else {
+                renderMyVideoList();
+            }
+        }
+
+        function renderVideoList() {
+            let videos = getVideos().filter(v => v.status === 'approved');
+            const list = document.getElementById('videoList');
+            const countEl = document.getElementById('videoCount');
+            const browseCountEl = document.getElementById('browseCount');
+
+            if (currentCategory !== 'all') {
+                videos = videos.filter(v => v.category === currentCategory);
+            }
+
+            if (currentSort === 'views') {
+                videos.sort((a, b) => b.views - a.views);
+            } else {
+                videos.sort((a, b) => new Date(b.date) - new Date(a.date));
+            }
+
+            countEl.textContent = videos.length;
+            browseCountEl.textContent = videos.length;
+
+            if (videos.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <svg viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
+                        </div>
+                        <p class="empty-text">暂无该分类的视频</p>
+                    </div>`;
+                return;
+            }
+
+            list.innerHTML = videos.map((video, index) => {
+                const cat = categoryMap[video.category] || categoryMap.other;
+                const isHot = video.views >= 1000;
+                const colors = ['#5b8def', '#4ecdc4', '#9b8bf4', '#f4a261', '#f85149'];
+                const bgColor = colors[index % colors.length];
+                return `
+                    <div class="video-card" onclick="playVideo('${video.id}')" style="animation-delay: ${index * 0.05}s">
+                        <div class="video-thumbnail" style="background: linear-gradient(135deg, ${bgColor}22, ${bgColor}44)">
+                            <svg viewBox="0 0 24 24" width="48" height="48" style="fill: ${bgColor}66"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
+                            <div class="play-overlay">
+                                <div class="play-icon">
+                                    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                </div>
+                            </div>
+                            <span class="video-type-badge ${cat.badge}">${cat.name}</span>
+                            <span class="video-duration">${video.duration}</span>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">${video.title}</div>
+                            <div class="video-meta">
+                                <div class="video-meta-left">
+                                    <span class="video-views ${isHot ? 'hot' : ''}">
+                                        <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                                        <span>${formatViews(video.views)}</span>
+                                    </span>
+                                    <span class="video-date">${video.date}</span>
+                                </div>
+                                <span class="video-uploader">${video.uploader}</span>
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        function renderMyVideoList() {
+            const myVideos = getMyVideos();
+            const container = document.getElementById('myVideoList');
+            const myCountEl = document.getElementById('myCount');
+            myCountEl.textContent = myVideos.length;
+
+            const pendingCount = myVideos.filter(v => v.status === 'pending').length;
+            const approvedCount = myVideos.filter(v => v.status === 'approved').length;
+            const rejectedCount = myVideos.filter(v => v.status === 'rejected').length;
+            document.getElementById('statPending').textContent = pendingCount;
+            document.getElementById('statApproved').textContent = approvedCount;
+            document.getElementById('statRejected').textContent = rejectedCount;
+
+            if (myVideos.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                        </div>
+                        <p class="empty-text">您还没有上传过视频</p>
+                    </div>`;
+                return;
+            }
+
+            myVideos.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            container.innerHTML = myVideos.map(video => {
+                const cat = categoryMap[video.category] || categoryMap.other;
+                const st = statusMap[video.status] || statusMap.pending;
+                let html = `
+                    <div class="my-video-card">
+                        <div class="my-video-top">
+                            <div class="my-video-title">${video.title}</div>
+                            <span class="status-badge ${st.cls}">
+                                <svg viewBox="0 0 24 24">${st.icon}</svg>
+                                ${st.name}
+                            </span>
+                        </div>
+                        ${video.description ? `<div style="font-size:12px;color:var(--text-tertiary);margin-bottom:8px;line-height:1.5;">${video.description}</div>` : ''}
+                        <div class="my-video-meta">
+                            <span>
+                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                                ${cat.name}
+                            </span>
+                            <span>
+                                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                                ${video.duration}
+                            </span>
+                            <span>
+                                <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                                ${formatViews(video.views)}
+                            </span>
+                            <span>${video.date}</span>
+                        </div>`;
+                if (video.status === 'rejected' && video.rejectReason) {
+                    html += `<div class="reject-reason">拒绝原因：${video.rejectReason}</div>`;
+                }
+                html += `
+                        <div style="margin-top: 10px; display: flex; justify-content: flex-end; gap: 8px;">`;
+                if (video.status === 'rejected') {
+                    html += `<button class="reupload-btn" onclick="reuploadVideo('${video.id}')">编辑重传</button>`;
+                }
+                html += `
+                            <button class="delete-btn" onclick="deleteMyVideo('${video.id}')">删除</button>
+                        </div>
+                    </div>`;
+                return html;
+            }).join('');
+        }
+
+        function filterCategory(category, el) {
+            currentCategory = category;
+            document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            renderVideoList();
+        }
+
+        function sortVideos(sort, el) {
+            currentSort = sort;
+            document.querySelectorAll('.sort-option').forEach(s => s.classList.remove('active'));
+            el.classList.add('active');
+            renderVideoList();
+        }
+
+        function showUploadModal(editData) {
+            document.getElementById('uploadModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+
+            if (editData) {
+                document.getElementById('videoTitle').value = editData.title || '';
+                document.getElementById('videoDesc').value = editData.description || '';
+                document.getElementById('videoCategory').value = editData.category || 'install';
+                document.querySelector('.upload-title').textContent = '编辑重传';
+                document.getElementById('submitBtn').textContent = '重新提交审核';
+                document.getElementById('submitBtn').dataset.editId = editData.id;
+            } else {
+                document.getElementById('videoTitle').value = '';
+                document.getElementById('videoDesc').value = '';
+                document.getElementById('videoCategory').value = 'install';
+                document.getElementById('videoFile').value = '';
+                document.getElementById('fileName').style.display = 'none';
+                document.getElementById('fileUploadArea').classList.remove('has-file');
+                document.getElementById('fileInfo').classList.remove('show');
+                document.getElementById('videoPreview').classList.remove('show');
+                document.getElementById('uploadProgress').classList.remove('show');
+                document.querySelector('.upload-title').textContent = '上传视频';
+                document.getElementById('submitBtn').textContent = '提交审核';
+                delete document.getElementById('submitBtn').dataset.editId;
+                selectedFile = null;
+            }
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.remove('show');
+            document.body.style.overflow = '';
+
+            const previewVideo = document.getElementById('previewVideo');
+            if (previewVideo.src) {
+                URL.revokeObjectURL(previewVideo.src);
+                previewVideo.src = '';
+            }
+            document.getElementById('videoPreview').classList.remove('show');
+            document.getElementById('videoTitle').value = '';
+            document.getElementById('videoDesc').value = '';
+            document.getElementById('videoFile').value = '';
+            document.getElementById('fileName').style.display = 'none';
+            document.getElementById('fileUploadArea').classList.remove('has-file');
+            document.getElementById('fileInfo').classList.remove('show');
+            document.getElementById('uploadProgress').classList.remove('show');
+            document.getElementById('progressBarFill').style.width = '0%';
+            document.getElementById('submitBtn').classList.remove('uploading');
+            document.getElementById('submitBtn').textContent = '提交审核';
+            delete document.getElementById('submitBtn').dataset.editId;
+            selectedFile = null;
+        }
+
+        function reuploadVideo(videoId) {
+            const myVideos = getMyVideos();
+            const video = myVideos.find(v => v.id === videoId);
+            if (!video) return;
+            showUploadModal(video);
+        }
+
+        function handleFileSelect(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const allowedTypes = ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/avi', 'video/webm', 'video/ogg'];
+            if (!file.type.startsWith('video/')) {
+                alert('请选择视频文件（支持 MP4、MOV、AVI 格式）');
+                input.value = '';
+                return;
+            }
+
+            const maxSize = 500 * 1024 * 1024;
+            if (file.size > maxSize) {
+                alert('视频文件大小不能超过 500MB');
+                input.value = '';
+                return;
+            }
+
+            selectedFile = file;
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileName').style.display = 'block';
+            document.getElementById('fileUploadArea').classList.add('has-file');
+
+            document.getElementById('fileInfoName').textContent = file.name;
+            document.getElementById('fileInfoSize').textContent = ' · ' + formatFileSize(file.size);
+            document.getElementById('fileInfo').classList.add('show');
+
+            const previewUrl = URL.createObjectURL(file);
+            const previewVideo = document.getElementById('previewVideo');
+            previewVideo.src = previewUrl;
+            document.getElementById('videoPreview').classList.add('show');
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes >= 1024 * 1024 * 1024) return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+            if (bytes >= 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+            if (bytes >= 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return bytes + ' B';
+        }
+
+        function removePreview() {
+            const previewVideo = document.getElementById('previewVideo');
+            URL.revokeObjectURL(previewVideo.src);
+            previewVideo.src = '';
+            document.getElementById('videoPreview').classList.remove('show');
+            document.getElementById('videoFile').value = '';
+            document.getElementById('fileName').style.display = 'none';
+            document.getElementById('fileUploadArea').classList.remove('has-file');
+            document.getElementById('fileInfo').classList.remove('show');
+            selectedFile = null;
+        }
+
+        function uploadVideo() {
+            const title = document.getElementById('videoTitle').value.trim();
+            const desc = document.getElementById('videoDesc').value.trim();
+            const category = document.getElementById('videoCategory').value;
+            const fileInput = document.getElementById('videoFile');
+            const editId = document.getElementById('submitBtn').dataset.editId;
+
+            if (!title) {
+                alert('请输入视频标题');
+                return;
+            }
+
+            if (!editId && !fileInput.files[0]) {
+                alert('请选择视频文件');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.classList.add('uploading');
+            submitBtn.textContent = '上传中...';
+
+            const progressEl = document.getElementById('uploadProgress');
+            progressEl.classList.add('show');
+
+            simulateUploadProgress(0, function() {
+                const myVideos = getMyVideos();
+
+                if (editId) {
+                    const idx = myVideos.findIndex(v => v.id === editId);
+                    if (idx !== -1) {
+                        myVideos[idx].title = title;
+                        myVideos[idx].description = desc;
+                        myVideos[idx].category = category;
+                        myVideos[idx].status = 'pending';
+                        myVideos[idx].date = new Date().toISOString().split('T')[0];
+                        myVideos[idx].rejectReason = '';
+                        if (fileInput.files[0]) {
+                            myVideos[idx].fileName = fileInput.files[0].name;
+                        }
+                    }
+                } else {
+                    const newVideo = {
+                        id: 'my' + Date.now(),
+                        title: title,
+                        category: category,
+                        views: 0,
+                        date: new Date().toISOString().split('T')[0],
+                        uploader: '我',
+                        duration: '00:00',
+                        status: 'pending',
+                        fileName: fileInput.files[0].name,
+                        description: desc
+                    };
+                    myVideos.unshift(newVideo);
+                }
+
+                saveMyVideos(myVideos);
+
+                submitBtn.classList.remove('uploading');
+                submitBtn.textContent = '提交审核';
+                progressEl.classList.remove('show');
+                document.getElementById('progressBarFill').style.width = '0%';
+
+                closeUploadModal();
+                showSuccessModal(editId ? 'reupload' : 'upload');
+                renderMyVideoList();
+                updateTabCounts();
+            });
+        }
+
+        function simulateUploadProgress(current, callback) {
+            if (current >= 100) {
+                document.getElementById('progressBarFill').style.width = '100%';
+                document.getElementById('progressPercent').textContent = '100%';
+                document.getElementById('progressLabel').textContent = '上传完成';
+                setTimeout(callback, 300);
+                return;
+            }
+            const increment = Math.random() * 15 + 5;
+            const next = Math.min(current + increment, 100);
+            document.getElementById('progressBarFill').style.width = next + '%';
+            document.getElementById('progressPercent').textContent = Math.round(next) + '%';
+            if (next < 30) {
+                document.getElementById('progressLabel').textContent = '正在上传...';
+            } else if (next < 70) {
+                document.getElementById('progressLabel').textContent = '正在处理...';
+            } else if (next < 100) {
+                document.getElementById('progressLabel').textContent = '即将完成...';
+            }
+            const delay = Math.random() * 200 + 100;
+            setTimeout(function() {
+                simulateUploadProgress(next, callback);
+            }, delay);
+        }
+
+        function showSuccessModal(type) {
+            const modal = document.getElementById('successModal');
+            const title = modal.querySelector('.success-title');
+            const desc = modal.querySelector('.success-desc');
+            if (type === 'reupload') {
+                title.textContent = '重新提交成功';
+                desc.textContent = '视频已重新提交审核，管理员审核通过后将显示在视频库中';
+            } else {
+                title.textContent = '提交成功';
+                desc.textContent = '视频已提交审核，管理员审核通过后将显示在视频库中';
+            }
+            modal.classList.add('show');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.remove('show');
+            switchTab('my', document.querySelector('.tab-item[data-tab="my"]'));
+        }
+
+        function deleteMyVideo(videoId) {
+            if (!confirm('确定要删除这个视频吗？')) return;
+            let myVideos = getMyVideos();
+            myVideos = myVideos.filter(v => v.id !== videoId);
+            saveMyVideos(myVideos);
+            renderMyVideoList();
+            updateTabCounts();
+        }
+
+        function updateTabCounts() {
+            const approvedCount = getVideos().filter(v => v.status === 'approved').length;
+            const myCount = getMyVideos().length;
+            document.getElementById('browseCount').textContent = approvedCount;
+            document.getElementById('myCount').textContent = myCount;
+        }
+
+        function playVideo(videoId) {
+            const videos = getVideos();
+            const video = videos.find(v => v.id === videoId);
+            if (!video) return;
+
+            video.views += 1;
+            saveVideos(videos);
+
+            document.getElementById('playerTitle').textContent = video.title;
+            document.getElementById('playerViews').textContent = formatViews(video.views) + ' 次观看';
+            document.getElementById('playerDate').textContent = video.date;
+            document.getElementById('playerUploader').textContent = '上传者: ' + video.uploader;
+
+            document.getElementById('playerModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+
+            renderVideoList();
+        }
+
+        function closePlayerModal() {
+            document.getElementById('playerModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        function goBack() {
+            window.location.href = 'profile.html';
+        }
+
+        function openAdminPanel() {
+            document.getElementById('adminPanel').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            renderAdminVideoList();
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('adminPanel').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        function renderAdminVideoList() {
+            const myVideos = getMyVideos();
+            const pendingVideos = myVideos.filter(v => v.status === 'pending');
+            const container = document.getElementById('adminVideoList');
+            const badgeCount = document.getElementById('adminBadgeCount');
+            badgeCount.textContent = pendingVideos.length;
+
+            if (pendingVideos.length === 0) {
+                container.innerHTML = `
+                    <div class="admin-empty">
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        <p>暂无待审核视频</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = pendingVideos.map(video => {
+                const cat = categoryMap[video.category] || categoryMap.other;
+                return `
+                    <div class="admin-video-card" id="admin-card-${video.id}">
+                        <div class="admin-video-top">
+                            <div class="admin-video-title">${video.title}</div>
+                            <span class="status-badge status-pending">
+                                <svg viewBox="0 0 24 24">${statusMap.pending.icon}</svg>
+                                待审核
+                            </span>
+                        </div>
+                        ${video.description ? `<div class="admin-video-desc">${video.description}</div>` : ''}
+                        <div class="admin-video-meta">
+                            <span>${cat.name}</span>
+                            <span>${video.date}</span>
+                            <span>${video.fileName || '未知文件'}</span>
+                        </div>
+                        <div class="admin-actions">
+                            <button class="admin-reject-btn" onclick="showRejectForm('${video.id}')">拒绝</button>
+                            <button class="admin-approve-btn" onclick="approveVideo('${video.id}')">通过</button>
+                        </div>
+                        <div class="admin-reject-form" id="reject-form-${video.id}">
+                            <textarea class="admin-reject-input" id="reject-reason-${video.id}" placeholder="请输入拒绝原因，方便用户修改后重新提交"></textarea>
+                            <div style="display:flex;justify-content:flex-end;gap:8px;">
+                                <button class="admin-reject-btn" onclick="hideRejectForm('${video.id}')" style="padding:6px 14px;">取消</button>
+                                <button class="admin-reject-submit" onclick="rejectVideo('${video.id}')">确认拒绝</button>
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        function showRejectForm(videoId) {
+            document.getElementById('reject-form-' + videoId).classList.add('show');
+        }
+
+        function hideRejectForm(videoId) {
+            document.getElementById('reject-form-' + videoId).classList.remove('show');
+        }
+
+        function approveVideo(videoId) {
+            const myVideos = getMyVideos();
+            const idx = myVideos.findIndex(v => v.id === videoId);
+            if (idx === -1) return;
+
+            myVideos[idx].status = 'approved';
+            myVideos[idx].rejectReason = '';
+            saveMyVideos(myVideos);
+
+            const allVideos = getVideos();
+            const existsInMain = allVideos.find(v => v.id === videoId);
+            if (!existsInMain) {
+                allVideos.unshift({
+                    id: myVideos[idx].id,
+                    title: myVideos[idx].title,
+                    category: myVideos[idx].category,
+                    views: myVideos[idx].views,
+                    date: myVideos[idx].date,
+                    uploader: myVideos[idx].uploader,
+                    duration: myVideos[idx].duration,
+                    status: 'approved',
+                    description: myVideos[idx].description
+                });
+                saveVideos(allVideos);
+            }
+
+            const card = document.getElementById('admin-card-' + videoId);
+            if (card) {
+                card.style.transition = 'all 0.3s';
+                card.style.opacity = '0';
+                card.style.transform = 'translateX(100%)';
+                setTimeout(function() {
+                    renderAdminVideoList();
+                    renderVideoList();
+                    renderMyVideoList();
+                    updateTabCounts();
+                }, 300);
+            }
+        }
+
+        function rejectVideo(videoId) {
+            const reasonEl = document.getElementById('reject-reason-' + videoId);
+            const reason = reasonEl ? reasonEl.value.trim() : '';
+            if (!reason) {
+                alert('请输入拒绝原因');
+                return;
+            }
+
+            const myVideos = getMyVideos();
+            const idx = myVideos.findIndex(v => v.id === videoId);
+            if (idx === -1) return;
+
+            myVideos[idx].status = 'rejected';
+            myVideos[idx].rejectReason = reason;
+            saveMyVideos(myVideos);
+
+            const card = document.getElementById('admin-card-' + videoId);
+            if (card) {
+                card.style.transition = 'all 0.3s';
+                card.style.opacity = '0';
+                card.style.transform = 'translateX(-100%)';
+                setTimeout(function() {
+                    renderAdminVideoList();
+                    renderMyVideoList();
+                    updateTabCounts();
+                }, 300);
+            }
+        }
+
+        document.getElementById('uploadModal').addEventListener('click', function(e) {
+            if (e.target === this) closeUploadModal();
+        });
+
+        document.getElementById('playerModal').addEventListener('click', function(e) {
+            if (e.target === this) closePlayerModal();
+        });
+
+        document.getElementById('successModal').addEventListener('click', function(e) {
+            if (e.target === this) closeSuccessModal();
+        });
+
+        document.getElementById('adminPanel').addEventListener('click', function(e) {
+            if (e.target === this) closeAdminPanel();
+        });
+
+        var headerTitle = document.querySelector('.header-title');
+        headerTitle.addEventListener('mousedown', function() {
+            adminLongPressTimer = setTimeout(function() {
+                openAdminPanel();
+            }, 2000);
+        });
+        headerTitle.addEventListener('mouseup', function() {
+            clearTimeout(adminLongPressTimer);
+        });
+        headerTitle.addEventListener('mouseleave', function() {
+            clearTimeout(adminLongPressTimer);
+        });
+        headerTitle.addEventListener('touchstart', function(e) {
+            adminLongPressTimer = setTimeout(function() {
+                openAdminPanel();
+            }, 2000);
+        });
+        headerTitle.addEventListener('touchend', function() {
+            clearTimeout(adminLongPressTimer);
+        });
+
+        renderVideoList();
+        updateTabCounts();
+    </script>
+</body>
+</html>
