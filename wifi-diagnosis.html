@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>网络测速</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -13,22 +14,15 @@
 
         :root {
             --bg-primary: #131524;
-            --bg-secondary: #131524;
             --bg-card: rgba(38, 41, 58, 0.65);
-            --bg-card-hover: rgba(46, 49, 69, 0.75);
-            --accent-blue: #5b8def;
-            --accent-blue-light: #7ca6f3;
             --accent-cyan: #4ecdc4;
             --accent-green: #5dbe8d;
             --accent-orange: #f4a261;
-            --accent-purple: #9b8bf4;
+            --accent-red: #ef4444;
             --text-primary: #e8eaf0;
             --text-secondary: #9aa3b2;
             --text-tertiary: #6b7280;
             --border-subtle: rgba(91, 141, 239, 0.15);
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
         }
 
         body {
@@ -47,23 +41,15 @@
             flex-direction: column;
         }
 
-        /* 头部 */
         .header {
-            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-subtle);
+            padding: 16px 20px 8px;
             position: sticky;
             top: 0;
             z-index: 10;
+            background: var(--bg-primary);
         }
 
         .header-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .header-left {
             display: flex;
             align-items: center;
             gap: 12px;
@@ -80,8 +66,8 @@
             transition: background 0.2s ease;
         }
 
-        .back-btn:hover {
-            background: rgba(255, 255, 255, 0.05);
+        .back-btn:active {
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .back-btn svg {
@@ -96,244 +82,600 @@
             color: var(--text-primary);
         }
 
-        .page-title-section {
-            text-align: center;
-            padding: 20px;
+        /* ===== Wi-Fi 信息面板 ===== */
+        .wifi-info-panel {
+            margin-top: 12px;
+            background: var(--bg-card);
+            border-radius: 14px;
+            border: 1px solid var(--border-subtle);
+            overflow: hidden;
         }
 
-        .page-title {
-            font-size: 22px;
+        .wifi-info-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 13px 15px 10px;
+        }
+
+        .wifi-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .wifi-icon-sm {
+            width: 18px;
+            height: 18px;
+            fill: var(--accent-cyan);
+            flex-shrink: 0;
+        }
+
+        .wifi-name-text {
+            font-size: 15px;
             font-weight: 600;
-            margin-bottom: 6px;
-            background: linear-gradient(135deg, var(--text-primary), var(--accent-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .page-subtitle {
+        .node-select-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 11px;
+            background: rgba(78, 205, 196, 0.1);
+            border: 1px solid rgba(78, 205, 196, 0.25);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--accent-cyan);
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .node-select-btn:active {
+            background: rgba(78, 205, 196, 0.2);
+        }
+
+        .node-select-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+            transition: transform 0.25s ease;
+        }
+
+        .node-select-btn.open svg {
+            transform: rotate(180deg);
+        }
+
+        .wifi-info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            padding: 6px 15px 13px;
+        }
+
+        .info-field {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .info-field-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            letter-spacing: 0.3px;
+        }
+
+        .info-field-value {
             font-size: 13px;
+            font-weight: 600;
             color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
-        /* 测速仪表盘 */
-        .speed-gauge {
+        .signal-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 14px;
+        }
+
+        .signal-bar {
+            width: 3px;
+            border-radius: 1px;
+            background: var(--text-tertiary);
+            transition: background 0.2s ease;
+        }
+
+        .signal-bar.active {
+            background: var(--accent-green);
+        }
+
+        /* ===== 节点选择弹窗 ===== */
+        .node-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .node-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .node-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+        }
+
+        .node-picker {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 480px;
+            margin: 0 auto;
+            background: #1c1f30;
+            border-radius: 18px 18px 0 0;
+            padding: 20px 20px 34px;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        .node-overlay.open .node-picker {
+            transform: translateY(0);
+        }
+
+        .picker-handle {
+            width: 36px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 2px;
+            margin: 0 auto 18px;
+        }
+
+        .picker-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .node-list {
+            max-height: 320px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .node-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 13px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .node-item:active {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .node-item.selected {
+            background: rgba(78, 205, 196, 0.08);
+        }
+
+        .node-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .node-city {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .node-detail {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .node-check {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .node-item.selected .node-check {
+            border-color: var(--accent-cyan);
+            background: var(--accent-cyan);
+        }
+
+        .node-check svg {
+            width: 12px;
+            height: 12px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+
+        .node-item.selected .node-check svg {
+            opacity: 1;
+        }
+
+        .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 30px 20px;
+            padding: 4px 20px 40px;
+        }
+
+        /* ===== 测速区域：按钮状态 vs 仪表盘状态 ===== */
+        .gauge-section {
             position: relative;
-        }
-
-        .gauge-container {
-            position: relative;
-            width: 280px;
-            height: 280px;
-            margin-bottom: 40px;
-        }
-
-        .gauge-svg {
-            width: 100%;
-            height: 100%;
-            transform: rotate(-90deg);
-        }
-
-        .gauge-bg {
-            fill: none;
-            stroke: rgba(255, 255, 255, 0.1);
-            stroke-width: 8;
-        }
-
-        .gauge-progress {
-            fill: none;
-            stroke: url(#gaugeGradient);
-            stroke-width: 8;
-            stroke-linecap: round;
-            stroke-dasharray: 754;
-            stroke-dashoffset: 754;
-            transition: stroke-dashoffset 0.3s ease;
-        }
-
-        .gauge-inner {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-        }
-
-        .gauge-value {
-            font-size: 72px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1;
-            margin-bottom: 8px;
-        }
-
-        .gauge-unit {
-            font-size: 16px;
-            color: var(--text-secondary);
-        }
-
-        .gauge-label {
-            font-size: 13px;
-            color: var(--text-tertiary);
-            margin-top: 8px;
-        }
-
-        /* 测速按钮 */
-        .speed-btn {
-            width: 200px;
-            height: 56px;
-            background: linear-gradient(270deg, #00c6ff 0%, #0072ff 100%);
-            border: none;
-            border-radius: 28px;
-            font-size: 18px;
-            font-weight: 600;
-            color: #fff;
+            width: 220px;
+            height: 220px;
+            margin: 32px 0 16px;
+            flex-shrink: 0;
             cursor: pointer;
-            box-shadow: 0 4px 20px rgba(0, 114, 255, 0.4);
-            margin-bottom: 20px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ---- 按钮状态（空闲 / 完成）---- */
+        .btn-view {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-view.hidden {
+            opacity: 0;
+            transform: scale(0.85);
+            pointer-events: none;
+        }
+
+        .btn-ring-outer {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 2px solid rgba(78, 205, 196, 0.25);
+            animation: btnPulse 2.5s ease-in-out infinite;
+        }
+
+        .btn-ring-inner {
+            position: absolute;
+            inset: 20px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(78, 205, 196, 0.12);
+        }
+
+        @keyframes btnPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(78, 205, 196, 0), 0 0 0 0 rgba(78, 205, 196, 0); }
+            40% { box-shadow: 0 0 0 18px rgba(78, 205, 196, 0.06), 0 0 30px rgba(78, 205, 196, 0.04); }
+            80% { box-shadow: 0 0 0 28px rgba(78, 205, 196, 0), 0 0 44px rgba(78, 205, 196, 0); }
+        }
+
+        .btn-core {
+            position: relative;
+            z-index: 2;
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, rgba(78, 205, 196, 0.18) 0%, rgba(19, 21, 36, 0.95) 70%);
+            border: 1.5px solid rgba(78, 205, 196, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
             transition: all 0.3s ease;
         }
 
-        .speed-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 24px rgba(0, 114, 255, 0.5);
+        .btn-core:active {
+            transform: scale(0.96);
+            background: radial-gradient(circle at 35% 30%, rgba(78, 205, 196, 0.28) 0%, rgba(19, 21, 36, 0.98) 70%);
         }
 
-        .speed-btn:active {
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            fill: none;
+            stroke: var(--accent-cyan);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 0 8px rgba(78, 205, 196, 0.4));
+        }
+
+        .btn-text {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--accent-cyan);
+        }
+
+        .btn-hint {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-top: 2px;
+        }
+
+        /* 完成状态的按钮文字 */
+        .btn-view.complete .btn-text {
+            color: var(--accent-green);
+        }
+        .btn-view.complete .btn-icon {
+            stroke: var(--accent-green);
+            filter: drop-shadow(0 0 8px rgba(93, 190, 141, 0.4));
+        }
+        .btn-view.complete .btn-ring-outer {
+            border-color: rgba(93, 190, 141, 0.25);
+            animation-name: btnPulseGreen;
+        }
+        @keyframes btnPulseGreen {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(93, 190, 141, 0), 0 0 0 0 rgba(93, 190, 141, 0); }
+            40% { box-shadow: 0 0 0 18px rgba(93, 190, 141, 0.06), 0 0 30px rgba(93, 190, 141, 0.04); }
+            80% { box-shadow: 0 0 0 28px rgba(93, 190, 141, 0), 0 0 44px rgba(93, 190, 141, 0); }
+        }
+
+        /* ---- 仪表盘状态（测速中）---- */
+        .gauge-view {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transform: scale(0.85);
+            pointer-events: none;
+            transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gauge-view.active {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        .echarts-gauge-container {
+            position: absolute;
+            inset: -10px;
+        }
+
+        .gauge-center-overlay {
+            position: absolute;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .gauge-unit-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: 1.5px;
+            font-family: -apple-system, sans-serif;
+        }
+
+        .gauge-phase-tag {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-top: 5px;
+            padding: 3px 14px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .gauge-phase-tag.dl-tag {
+            color: var(--accent-cyan);
+            background: rgba(78, 205, 196, 0.1);
+            border: 1px solid rgba(78, 205, 196, 0.2);
+        }
+
+        .gauge-phase-tag.ul-tag {
+            color: #9b8bf4;
+            background: rgba(155, 139, 244, 0.1);
+            border: 1px solid rgba(155, 139, 244, 0.2);
+        }
+
+        /* ===== 实时速率曲线 ===== */
+        .chart-section {
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+
+
+        .chart-container {
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .chart-container.visible {
+            opacity: 1;
             transform: translateY(0);
         }
 
-        .speed-btn:disabled {
-            background: linear-gradient(270deg, #3a4a5c 0%, #2d3a4a 100%);
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        /* 测速结果区域 */
-        .results-section {
+        .chart-canvas {
             width: 100%;
-            padding: 0 20px;
-            margin-top: 20px;
-            display: none;
-        }
-
-        .results-section.show {
+            height: 80px;
             display: block;
-            animation: fadeIn 0.5s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .results-grid {
+        /* ===== 结果面板 ===== */
+        .results-panel {
+            width: 100%;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-top: 18px;
+            opacity: 0;
+            transform: translateY(16px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .results-panel.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
         }
 
         .result-item {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 16px 12px;
             text-align: center;
-            border: 1px solid var(--border-subtle);
+            padding: 14px 8px 10px;
         }
 
-        .result-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--accent-blue);
-            margin-bottom: 4px;
-        }
-
-        .result-label {
+        .result-item-label {
             font-size: 12px;
             color: var(--text-secondary);
+            margin-bottom: 6px;
         }
 
-        .result-unit {
+        .result-item-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.1;
+        }
+
+        .result-item-unit {
             font-size: 11px;
             color: var(--text-tertiary);
+            margin-top: 2px;
         }
 
-        /* 底部安全区域 */
         .safe-area-bottom {
-            height: 20px;
+            height: 24px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- SVG渐变定义 -->
-        <svg width="0" height="0" style="position: absolute;">
-            <defs>
-                <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" style="stop-color:#58a6ff;stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#39d0d8;stop-opacity:1" />
-                </linearGradient>
-            </defs>
-        </svg>
 
-        <!-- 头部 -->
         <header class="header">
             <div class="header-top">
-                <div class="header-left">
-                    <div class="back-btn" onclick="location.href='toolbox.html'">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                <div class="back-btn" onclick="location.href='toolbox.html'">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                    </svg>
+                </div>
+                <div class="header-title">网络测速</div>
+            </div>
+
+            <div class="wifi-info-panel">
+                <div class="wifi-info-header">
+                    <div class="wifi-name-row">
+                        <svg class="wifi-icon-sm" viewBox="0 0 24 24">
+                            <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
                         </svg>
+                        <span class="wifi-name-text" id="wifiName">Home_WiFi_5G</span>
                     </div>
-                    <div class="header-title">网络测速</div>
+                    <div class="node-select-btn" id="nodeSelectBtn" onclick="toggleNodePicker()">
+                        <span id="selectedNodeLabel">北京电信</span>
+                        <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                    </div>
+                </div>
+                <div class="wifi-info-grid">
+                    <div class="info-field">
+                        <span class="info-field-label">网络类型</span>
+                        <span class="info-field-value" id="networkType">WiFi</span>
+                    </div>
+                    <div class="info-field">
+                        <span class="info-field-label">信号强度</span>
+                        <span class="info-field-value">
+                            <span id="signalDbm">-50/最强</span>
+                        </span>
+                    </div>
+                    <div class="info-field">
+                        <span class="info-field-label">WiFi速率</span>
+                        <span class="info-field-value" id="wifiRate">1200 Mbps</span>
+                    </div>
                 </div>
             </div>
         </header>
 
-        <!-- 页面标题 -->
-        <div class="page-title-section">
-            <div class="page-title">网络测速</div>
-            <div class="page-subtitle">检测您的网络连接质量</div>
-        </div>
+        <div class="main-content">
+            <!-- 测速按钮 / 仪表盘 区域 -->
+            <div class="gauge-section" id="gaugeSection" onclick="toggleTest()">
 
-        <!-- 测速仪表盘 -->
-        <div class="speed-gauge">
-            <div class="gauge-container">
-                <svg class="gauge-svg" viewBox="0 0 240 240">
-                    <circle class="gauge-bg" cx="120" cy="120" r="110"/>
-                    <circle class="gauge-progress" id="gaugeProgress" cx="120" cy="120" r="110"/>
-                </svg>
-                <div class="gauge-inner">
-                    <div class="gauge-value" id="speedValue">0.0</div>
-                    <div class="gauge-unit">Mbps</div>
-                    <div class="gauge-label" id="gaugeLabel">点击开始测速</div>
+                <!-- 按钮视图（空闲 / 完成） -->
+                <div class="btn-view" id="btnView">
+                    <div class="btn-ring-outer"></div>
+                    <div class="btn-ring-inner"></div>
+                    <div class="btn-core">
+                        <svg class="btn-icon" viewBox="0 0 24 24">
+                            <polygon points="5 3 19 12 5 21 5 3" fill="currentColor" stroke="none"/>
+                        </svg>
+                        <span class="btn-text" id="btnText">开始测速</span>
+                        <span class="btn-hint" id="btnHint">点击启动</span>
+                    </div>
+                </div>
+
+                <!-- 仪表盘视图（测速中） -->
+                <div class="gauge-view" id="gaugeView">
+                    <div class="echarts-gauge-container" id="echartsGauge"></div>
+                    <div class="gauge-center-overlay">
+                        <div class="gauge-unit-text" id="gaugeUnitText">Mbps</div>
+                        <div class="gauge-phase-tag dl-tag" id="gaugePhaseTag">准备中</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="chart-section">
+                <div class="chart-container" id="chartContainer">
+                    <canvas class="chart-canvas" id="chartCanvas"></canvas>
                 </div>
             </div>
 
-            <button class="speed-btn" id="speedBtn" onclick="startSpeedTest()">开始测速</button>
-
-            <!-- 测速结果 -->
-            <div class="results-section" id="resultsSection">
-                <div class="results-grid">
-                    <div class="result-item">
-                        <div class="result-value" id="downloadValue">--</div>
-                        <div class="result-label">下行速率</div>
-                        <div class="result-unit">Mbps</div>
-                    </div>
-                    <div class="result-item">
-                        <div class="result-value" id="uploadValue">--</div>
-                        <div class="result-label">上行速率</div>
-                        <div class="result-unit">Mbps</div>
-                    </div>
+            <div class="results-panel" id="resultsPanel">
+                <div class="result-item">
+                    <div class="result-item-label">下载速度</div>
+                    <div class="result-item-value" id="resultDownload">--</div>
+                    <div class="result-item-unit">Mbps</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-item-label">上传速度</div>
+                    <div class="result-item-value" id="resultUpload">--</div>
+                    <div class="result-item-unit">Mbps</div>
                 </div>
             </div>
         </div>
@@ -341,65 +683,596 @@
         <div class="safe-area-bottom"></div>
     </div>
 
+    <!-- 节点选择弹窗 -->
+    <div class="node-overlay" id="nodeOverlay">
+        <div class="node-backdrop" onclick="toggleNodePicker()"></div>
+        <div class="node-picker">
+            <div class="picker-handle"></div>
+            <div class="picker-title">选择测速节点</div>
+            <div class="node-list" id="nodeList"></div>
+        </div>
+    </div>
+
     <script>
         let isTesting = false;
+        let testTimer = null;
+        let testResults = null;
 
-        function startSpeedTest() {
-            if (isTesting) return;
-            
-            isTesting = true;
-            const btn = document.getElementById('speedBtn');
-            const gaugeLabel = document.getElementById('gaugeLabel');
-            const gaugeProgress = document.getElementById('gaugeProgress');
-            const speedValue = document.getElementById('speedValue');
-            const resultsSection = document.getElementById('resultsSection');
-            
-            btn.disabled = true;
-            btn.textContent = '测速中...';
-            gaugeLabel.textContent = '正在测试网络...';
-            resultsSection.classList.remove('show');
-            
-            // 模拟测速过程
-            let progress = 0;
-            const testInterval = setInterval(() => {
-                progress += Math.random() * 15;
-                if (progress > 100) progress = 100;
-                
-                // 更新仪表盘
-                const offset = 754 - (754 * progress / 100);
-                gaugeProgress.style.strokeDashoffset = offset;
-                speedValue.textContent = (progress * 5.5).toFixed(1);
-                
-                if (progress >= 100) {
-                    clearInterval(testInterval);
-                    completeTest();
-                }
-            }, 200);
-            
-            function completeTest() {
-                // 生成测试结果
-                const testResults = {
-                    download: 350 + Math.random() * 200,
-                    upload: (350 + Math.random() * 200) * 0.6
-                };
-                
-                // 显示结果 - 只显示上行和下行速率
-                document.getElementById('downloadValue').textContent = testResults.download.toFixed(1);
-                document.getElementById('uploadValue').textContent = testResults.upload.toFixed(1);
-                
-                // 更新UI
-                speedValue.textContent = testResults.download.toFixed(1);
-                gaugeLabel.textContent = '测速完成';
-                btn.disabled = false;
-                btn.textContent = '重新测速';
-                resultsSection.classList.add('show');
-                
-                // 保存结果
-                localStorage.setItem('speedTestResults', JSON.stringify(testResults));
-                
-                isTesting = false;
+        const $ = (id) => document.getElementById(id);
+
+        const btnView = $('btnView');
+        const btnText = $('btnText');
+        const btnHint = $('btnHint');
+        const gaugeView = $('gaugeView');
+        const gaugeUnitText = $('gaugeUnitText');
+        const gaugePhaseTag = $('gaugePhaseTag');
+        const chartContainer = $('chartContainer');
+        const chartCanvas = $('chartCanvas');
+        const resultsPanel = $('resultsPanel');
+        const ctx = chartCanvas.getContext('2d');
+
+        let downloadSamples = [];
+        let uploadSamples = [];
+        let chartMaxSpeed = 100;
+        let chartAnimFrame = null;
+        let chartWidth = 0;
+        let chartHeight = 0;
+
+        let echartsGauge = null;
+        let gaugeMax = 100;
+        let gaugeValue = 0;
+        let currentPhase = 'download';
+
+        const PHASE_COLORS = {
+            download: { start: '#4ecdc4', end: '#5dbe8d', glow: 'rgba(78,205,196,0.5)' },
+            upload: { start: '#4ecdc4', end: '#9b8bf4', glow: 'rgba(155,139,244,0.5)' }
+        };
+
+        function initEchartsGauge() {
+            const container = $('echartsGauge');
+            if (!container) return;
+            if (echartsGauge) echartsGauge.dispose();
+            echartsGauge = echarts.init(container);
+        }
+
+        function buildGaugeOption(phase, maxVal, value) {
+            const colors = PHASE_COLORS[phase] || PHASE_COLORS.download;
+            return {
+                backgroundColor: 'transparent',
+                series: [
+                    {
+                        type: 'gauge',
+                        startAngle: 210,
+                        endAngle: -30,
+                        center: ['50%', '50%'],
+                        radius: '82%',
+                        min: 0,
+                        max: maxVal,
+                        splitNumber: 10,
+                        progress: {
+                            show: true,
+                            width: 12,
+                            roundCap: true,
+                            itemStyle: {
+                                color: {
+                                    type: 'linear',
+                                    x: 0, y: 0, x2: 1, y2: 0,
+                                    colorStops: [
+                                        { offset: 0, color: colors.start },
+                                        { offset: 1, color: colors.end }
+                                    ]
+                                },
+                                shadowBlur: 18,
+                                shadowColor: colors.glow,
+                                shadowOffsetX: 0,
+                                shadowOffsetY: 0
+                            }
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                width: 12,
+                                color: [[1, 'rgba(255,255,255,0.05)']]
+                            }
+                        },
+                        axisTick: { show: false },
+                        splitLine: { show: false },
+                        axisLabel: { show: false },
+                        pointer: { show: false },
+                        title: { show: false },
+                        detail: {
+                            valueAnimation: true,
+                            formatter: function (v) {
+                                return v.toFixed(1);
+                            },
+                            color: '#ffffff',
+                            fontSize: 38,
+                            fontWeight: 'bold',
+                            offsetCenter: [0, '0%'],
+                            fontFamily: 'SF Mono, Menlo, Consolas, monospace',
+                            textShadowColor: colors.glow,
+                            textShadowBlur: 12
+                        },
+                        data: [{ value: value }]
+                    },
+                    {
+                        type: 'gauge',
+                        startAngle: 210,
+                        endAngle: -30,
+                        center: ['50%', '50%'],
+                        radius: '96%',
+                        min: 0,
+                        max: maxVal,
+                        splitNumber: 24,
+                        progress: { show: false },
+                        axisLine: {
+                            lineStyle: {
+                                width: 1,
+                                color: [[1, 'rgba(78,205,196,0.12)']]
+                            }
+                        },
+                        axisTick: {
+                            length: 5,
+                            distance: -2,
+                            lineStyle: {
+                                color: 'rgba(78,205,196,0.15)',
+                                width: 1
+                            }
+                        },
+                        splitLine: { show: false },
+                        axisLabel: { show: false },
+                        pointer: { show: false },
+                        title: { show: false },
+                        detail: { show: false },
+                        data: [{ value: value }]
+                    },
+                    {
+                        type: 'gauge',
+                        startAngle: 210,
+                        endAngle: -30,
+                        center: ['50%', '50%'],
+                        radius: '72%',
+                        min: 0,
+                        max: maxVal,
+                        splitNumber: 10,
+                        progress: { show: false },
+                        axisLine: {
+                            lineStyle: {
+                                width: 1,
+                                color: [[1, 'rgba(255,255,255,0.04)']]
+                            }
+                        },
+                        axisTick: { show: false },
+                        splitLine: { show: false },
+                        axisLabel: { show: false },
+                        pointer: { show: false },
+                        title: { show: false },
+                        detail: { show: false },
+                        data: [{ value: value }]
+                    }
+                ]
+            };
+        }
+
+        function updateGauge(phase, maxVal, value) {
+            if (!echartsGauge) return;
+            if (phase !== currentPhase || maxVal !== gaugeMax) {
+                currentPhase = phase;
+                gaugeMax = maxVal;
+                const option = buildGaugeOption(phase, maxVal, value);
+                echartsGauge.setOption(option, true);
+            } else {
+                echartsGauge.setOption({
+                    series: [
+                        { data: [{ value: value }] },
+                        { data: [{ value: value }] },
+                        { data: [{ value: value }] }
+                    ]
+                });
+            }
+            gaugeValue = value;
+        }
+
+        function setArcProgress(ratio) {
+            if (!echartsGauge) return;
+            const value = ratio * gaugeMax;
+            updateGauge(currentPhase, gaugeMax, value);
+        }
+
+        function updateGaugeSpeed(value, unit) {
+            gaugeUnitText.textContent = unit || 'Mbps';
+        }
+
+        const NODES = [
+            { id: 1, city: '北京电信', isp: '中国电信', location: '北京 · 延迟约 8ms' },
+            { id: 2, city: '北京联通', isp: '中国联通', location: '北京 · 延迟约 10ms' },
+            { id: 3, city: '北京移动', isp: '中国移动', location: '北京 · 延迟约 12ms' },
+            { id: 4, city: '上海电信', isp: '中国电信', location: '上海 · 延迟约 22ms' },
+            { id: 5, city: '上海联通', isp: '中国联通', location: '上海 · 延迟约 25ms' },
+            { id: 6, city: '广州电信', isp: '中国电信', location: '广州 · 延迟约 35ms' },
+            { id: 7, city: '深圳联通', isp: '中国联通', location: '深圳 · 延迟约 33ms' },
+            { id: 8, city: '成都移动', isp: '中国移动', location: '成都 · 延迟约 45ms' },
+            { id: 9, city: '杭州电信', isp: '中国电信', location: '杭州 · 延迟约 28ms' },
+            { id: 10, city: '武汉联通', isp: '中国联通', location: '武汉 · 延迟约 38ms' },
+        ];
+
+        let selectedNodeId = 1;
+
+        function showButtonMode(complete) {
+            btnView.classList.remove('hidden');
+            if (complete) {
+                btnView.classList.add('complete');
+                btnText.textContent = '重新测速';
+                btnHint.textContent = testResults ? testResults.download.toFixed(1) + ' Mbps' : '';
+            } else {
+                btnView.classList.remove('complete');
+                btnText.textContent = '开始测速';
+                btnHint.textContent = '点击启动';
+            }
+            gaugeView.classList.remove('active');
+            if (echartsGauge) {
+                echartsGauge.dispose();
+                echartsGauge = null;
             }
         }
+
+        function showGaugeMode() {
+            btnView.classList.add('hidden');
+            gaugeView.classList.add('active');
+            initEchartsGauge();
+            currentPhase = 'download';
+            gaugeMax = 100;
+            gaugeValue = 0;
+            updateGauge('download', 100, 0);
+        }
+
+        function setPhaseTag(phase) {
+            gaugePhaseTag.className = 'gauge-phase-tag';
+            switch (phase) {
+                case 'download':
+                    gaugePhaseTag.classList.add('dl-tag');
+                    gaugePhaseTag.textContent = 'DOWNLOAD';
+                    break;
+                case 'upload':
+                    gaugePhaseTag.classList.add('ul-tag');
+                    gaugePhaseTag.textContent = 'UPLOAD';
+                    break;
+                default:
+                    gaugePhaseTag.classList.add('dl-tag');
+                    gaugePhaseTag.textContent = phase || '准备中';
+            }
+        }
+
+        function renderSignalBars(level) {
+            const container = $('signalBars');
+            container.innerHTML = '';
+            for (let i = 0; i < 4; i++) {
+                const bar = document.createElement('span');
+                bar.className = 'signal-bar' + (i < level ? ' active' : '');
+                bar.style.height = (4 + i * 3) + 'px';
+                container.appendChild(bar);
+            }
+        }
+
+        function initWifiInfo() {
+            const wifiNames = ['Home_WiFi_5G', 'TP-LINK_6E_5GHz', 'Xiaomi_Router_Pro', 'HUAWEI_AX3'];
+            const networkTypes = ['WiFi', 'WiFi', 'WiFi', 'WiFi'];
+            const rates = ['1200 Mbps', '2400 Mbps', '867 Mbps', '5765 Mbps'];
+
+            $('wifiName').textContent = wifiNames[Math.floor(Math.random() * wifiNames.length)];
+            $('networkType').textContent = networkTypes[Math.floor(Math.random() * networkTypes.length)];
+            $('wifiRate').textContent = rates[Math.floor(Math.random() * rates.length)];
+
+            const dbm = -(30 + Math.floor(Math.random() * 35));
+
+            const levelTexts = { 4: '最强', 3: '较强', 2: '一般', 1: '较弱' };
+            let level = 4;
+            if (dbm > -55) level = 4;
+            else if (dbm > -67) level = 3;
+            else if (dbm > -78) level = 2;
+            else level = 1;
+            $('signalDbm').textContent = dbm + '/' + levelTexts[level];
+            renderSignalBars(level);
+        }
+
+        function renderNodeList() {
+            const list = $('nodeList');
+            list.innerHTML = '';
+            NODES.forEach(node => {
+                const item = document.createElement('div');
+                item.className = 'node-item' + (node.id === selectedNodeId ? ' selected' : '');
+                item.onclick = () => selectNode(node.id);
+                item.innerHTML =
+                    '<div class="node-item-left">' +
+                        '<div>' +
+                            '<div class="node-city">' + node.city + '</div>' +
+                            '<div class="node-detail">' + node.location + '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="node-check">' +
+                        '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>' +
+                    '</div>';
+                list.appendChild(item);
+            });
+        }
+
+        function toggleNodePicker() {
+            const overlay = $('nodeOverlay');
+            const btn = $('nodeSelectBtn');
+            overlay.classList.toggle('open');
+            btn.classList.toggle('open');
+        }
+
+        function selectNode(id) {
+            selectedNodeId = id;
+            const node = NODES.find(n => n.id === id);
+            if (node) {
+                $('selectedNodeLabel').textContent = node.city;
+            }
+            renderNodeList();
+            setTimeout(() => toggleNodePicker(), 180);
+        }
+
+        function initChart() {
+            const rect = chartCanvas.parentElement.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            chartWidth = rect.width-0;
+            chartHeight = 80;
+            chartCanvas.width = chartWidth * dpr;
+            chartCanvas.height = chartHeight * dpr;
+            chartCanvas.style.width = chartWidth + 'px';
+            chartCanvas.style.height = chartHeight + 'px';
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(dpr, dpr);
+        }
+
+        function drawChartGrid() {
+            ctx.clearRect(0, 0, chartWidth, chartHeight);
+        }
+
+        function drawCurve(samples, color, alpha) {
+            if (samples.length < 2) return;
+
+            const w = chartWidth;
+            const h = chartHeight;
+            const maxSamples = Math.max(samples.length, 1);
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(0, 0, w, h);
+            ctx.clip();
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, h);
+            gradient.addColorStop(0, color);
+            gradient.addColorStop(1, 'rgba(19,21,36,0)');
+
+            ctx.beginPath();
+            for (let i = 0; i < samples.length; i++) {
+                const x = (i / (maxSamples - 1 || 1)) * w;
+                const y = h - (samples[i] / chartMaxSpeed) * h;
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    const prevX = ((i - 1) / (maxSamples - 1 || 1)) * w;
+                    const prevY = h - (samples[i - 1] / chartMaxSpeed) * h;
+                    const cpX = (prevX + x) / 2;
+                    ctx.bezierCurveTo(cpX, prevY, cpX, y, x, y);
+                }
+            }
+
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = alpha;
+            ctx.stroke();
+
+            const lastX = ((samples.length - 1) / (maxSamples - 1 || 1)) * w;
+            const lastY = h - (samples[samples.length - 1] / chartMaxSpeed) * h;
+            ctx.lineTo(lastX, h);
+            ctx.lineTo(0, h);
+            ctx.closePath();
+            ctx.fillStyle = gradient;
+            ctx.globalAlpha = alpha * 0.15;
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function renderChart() {
+            drawChartGrid();
+            if (uploadSamples.length > 0) drawCurve(uploadSamples, '#9b8bf4', 1);
+            if (downloadSamples.length > 0) drawCurve(downloadSamples, '#4ecdc4', 1);
+        }
+
+        function startChartAnimation() {
+            function animate() {
+                renderChart();
+                chartAnimFrame = requestAnimationFrame(animate);
+            }
+            if (!chartAnimFrame) animate();
+        }
+
+        function stopChartAnimation() {
+            if (chartAnimFrame) {
+                cancelAnimationFrame(chartAnimFrame);
+                chartAnimFrame = null;
+            }
+        }
+
+        function resetUI() {
+            stopChartAnimation();
+            downloadSamples = [];
+            uploadSamples = [];
+            chartMaxSpeed = 100;
+
+            chartContainer.classList.remove('visible');
+            resultsPanel.classList.remove('visible');
+
+            $('resultDownload').textContent = '--';
+            $('resultUpload').textContent = '--';
+
+            initChart();
+            drawChartGrid();
+        }
+
+        function toggleTest() {
+            if (isTesting) {
+                stopTest();
+            } else {
+                startTest();
+            }
+        }
+
+        function stopTest() {
+            if (testTimer) clearTimeout(testTimer);
+            stopChartAnimation();
+            isTesting = false;
+
+            downloadSamples = [];
+            uploadSamples = [];
+            chartMaxSpeed = 100;
+
+            chartContainer.classList.remove('visible');
+
+            initChart();
+            drawChartGrid();
+
+            showButtonMode(false);
+        }
+
+        function startTest() {
+            if (isTesting) return;
+            isTesting = true;
+
+            testResults = { ping: 0, download: 0, upload: 0 };
+            downloadSamples = [];
+            uploadSamples = [];
+            chartMaxSpeed = 100;
+
+            resetUI();
+
+            showGaugeMode();
+
+            chartContainer.classList.add('visible');
+
+            initChart();
+            startChartAnimation();
+
+            runDownloadTest();
+        }
+
+        function runDownloadTest() {
+            setPhaseTag('download');
+            updateGauge('download', 500, 0);
+            updateGaugeSpeed('0.0', 'Mbps');
+
+            let elapsed = 0;
+            const duration = 3000;
+            const interval = 100;
+            let currentSpeed = 0;
+            const targetSpeed = 80 + Math.random() * 400;
+
+            function tick() {
+                elapsed += interval;
+                const progress = elapsed / duration;
+
+                const easeProgress = 1 - Math.pow(1 - progress, 3);
+                currentSpeed = targetSpeed * easeProgress;
+                const displaySpeed = currentSpeed + (Math.random() - 0.5) * 30;
+                const clampedSpeed = Math.max(0, displaySpeed);
+
+                downloadSamples.push(clampedSpeed);
+                if (clampedSpeed > chartMaxSpeed * 0.85) {
+                    chartMaxSpeed = Math.ceil(clampedSpeed * 1.3 / 50) * 50;
+                }
+
+                const dynamicMax = Math.max(500, Math.ceil(targetSpeed * 1.2 / 50) * 50);
+                const arcProgress = 0.05 + (easeProgress * 0.50);
+                const gaugeDisplayVal = arcProgress * dynamicMax;
+                updateGauge('download', dynamicMax, gaugeDisplayVal);
+                updateGaugeSpeed(clampedSpeed.toFixed(1), 'Mbps');
+                if (elapsed >= duration) {
+                    testResults.download = Math.max(0, currentSpeed + (Math.random() - 0.5) * 20);
+                    runUploadTest();
+                } else {
+                    testTimer = setTimeout(tick, interval);
+                }
+            }
+
+            testTimer = setTimeout(tick, interval);
+        }
+
+        function runUploadTest() {
+            setPhaseTag('upload');
+            updateGauge('upload', 200, 0);
+            updateGaugeSpeed('0.0', 'Mbps');
+
+            let elapsed = 0;
+            const duration = 2500;
+            const interval = 100;
+            let currentSpeed = 0;
+            const targetSpeed = testResults.download * (0.3 + Math.random() * 0.5);
+
+            function tick() {
+                elapsed += interval;
+                const progress = elapsed / duration;
+
+                const easeProgress = 1 - Math.pow(1 - progress, 3);
+                currentSpeed = targetSpeed * easeProgress;
+                const displaySpeed = currentSpeed + (Math.random() - 0.5) * 15;
+                const clampedSpeed = Math.max(0, displaySpeed);
+
+                uploadSamples.push(clampedSpeed);
+                const maxUpload = Math.max(...uploadSamples);
+                if (maxUpload > chartMaxSpeed * 0.85) {
+                    chartMaxSpeed = Math.ceil(maxUpload * 1.3 / 50) * 50;
+                }
+
+                const dynamicMax = Math.max(200, Math.ceil(targetSpeed * 1.2 / 50) * 50);
+                const arcProgress = 0.55 + (easeProgress * 0.45);
+                const gaugeDisplayVal = arcProgress * dynamicMax;
+                updateGauge('upload', dynamicMax, gaugeDisplayVal);
+                updateGaugeSpeed(clampedSpeed.toFixed(1), 'Mbps');
+
+                if (elapsed >= duration) {
+                    testResults.upload = Math.max(0, currentSpeed + (Math.random() - 0.5) * 10);
+                    completeTest();
+                } else {
+                    testTimer = setTimeout(tick, interval);
+                }
+            }
+
+            testTimer = setTimeout(tick, interval);
+        }
+
+        function completeTest() {
+            isTesting = false;
+            testTimer = null;
+
+            updateGauge('download', gaugeMax, gaugeMax);
+            updateGaugeSpeed(testResults.download.toFixed(1), 'Mbps');
+            setPhaseTag('完成');
+
+            const maxVal = Math.max(...downloadSamples, ...uploadSamples, 100);
+            chartMaxSpeed = Math.ceil(maxVal * 1.2 / 50) * 50;
+            renderChart();
+
+            $('resultDownload').textContent = testResults.download.toFixed(1);
+            $('resultUpload').textContent = testResults.upload.toFixed(1);
+
+            resultsPanel.classList.add('visible');
+
+            localStorage.setItem('speedTestResults', JSON.stringify(testResults));
+
+            setTimeout(() => showButtonMode(true), 1200);
+        }
+
+        initWifiInfo();
+        renderNodeList();
+        initChart();
+        drawChartGrid();
+
+        window.addEventListener('resize', function () {
+            if (echartsGauge) echartsGauge.resize();
+        });
     </script>
 </body>
 </html>
