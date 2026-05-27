@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Trace 路由追踪</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #060d1f;
+            --bg-card: rgba(14, 28, 60, 0.55);
+            --accent-blue: #00aaff;
+            --accent-cyan: #38bdf8;
+            --accent-light: #7dd3fc;
+            --accent-green: #06b6d4;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --text-primary: #e8f0ff;
+            --text-secondary: #94a3c8;
+            --text-tertiary: #5a6a8a;
+            --border-subtle: rgba(56, 189, 248, 0.12);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(180deg, #060d1f 0%, #0a162e 50%, #071024 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            padding: 16px 20px 8px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: var(--bg-primary);
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:active {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 4px 20px 40px;
+        }
+
+        /* ===== 目标输入区 ===== */
+        .target-section {
+            margin-top: 16px;
+            background: var(--bg-card);
+            border-radius: 14px;
+            border: 1px solid var(--border-subtle);
+            padding: 16px;
+        }
+
+        .target-label {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            margin-bottom: 10px;
+        }
+
+        .target-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .target-input {
+            flex: 1;
+            height: 42px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 0 14px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .target-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .target-input:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .trace-btn {
+            height: 42px;
+            padding: 0 20px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .trace-btn:active {
+            transform: scale(0.96);
+            opacity: 0.9;
+        }
+
+        .trace-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ===== 快捷目标 ===== */
+        .quick-targets {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .quick-tag {
+            padding: 5px 12px;
+            border-radius: 16px;
+            background: rgba(56, 189, 248, 0.08);
+            border: 1px solid rgba(56, 189, 248, 0.15);
+            color: var(--accent-cyan);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-tag:active {
+            background: rgba(56, 189, 248, 0.18);
+        }
+
+        /* ===== 概览统计 ===== */
+        .stats-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent-blue);
+            font-family: 'SF Mono', Menlo, Consolas, monospace;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-top: 4px;
+        }
+
+        /* ===== 路由节点列表 ===== */
+        .hops-section {
+            margin-top: 16px;
+            flex: 1;
+        }
+
+        .hops-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .hops-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .hops-count {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .hop-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .hop-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hop-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hop-index {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            flex-shrink: 0;
+        }
+
+        .hop-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .hop-ip {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: 'SF Mono', Menlo, Consolas, monospace;
+        }
+
+        .hop-location {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-top: 2px;
+        }
+
+        .hop-latency {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .hop-latency-value {
+            font-size: 15px;
+            font-weight: 700;
+            font-family: 'SF Mono', Menlo, Consolas, monospace;
+        }
+
+        .hop-latency-value.good { color: var(--accent-green); }
+        .hop-latency-value.medium { color: var(--accent-orange); }
+        .hop-latency-value.bad { color: var(--accent-red); }
+
+        .hop-latency-label {
+            font-size: 10px;
+            color: var(--text-tertiary);
+        }
+
+        /* 连接线 */
+        .hop-connector {
+            width: 2px;
+            height: 8px;
+            background: rgba(56, 189, 248, 0.15);
+            margin-left: 27px;
+            border-radius: 1px;
+        }
+
+        /* ===== 空状态 ===== */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            color: var(--text-tertiary);
+        }
+
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-text {
+            font-size: 14px;
+        }
+
+        .empty-hint {
+            font-size: 12px;
+            margin-top: 6px;
+            opacity: 0.6;
+        }
+
+        /* ===== 进行中动画 ===== */
+        .hop-item.tracing {
+            border-color: rgba(0, 170, 255, 0.3);
+        }
+
+        .hop-item.tracing .hop-index {
+            background: rgba(0, 170, 255, 0.15);
+            border-color: rgba(0, 170, 255, 0.4);
+            color: var(--accent-blue);
+            animation: tracePulse 1.2s ease-in-out infinite;
+        }
+
+        @keyframes tracePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 170, 255, 0); }
+            50% { box-shadow: 0 0 0 6px rgba(0, 170, 255, 0.15); }
+        }
+
+        /* ===== 超时节点 ===== */
+        .hop-item.timeout .hop-index {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+            color: var(--accent-red);
+        }
+
+        .hop-item.timeout .hop-ip {
+            color: var(--text-tertiary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-top">
+                <div class="back-btn" onclick="location.href='toolbox.html'">
+                    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </div>
+                <div class="header-title">Trace 路由追踪</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- 目标输入 -->
+            <div class="target-section">
+                <div class="target-label">目标地址</div>
+                <div class="target-row">
+                    <input class="target-input" id="targetInput" type="text" placeholder="输入域名或IP地址" value="baidu.com">
+                    <button class="trace-btn" id="traceBtn" onclick="toggleTrace()">开始追踪</button>
+                </div>
+                <div class="quick-targets">
+                    <span class="quick-tag" onclick="setTarget('baidu.com')">baidu.com</span>
+                    <span class="quick-tag" onclick="setTarget('qq.com')">qq.com</span>
+                    <span class="quick-tag" onclick="setTarget('google.com')">google.com</span>
+                    <span class="quick-tag" onclick="setTarget('8.8.8.8')">8.8.8.8</span>
+                    <span class="quick-tag" onclick="setTarget('114.114.114.114')">114.114.114.114</span>
+                </div>
+            </div>
+
+            <!-- 概览统计 -->
+            <div class="stats-bar" id="statsBar" style="display:none;">
+                <div class="stat-card">
+                    <div class="stat-value" id="statHops">0</div>
+                    <div class="stat-label">跳数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statAvg">0</div>
+                    <div class="stat-label">平均延迟</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statMax">0</div>
+                    <div class="stat-label">最大延迟</div>
+                </div>
+            </div>
+
+            <!-- 路由节点列表 -->
+            <div class="hops-section">
+                <div class="hops-header" id="hopsHeader" style="display:none;">
+                    <div class="hops-title">路由路径</div>
+                    <div class="hops-count" id="hopsCount"></div>
+                </div>
+                <div class="hop-list" id="hopList">
+                    <div class="empty-state" id="emptyState">
+                        <svg class="empty-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <div class="empty-text">输入目标地址开始追踪</div>
+                        <div class="empty-hint">追踪到目标的路由路径和延迟</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const $ = id => document.getElementById(id);
+
+        let isTracing = false;
+        let traceTimer = null;
+        let hopResults = [];
+
+        function setTarget(target) {
+            $('targetInput').value = target;
+        }
+
+        function toggleTrace() {
+            if (isTracing) {
+                stopTrace();
+            } else {
+                startTrace();
+            }
+        }
+
+        function startTrace() {
+            const target = $('targetInput').value.trim();
+            if (!target) return;
+
+            isTracing = true;
+            hopResults = [];
+            $('traceBtn').textContent = '停止';
+            $('traceBtn').style.background = 'linear-gradient(135deg, #ef4444, #f97316)';
+            $('targetInput').disabled = true;
+            $('emptyState').style.display = 'none';
+            $('statsBar').style.display = 'flex';
+            $('hopsHeader').style.display = 'flex';
+            $('hopList').innerHTML = '';
+
+            $('statHops').textContent = '0';
+            $('statAvg').textContent = '0';
+            $('statMax').textContent = '0';
+
+            simulateTrace(target);
+        }
+
+        function stopTrace() {
+            isTracing = false;
+            if (traceTimer) clearTimeout(traceTimer);
+            $('traceBtn').textContent = '开始追踪';
+            $('traceBtn').style.background = 'linear-gradient(135deg, var(--accent-blue), var(--accent-cyan))';
+            $('targetInput').disabled = false;
+
+            // Remove tracing state from last item
+            const tracingItem = document.querySelector('.hop-item.tracing');
+            if (tracingItem) tracingItem.classList.remove('tracing');
+        }
+
+        function simulateTrace(target) {
+            const totalHops = 8 + Math.floor(Math.random() * 8); // 8-15 hops
+            let currentHop = 0;
+
+            function addHop() {
+                if (!isTracing || currentHop >= totalHops) {
+                    if (isTracing) {
+                        // Reached destination
+                        addFinalHop(target);
+                        finishTrace();
+                    }
+                    return;
+                }
+
+                currentHop++;
+                const isTimeout = Math.random() < 0.1;
+                const latency = isTimeout ? null : (5 + Math.random() * currentHop * 12 + Math.random() * 30);
+                const ip = isTimeout ? '* * *' : generateIP();
+                const location = isTimeout ? '' : generateLocation();
+
+                const hop = { index: currentHop, ip, location, latency, isTimeout };
+                hopResults.push(hop);
+                renderHop(hop, true);
+                updateStats();
+
+                const delay = 300 + Math.random() * 500;
+                traceTimer = setTimeout(addHop, delay);
+            }
+
+            addHop();
+        }
+
+        function addFinalHop(target) {
+            const latency = hopResults.length > 0
+                ? hopResults[hopResults.length - 1].latency + Math.random() * 10
+                : 20 + Math.random() * 30;
+            const ip = resolveTargetIP(target);
+
+            const hop = {
+                index: hopResults.length + 1,
+                ip: ip,
+                location: target,
+                latency: latency,
+                isTimeout: false,
+                isTarget: true
+            };
+            hopResults.push(hop);
+            renderHop(hop, true);
+            updateStats();
+        }
+
+        function finishTrace() {
+            isTracing = false;
+            $('traceBtn').textContent = '重新追踪';
+            $('traceBtn').style.background = 'linear-gradient(135deg, var(--accent-blue), var(--accent-cyan))';
+            $('targetInput').disabled = false;
+        }
+
+        function renderHop(hop, animate) {
+            // Remove tracing class from previous item
+            const prevTracing = document.querySelector('.hop-item.tracing');
+            if (prevTracing) prevTracing.classList.remove('tracing');
+
+            // Add connector line (except for first hop)
+            if (hopResults.length > 1) {
+                const connector = document.createElement('div');
+                connector.className = 'hop-connector';
+                $('hopList').appendChild(connector);
+            }
+
+            const item = document.createElement('div');
+            let classes = 'hop-item';
+            if (hop.isTimeout) classes += ' timeout';
+            if (!hop.isTimeout && isTracing && hop.index === hopResults.length) classes += ' tracing';
+            item.className = classes;
+
+            const latencyClass = hop.isTimeout ? '' :
+                (hop.latency < 30 ? 'good' : (hop.latency < 80 ? 'medium' : 'bad'));
+            const latencyText = hop.isTimeout ? '超时' : hop.latency.toFixed(1);
+
+            item.innerHTML = `
+                <div class="hop-index">${hop.index}</div>
+                <div class="hop-info">
+                    <div class="hop-ip">${hop.ip}</div>
+                    ${hop.location ? `<div class="hop-location">${hop.location}</div>` : ''}
+                </div>
+                <div class="hop-latency">
+                    <div class="hop-latency-value ${latencyClass}">${latencyText}</div>
+                    <div class="hop-latency-label">${hop.isTimeout ? '' : 'ms'}</div>
+                </div>
+            `;
+
+            $('hopList').appendChild(item);
+
+            if (animate) {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        item.classList.add('visible');
+                    });
+                });
+            } else {
+                item.classList.add('visible');
+            }
+
+            // Scroll to bottom
+            item.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+
+        function updateStats() {
+            const validHops = hopResults.filter(h => !h.isTimeout);
+            const count = hopResults.length;
+
+            $('statHops').textContent = count;
+            $('hopsCount').textContent = count + ' 跳';
+
+            if (validHops.length > 0) {
+                const avg = validHops.reduce((s, h) => s + h.latency, 0) / validHops.length;
+                const max = Math.max(...validHops.map(h => h.latency));
+                $('statAvg').textContent = avg.toFixed(1);
+                $('statMax').textContent = max.toFixed(1);
+            }
+        }
+
+        function generateIP() {
+            const prefixes = ['10', '172', '192', '202', '211', '220', '221', '114', '61', '123', '36', '39'];
+            const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+            return `${prefix}.${Math.floor(Math.random()*256)}.${Math.floor(Math.random()*256)}.${Math.floor(Math.random()*256)}`;
+        }
+
+        function generateLocation() {
+            const locations = [
+                '本地网关', '城域网', '省网核心', '骨干网',
+                '北京', '上海', '广州', '深圳', '杭州', '成都',
+                '中国电信', '中国联通', '中国移动',
+                '国际出口', '对端网络'
+            ];
+            return locations[Math.floor(Math.random() * locations.length)];
+        }
+
+        function resolveTargetIP(target) {
+            const map = {
+                'baidu.com': '220.181.38.148',
+                'qq.com': '203.205.147.59',
+                'google.com': '142.250.80.46',
+                '8.8.8.8': '8.8.8.8',
+                '114.114.114.114': '114.114.114.114'
+            };
+            return map[target] || `${Math.floor(Math.random()*200+50)}.${Math.floor(Math.random()*256)}.${Math.floor(Math.random()*256)}.${Math.floor(Math.random()*256)}`;
+        }
+    </script>
+</body>
+</html>

@@ -201,6 +201,15 @@
             opacity: 1;
         }
 
+        .tool-icon.trace {
+            background: rgba(56, 189, 248, 0.15);
+        }
+
+        .tool-icon.trace svg {
+            fill: #38bdf8;
+            opacity: 1;
+        }
+
         /* WiFi信息卡片 */
         .wifi-info-card {
             background: var(--bg-card);
@@ -529,6 +538,21 @@
                         <div class="tool-info">
                             <div class="tool-name">IP检测</div>
                             <div class="tool-desc">检测IPv4/IPv6</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trace路由卡片 -->
+                <div class="tool-card" onclick="location.href='trace.html'">
+                    <div class="tool-header">
+                        <div class="tool-icon trace">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">Trace</div>
+                            <div class="tool-desc">路由追踪测试</div>
                         </div>
                     </div>
                 </div>
