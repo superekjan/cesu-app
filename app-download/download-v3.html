@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>易测管家 - 专业家庭内网诊断软件</title>
+    <meta name="description" content="易测管家是一款专业家庭内网诊断软件，一键检测WiFi速率、信号、干扰、WiFi6支持及内网时延，AI智能分析网络问题并提供优化方案。">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-gradient-start: #0f1629;
+            --bg-gradient-end: #131b2e;
+            --accent-blue: #5b8def;
+            --accent-cyan: #4ecdc4;
+            --accent-glow: rgba(91, 141, 239, 0.4);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-tertiary: rgba(255, 255, 255, 0.5);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 60px 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at 50% 0%, rgba(91, 141, 239, 0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 60%, rgba(78, 205, 196, 0.15) 0%, transparent 40%),
+                radial-gradient(ellipse at 20% 80%, rgba(91, 141, 239, 0.1) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(91, 141, 239, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(91, 141, 239, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            mask-image: radial-gradient(ellipse at 50% 30%, black 0%, transparent 70%);
+            -webkit-mask-image: radial-gradient(ellipse at 50% 30%, black 0%, transparent 70%);
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-dot:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .floating-dot:nth-child(2) { top: 60%; left: 85%; animation-delay: 1s; background: var(--accent-blue); }
+        .floating-dot:nth-child(3) { top: 80%; left: 20%; animation-delay: 2s; }
+        .floating-dot:nth-child(4) { top: 30%; left: 75%; animation-delay: 3s; background: var(--accent-cyan); }
+        .floating-dot:nth-child(5) { top: 70%; left: 50%; animation-delay: 4s; background: var(--accent-blue); }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+            50% { transform: translateY(-20px) scale(1.2); opacity: 1; }
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 420px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .app-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 40px;
+            border-radius: 28px;
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .app-icon::before {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 32px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan), var(--accent-blue));
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+            z-index: -1;
+        }
+
+        .app-icon::after {
+            content: '';
+            position: absolute;
+            inset: -20px;
+            border-radius: 48px;
+            background: radial-gradient(circle, rgba(91, 141, 239, 0.3) 0%, transparent 70%);
+            filter: blur(20px);
+            z-index: -2;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .app-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 28px;
+        }
+
+        .app-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: rgba(78, 205, 196, 0.1);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--accent-cyan);
+            margin-bottom: 28px;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInUp 0.6s ease 0.15s forwards;
+        }
+
+        .app-badge svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--accent-cyan);
+        }
+
+        .app-name {
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease 0.2s forwards;
+        }
+
+        .app-tagline {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 28px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease 0.3s forwards;
+        }
+
+        .app-desc {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.9;
+            margin-bottom: 32px;
+            padding: 0 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease 0.4s forwards;
+        }
+
+        .feature-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease 0.45s forwards;
+        }
+
+        .feature-tag {
+            padding: 8px 12px;
+            background: rgba(91, 141, 239, 0.08);
+            border: 1px solid rgba(91, 141, 239, 0.2);
+            border-radius: 24px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .feature-tag:hover {
+            background: rgba(91, 141, 239, 0.15);
+            border-color: rgba(91, 141, 239, 0.4);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .feature-tag svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--accent-cyan);
+            margin-right: 6px;
+            vertical-align: -3px;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 18px 56px;
+            background: linear-gradient(135deg, var(--accent-blue), #6b9fff, var(--accent-cyan));
+            background-size: 200% 200%;
+            border: none;
+            border-radius: 50px;
+            font-size: 17px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 10px 40px rgba(91, 141, 239, 0.4);
+            transition: all 0.3s ease;
+            animation: gradientShift 3s ease infinite, fadeInUp 0.8s ease 0.5s forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(91, 141, 239, 0.5);
+        }
+
+        .download-btn:active {
+            transform: translateY(0);
+        }
+
+        .download-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: white;
+        }
+
+        .app-version {
+            margin-top: 20px;
+            font-size: 12px;
+            color: var(--text-tertiary);
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.6s forwards;
+        }
+
+        .scan-qr-btn {
+            display: block;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: var(--accent-cyan);
+            text-decoration: none;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.45s forwards;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .scan-qr-btn:hover {
+            color: var(--accent-blue);
+        }
+
+        .scan-qr-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+            vertical-align: -3px;
+            margin-right: 6px;
+        }
+
+        .qr-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .qr-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .qr-content {
+            background: var(--bg-gradient-start);
+            border-radius: 24px;
+            padding: 32px;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(91, 141, 239, 0.2);
+        }
+
+        .qr-modal.show .qr-content {
+            transform: scale(1);
+        }
+
+        .qr-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            background: white;
+            border-radius: 12px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .qr-code img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .qr-hint {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .qr-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .qr-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .qr-close svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 375px) {
+            .app-name {
+                font-size: 28px;
+            }
+            .app-desc{
+                font-size: 14px;
+                padding: 0;
+            }
+            .feature-tags {
+                gap: 8px;
+            }
+            .feature-tag {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <div class="grid-bg"></div>
+        <div class="floating-elements">
+            <div class="floating-dot"></div>
+            <div class="floating-dot"></div>
+            <div class="floating-dot"></div>
+            <div class="floating-dot"></div>
+            <div class="floating-dot"></div>
+        </div>
+        <div class="hero-content">
+            <div class="app-icon">
+                <img src="logo.png">
+            </div>
+            
+            <h1 class="app-name">易测管家</h1>
+            <p class="app-tagline">NETWORK DIAGNOSTIC EXPERT</p>
+<div class="app-badge">
+                <svg viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                AI智能诊断
+            </div>
+            <p class="app-desc">一键检测WiFi速率、信号、干扰、WiFi6支持及内网时延，AI智能分析问题并提供优化方案</p>
+
+
+            <a href="#" class="scan-qr-btn" onclick="showQRCode(event)">
+                <svg viewBox="0 0 24 24"><path d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 13h6v6H3v-6zm2 2v2h2v-2H5zm13-2h1v1h-1v-1zm-4 0h1v3h-1v-3zm2 0h1v1h-1v-1zm2 2h1v3h-1v-3zm-8 2h1v1h-1v-1zm2 0h3v1h-3v-1zm2 0h1v1h-1v-1zm2 0h1v1h-1v-1zm-8 0h1v1h-1v-1zm2 0h1v1h-1v-1zm2 0h1v1h-1v-1z"/></svg>
+                扫码下载
+            </a>
+
+            <a href="http://fjsp.chinaqoe.net:8000/ycgj_v1.2.0.apk" class="download-btn">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+                下载APP
+            </a>
+            <p class="app-version">版本 v1.2.0</p>
+        </div>
+    </section>
+
+    <div class="qr-modal" id="qrModal">
+        <button class="qr-close" onclick="closeQRCode()">
+            <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+        <div class="qr-content">
+            <div class="qr-title">扫码下载易测管家</div>
+            <div class="qr-code">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http://fjsp.chinaqoe.net:8000/ycgj_v1.2.0.apk" alt="下载二维码">
+            </div>
+            <p class="qr-hint">使用微信扫一扫或长按识别</p>
+        </div>
+    </div>
+
+    <script>
+        function showQRCode(event) {
+            event.preventDefault();
+            document.getElementById('qrModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeQRCode() {
+            document.getElementById('qrModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('qrModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeQRCode();
+            }
+        });
+    </script>
+</body>
+</html>

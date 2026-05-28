@@ -813,6 +813,21 @@
                             <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
                         </svg>
                     </div>
+                    <div class="menu-item" onclick="goToStaffReports()">
+                        <div class="menu-icon" style="background: rgba(56, 189, 248, 0.15);">
+                            <svg viewBox="0 0 24 24" style="fill: #38bdf8;">
+                                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                            </svg>
+                        </div>
+                        <div class="menu-content">
+                            <div class="menu-label">用户报告</div>
+                            <div class="menu-desc">查看绑定用户的测速和诊断报告</div>
+                        </div>
+                        <span class="menu-badge">12</span>
+                        <svg class="menu-arrow" viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                        </svg>
+                    </div>
                     <div class="menu-item" onclick="goToStaffInvitation()">
                         <div class="menu-icon blue">
                             <svg viewBox="0 0 24 24">
@@ -1152,6 +1167,11 @@
         // 前往装维邀请页面
         function goToStaffInvitation() {
             window.location.href = 'staff-invitation.html';
+        }
+
+        // 前往用户报告页面
+        function goToStaffReports() {
+            window.location.href = 'staff-reports.html';
         }
 
         function goToVideoKnowledge() {
