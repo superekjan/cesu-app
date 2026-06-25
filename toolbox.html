@@ -210,6 +210,15 @@
             opacity: 1;
         }
 
+        .tool-icon.wholehouse {
+            background: rgba(94, 234, 212, 0.15);
+        }
+
+        .tool-icon.wholehouse svg {
+            fill: #5eead4;
+            opacity: 1;
+        }
+
         /* WiFi信息卡片 */
         .wifi-info-card {
             background: var(--bg-card);
@@ -553,6 +562,21 @@
                         <div class="tool-info">
                             <div class="tool-name">Trace</div>
                             <div class="tool-desc">路由追踪测试</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 全屋WiFi卡片 -->
+                <div class="tool-card" onclick="location.href='whole-house-wifi.html'">
+                    <div class="tool-header">
+                        <div class="tool-icon wholehouse">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 2.83L19.17 11H18v8h-4v-6H10v6H6v-8H4.83L12 5.83z"/>
+                            </svg>
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">全屋WiFi</div>
+                            <div class="tool-desc">信号覆盖测试</div>
                         </div>
                     </div>
                 </div>

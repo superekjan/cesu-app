@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>全屋WiFi覆盖测试</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --bg-primary:#060d1f; --bg-secondary:#0a162e; --bg-card:rgba(14,28,60,0.55); --bg-canvas:#0a1830;
+            --accent-blue:#00aaff; --accent-cyan:#38bdf8; --accent-green:#22c55e; --accent-orange:#f59e0b; --accent-red:#ef4444;
+            --text-primary:#e8f0ff; --text-secondary:#94a3c8; --text-tertiary:#5a6a8a;
+            --border-subtle:rgba(56,189,248,0.12); --border-active:rgba(56,189,248,0.4);
+        }
+        body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; background:linear-gradient(180deg,#060d1f 0%,#0a162e 50%,#071024 100%); color:var(--text-primary); min-height:100vh; overflow-x:hidden; }
+        .container { max-width:480px; margin:0 auto; min-height:100vh; display:flex; flex-direction:column; }
+        .header { padding:16px 20px 12px; position:sticky; top:0; z-index:100; background:rgba(6,13,31,0.95); backdrop-filter:blur(12px); border-bottom:1px solid var(--border-subtle); }
+        .header-top { display:flex; align-items:center; gap:12px; }
+        .back-btn { width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; border-radius:50%; transition:background 0.2s; }
+        .back-btn:active { background:rgba(255,255,255,0.08); }
+        .back-btn svg { width:22px; height:22px; fill:var(--text-primary); }
+        .back-btn.hidden { visibility:hidden; }
+        .header-title { font-size:17px; font-weight:600; flex:1; }
+        .header-action { font-size:14px; color:var(--accent-cyan); cursor:pointer; padding:4px 8px; }
+        .view { display:none; flex:1; flex-direction:column; }
+        .view.active { display:flex; }
+        .home-content { padding:24px 20px; display:flex; flex-direction:column; gap:16px; }
+        .home-hero { text-align:center; padding:32px 0 24px; }
+        .home-hero .hero-icon { width:72px; height:72px; margin:0 auto 16px; border-radius:20px; background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan)); display:flex; align-items:center; justify-content:center; box-shadow:0 8px 32px rgba(56,189,248,0.3); }
+        .home-hero .hero-icon svg { width:40px; height:40px; fill:#fff; }
+        .home-hero h1 { font-size:24px; font-weight:700; margin-bottom:8px; }
+        .home-hero p { font-size:14px; color:var(--text-secondary); }
+        .action-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+        .action-card { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:18px; padding:24px 16px; cursor:pointer; transition:all 0.25s ease; display:flex; flex-direction:column; align-items:center; gap:12px; position:relative; overflow:hidden; }
+        .action-card:active { transform:scale(0.96); border-color:var(--border-active); }
+        .action-card .card-icon { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; position:relative; z-index:1; }
+        .action-card .card-icon svg { width:28px; height:28px; fill:#fff; }
+        .action-card .card-title { font-size:15px; font-weight:600; position:relative; z-index:1; }
+        .action-card .card-desc { font-size:12px; color:var(--text-tertiary); text-align:center; position:relative; z-index:1; }
+        .action-card .card-badge { position:absolute; top:10px; right:10px; background:var(--accent-cyan); color:#060d1f; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; z-index:2; }
+        .card-blue .card-icon { background:linear-gradient(135deg,#0066cc,#00aaff); }
+        .card-cyan .card-icon { background:linear-gradient(135deg,#0284c7,#38bdf8); }
+        .card-orange .card-icon { background:linear-gradient(135deg,#d97706,#f59e0b); }
+        .card-green .card-icon { background:linear-gradient(135deg,#16a34a,#22c55e); }
+        .list-content { padding:16px 20px; flex:1; }
+        .list-item { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:14px; padding:14px; margin-bottom:12px; cursor:pointer; transition:all 0.2s; display:flex; gap:14px; align-items:center; }
+        .list-item:active { border-color:var(--border-active); transform:scale(0.98); }
+        .item-thumb { width:72px; height:72px; border-radius:10px; background:var(--bg-canvas); border:1px solid var(--border-subtle); flex-shrink:0; overflow:hidden; }
+        .item-thumb canvas { width:100%; height:100%; display:block; }
+        .item-info { flex:1; min-width:0; }
+        .item-name { font-size:15px; font-weight:600; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .item-meta { font-size:12px; color:var(--text-secondary); display:flex; gap:8px; flex-wrap:wrap; }
+        .item-meta .tag { background:rgba(56,189,248,0.1); color:var(--accent-cyan); padding:2px 8px; border-radius:6px; font-size:11px; }
+        .item-time { font-size:11px; color:var(--text-tertiary); margin-top:4px; }
+        .item-action { flex-shrink:0; position:relative; }
+        .item-action svg { width:20px; height:20px; fill:var(--text-secondary); }
+        .compare-btn { background:linear-gradient(135deg,var(--accent-orange),#f97316); color:#fff; border:none; padding:6px 12px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap; }
+        .compare-btn:active { transform:scale(0.95); }
+        .empty-state { text-align:center; padding:60px 20px; color:var(--text-tertiary); }
+        .empty-state svg { width:64px; height:64px; fill:var(--text-tertiary); opacity:0.3; margin-bottom:16px; }
+        .empty-state p { font-size:14px; margin-bottom:8px; }
+        .empty-state .empty-hint { font-size:12px; }
+        .draw-content { flex:1; display:flex; flex-direction:column; }
+        .draw-toolbar { display:flex; gap:8px; padding:12px 16px; background:var(--bg-secondary); border-bottom:1px solid var(--border-subtle); overflow-x:auto; }
+        .tool-btn { display:flex; align-items:center; gap:6px; padding:8px 14px; background:rgba(56,189,248,0.08); border:1px solid var(--border-subtle); border-radius:10px; color:var(--text-primary); font-size:13px; cursor:pointer; white-space:nowrap; transition:all 0.2s; }
+        .tool-btn svg { width:16px; height:16px; fill:currentColor; }
+        .tool-btn.active { background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan)); border-color:var(--accent-cyan); color:#fff; }
+        .tool-btn:active { transform:scale(0.95); }
+        .canvas-wrap { flex:1; position:relative; background:var(--bg-canvas); margin:12px; border-radius:14px; border:1px solid var(--border-subtle); overflow:hidden; }
+        #drawCanvas { width:100%; height:100%; display:block; cursor:crosshair; touch-action:none; }
+        .draw-footer { padding:12px 16px; background:var(--bg-secondary); border-top:1px solid var(--border-subtle); display:flex; gap:10px; }
+        .footer-input { flex:1; background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); border-radius:10px; padding:10px 14px; color:var(--text-primary); font-size:14px; }
+        .footer-input::placeholder { color:var(--text-tertiary); }
+        .footer-input:focus { outline:none; border-color:var(--border-active); }
+        .btn-primary { background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan)); color:#fff; border:none; padding:10px 20px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s; }
+        .btn-primary:active { transform:scale(0.96); }
+        .btn-primary:disabled { opacity:0.4; cursor:not-allowed; }
+        .btn-secondary { background:rgba(255,255,255,0.06); color:var(--text-primary); border:1px solid var(--border-subtle); padding:10px 16px; border-radius:10px; font-size:13px; cursor:pointer; }
+        .btn-secondary:active { transform:scale(0.96); }
+        .test-content { flex:1; display:flex; flex-direction:column; }
+        .test-info-bar { padding:10px 16px; background:rgba(56,189,248,0.06); border-bottom:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between; font-size:13px; }
+        .test-info-bar .info-label { color:var(--text-secondary); }
+        .test-info-bar .info-value { color:var(--accent-cyan); font-weight:600; }
+        .test-canvas-wrap { flex:1; position:relative; background:var(--bg-canvas); margin:12px; border-radius:14px; border:1px solid var(--border-subtle); overflow:hidden; }
+        #testCanvas { width:100%; height:100%; display:block; cursor:crosshair; touch-action:none; }
+        .signal-input-panel { position:absolute; bottom:12px; left:12px; right:12px; background:rgba(10,22,46,0.95); backdrop-filter:blur(12px); border:1px solid var(--border-active); border-radius:14px; padding:14px; display:none; }
+        .signal-input-panel.show { display:block; }
+        .signal-input-panel .panel-title { font-size:13px; color:var(--text-secondary); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
+        .signal-input-panel .panel-close { color:var(--text-tertiary); cursor:pointer; font-size:18px; }
+        .signal-slider-wrap { display:flex; align-items:center; gap:12px; }
+        .signal-slider { flex:1; -webkit-appearance:none; height:6px; border-radius:3px; background:linear-gradient(90deg,var(--accent-red),var(--accent-orange),var(--accent-green)); outline:none; }
+        .signal-slider::-webkit-slider-thumb { -webkit-appearance:none; width:24px; height:24px; border-radius:50%; background:#fff; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.3); }
+        .signal-value { font-size:20px; font-weight:700; min-width:56px; text-align:center; }
+        .signal-value .unit { font-size:12px; color:var(--text-secondary); }
+        .test-footer { padding:12px 16px; background:var(--bg-secondary); border-top:1px solid var(--border-subtle); display:flex; gap:10px; align-items:center; }
+        .point-count { font-size:13px; color:var(--text-secondary); flex:1; }
+        .point-count .count { color:var(--accent-cyan); font-weight:700; font-size:16px; }
+        .signal-list-panel { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; background:var(--bg-secondary); border-top:1px solid var(--border-active); border-radius:20px 20px 0 0; padding:16px 20px; max-height:60vh; overflow-y:auto; display:none; z-index:200; }
+        .signal-list-panel.show { display:block; }
+        .signal-list-panel .panel-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+        .signal-list-panel .panel-header h3 { font-size:15px; }
+        .signal-point-item { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border-subtle); }
+        .signal-point-item:last-child { border-bottom:none; }
+        .point-num { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; }
+        .point-signal { flex:1; font-size:14px; }
+        .point-delete { color:var(--accent-red); font-size:13px; cursor:pointer; padding:4px 8px; }
+        .heatmap-detail-content { padding:16px; flex:1; }
+        .heatmap-canvas-wrap { background:var(--bg-canvas); border-radius:14px; border:1px solid var(--border-subtle); overflow:hidden; margin-bottom:16px; }
+        #heatmapDetailCanvas { width:100%; display:block; }
+        .stats-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:16px; }
+        .stat-card { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:12px; padding:14px 10px; text-align:center; }
+        .stat-label { font-size:11px; color:var(--text-secondary); margin-bottom:6px; }
+        .stat-value { font-size:22px; font-weight:700; }
+        .stat-value .unit { font-size:12px; color:var(--text-secondary); }
+        .legend-bar { display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--bg-card); border-radius:10px; font-size:12px; color:var(--text-secondary); }
+        .legend-gradient { flex:1; height:8px; border-radius:4px; background:linear-gradient(90deg,#ef4444,#f59e0b,#22c55e); }
+        .compare-detail-content { padding:16px; flex:1; }
+        .compare-cards { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+        .compare-card { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:14px; padding:12px; }
+        .compare-card.after { border-color:rgba(34,197,94,0.3); }
+        .compare-label { font-size:13px; font-weight:600; margin-bottom:10px; text-align:center; padding:4px; border-radius:6px; }
+        .compare-label.before { background:rgba(239,68,68,0.1); color:var(--accent-orange); }
+        .compare-label.after { background:rgba(34,197,94,0.1); color:var(--accent-green); }
+        .compare-canvas-wrap { background:var(--bg-canvas); border-radius:8px; overflow:hidden; margin-bottom:10px; }
+        .compare-canvas-wrap canvas { width:100%; display:block; }
+        .compare-stats { font-size:12px; }
+        .compare-stat-row { display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid var(--border-subtle); }
+        .compare-stat-row:last-child { border-bottom:none; }
+        .compare-stat-row .label { color:var(--text-secondary); }
+        .compare-stat-row .value { font-weight:600; }
+        .improvement-banner { background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(56,189,248,0.1)); border:1px solid rgba(34,197,94,0.3); border-radius:14px; padding:16px; text-align:center; margin-bottom:16px; }
+        .improvement-banner .improve-label { font-size:12px; color:var(--text-secondary); margin-bottom:6px; }
+        .improvement-banner .improve-value { font-size:32px; font-weight:700; background:linear-gradient(135deg,var(--accent-green),var(--accent-cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .improvement-banner .improve-value .unit { font-size:14px; }
+        .modal-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); display:none; align-items:flex-end; justify-content:center; z-index:300; }
+        .modal-overlay.show { display:flex; }
+        .modal-sheet { background:var(--bg-secondary); border-radius:20px 20px 0 0; width:100%; max-width:480px; padding:20px; animation:slideUp 0.3s ease; }
+        @keyframes slideUp { from{transform:translateY(100%);} to{transform:translateY(0);} }
+        .modal-sheet .modal-handle { width:40px; height:4px; background:var(--text-tertiary); border-radius:2px; margin:0 auto 16px; }
+        .modal-sheet h3 { font-size:16px; margin-bottom:16px; text-align:center; }
+        .modal-option { display:flex; align-items:center; gap:14px; padding:16px; background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:12px; margin-bottom:10px; cursor:pointer; transition:all 0.2s; }
+        .modal-option:active { border-color:var(--border-active); transform:scale(0.98); }
+        .modal-option .option-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .modal-option .option-icon svg { width:24px; height:24px; fill:#fff; }
+        .modal-option .option-text { flex:1; }
+        .modal-option .option-title { font-size:14px; font-weight:600; margin-bottom:2px; }
+        .modal-option .option-desc { font-size:12px; color:var(--text-secondary); }
+        .modal-cancel { text-align:center; padding:14px; color:var(--text-secondary); font-size:14px; cursor:pointer; margin-top:8px; }
+        .toast { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(10,22,46,0.95); border:1px solid var(--border-active); border-radius:12px; padding:14px 24px; font-size:14px; z-index:400; display:none; backdrop-filter:blur(12px); }
+        .toast.show { display:block; animation:fadeIn 0.2s; }
+        @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+        .history-select-content { padding:16px 20px; flex:1; }
+        .history-select-content .select-hint { font-size:13px; color:var(--text-secondary); margin-bottom:14px; padding:10px 14px; background:rgba(56,189,248,0.06); border-radius:10px; }
+        .history-item { display:flex; gap:12px; align-items:center; padding:14px; background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:12px; margin-bottom:10px; cursor:pointer; transition:all 0.2s; }
+        .history-item:active { transform:scale(0.98); }
+        .history-item.selected { border-color:var(--accent-cyan); background:rgba(56,189,248,0.08); }
+        .history-item .radio { width:22px; height:22px; border-radius:50%; border:2px solid var(--text-tertiary); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+        .history-item.selected .radio { border-color:var(--accent-cyan); background:var(--accent-cyan); }
+        .history-item.selected .radio::after { content:''; width:8px; height:8px; border-radius:50%; background:#fff; }
+        .history-item .history-info { flex:1; }
+        .history-item .history-name { font-size:14px; font-weight:600; margin-bottom:4px; }
+        .history-item .history-time { font-size:12px; color:var(--text-tertiary); }
+        .select-footer { padding:12px 16px; background:var(--bg-secondary); border-top:1px solid var(--border-subtle); }
+        .select-footer .btn-primary { width:100%; padding:14px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="header-top">
+            <div class="back-btn" id="backBtn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></div>
+            <div class="header-title" id="headerTitle">全屋WiFi覆盖测试</div>
+            <div class="header-action" id="headerAction" style="display:none;"></div>
+        </div>
+    </div>
+
+    <div class="view active" id="view-home">
+        <div class="home-content">
+            <div class="home-hero">
+                <div class="hero-icon"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg></div>
+                <h1>全屋WiFi覆盖测试</h1>
+                <p>绘制户型 · 信号打点 · 热力分析 · 整改对比</p>
+            </div>
+            <div class="action-grid">
+                <div class="action-card card-blue" onclick="navigateTo('plan-list','选择户型图')">
+                    <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M3 5v14h18V5H3zm16 12H5V7h14v10zM7 9h6v6H7z"/></svg></div>
+                    <div class="card-title">选择户型图</div>
+                    <div class="card-desc">从模板或历史中选择</div>
+                    <span class="card-badge" id="planBadge" style="display:none;"></span>
+                </div>
+                <div class="action-card card-cyan" onclick="navigateTo('plan-draw','绘制户型图')">
+                    <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></div>
+                    <div class="card-title">绘制户型图</div>
+                    <div class="card-desc">自由绘制您的户型</div>
+                </div>
+                <div class="action-card card-orange" onclick="navigateTo('heatmap-list','信号热力图')">
+                    <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M17.66 7.93L12 2.27 6.34 7.93c-3.12 3.12-3.12 8.19 0 11.31C7.9 20.8 9.95 21.58 12 21.58c2.05 0 4.1-.78 5.66-2.34 3.12-3.12 3.12-8.19 0-11.31z"/></svg></div>
+                    <div class="card-title">信号热力图</div>
+                    <div class="card-desc">查看已生成的热力图</div>
+                    <span class="card-badge" id="heatmapBadge" style="display:none;"></span>
+                </div>
+                <div class="action-card card-green" onclick="navigateTo('compare-list','对比报告')">
+                    <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M9 16H5v-6h4v6zm6 0h-4V8h4v8zm6 0h-4V4h4v12z"/></svg></div>
+                    <div class="card-title">对比报告</div>
+                    <div class="card-desc">整改前后效果对比</div>
+                    <span class="card-badge" id="compareBadge" style="display:none;"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="view" id="view-plan-list"><div class="list-content" id="planListContent"></div></div>
+
+    <div class="view" id="view-plan-draw">
+        <div class="draw-content">
+            <div class="draw-toolbar">
+                <div class="tool-btn active" data-tool="wall" onclick="setDrawTool('wall')"><svg viewBox="0 0 24 24"><path d="M3 3h18v2H3zm0 8h18v2H3zm0 8h18v2H3z"/></svg>画墙</div>
+                <div class="tool-btn" data-tool="room" onclick="setDrawTool('room')"><svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg>画房间</div>
+                <div class="tool-btn" data-tool="erase" onclick="setDrawTool('erase')"><svg viewBox="0 0 24 24"><path d="M16.24 3.56l4.95 4.94c.78.79.78 2.05 0 2.84L12 20.53c-1.56 1.56-4.09 1.56-5.66 0L2.81 17c-.78-.79-.78-2.05 0-2.84L13.41 3.56c.79-.78 2.05-.78 2.83 0z"/></svg>擦除</div>
+                <div class="tool-btn" onclick="clearCanvas()"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>清空</div>
+            </div>
+            <div class="canvas-wrap"><canvas id="drawCanvas"></canvas></div>
+            <div class="draw-footer">
+                <input type="text" class="footer-input" id="planNameInput" placeholder="输入户型图名称" maxlength="20">
+                <button class="btn-primary" onclick="saveDrawnPlan()">保存户型图</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="view" id="view-plan-test">
+        <div class="test-content">
+            <div class="test-info-bar">
+                <span><span class="info-label">户型：</span><span class="info-value" id="testPlanName">-</span></span>
+                <span><span class="info-label">已打点：</span><span class="info-value" id="testPointCount">0</span></span>
+            </div>
+            <div class="test-canvas-wrap">
+                <canvas id="testCanvas"></canvas>
+                <div class="signal-input-panel" id="signalInputPanel">
+                    <div class="panel-title"><span>设置信号强度</span><span class="panel-close" onclick="cancelAddPoint()">×</span></div>
+                    <div class="signal-slider-wrap">
+                        <input type="range" class="signal-slider" id="signalSlider" min="-90" max="-30" value="-55">
+                        <div class="signal-value"><span id="signalValue">-55</span><span class="unit"> dBm</span></div>
+                    </div>
+                    <button class="btn-primary" style="width:100%;margin-top:12px;" onclick="confirmAddPoint()">确认添加</button>
+                </div>
+            </div>
+            <div class="test-footer">
+                <div class="point-count">共 <span class="count" id="footerPointCount">0</span> 个测试点</div>
+                <button class="btn-secondary" onclick="toggleSignalList()">信号点列表</button>
+                <button class="btn-primary" id="btnGenerateHeatmap" onclick="generateHeatmap()" disabled>生成热力图</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="view" id="view-heatmap-list"><div class="list-content" id="heatmapListContent"></div></div>
+
+    <div class="view" id="view-heatmap-detail">
+        <div class="heatmap-detail-content">
+            <div class="heatmap-canvas-wrap"><canvas id="heatmapDetailCanvas"></canvas></div>
+            <div class="stats-grid" id="heatmapStats"></div>
+            <div class="legend-bar"><span>弱</span><div class="legend-gradient"></div><span>强</span></div>
+        </div>
+    </div>
+
+    <div class="view" id="view-compare-list"><div class="list-content" id="compareListContent"></div></div>
+    <div class="view" id="view-compare-detail"><div class="compare-detail-content" id="compareDetailContent"></div></div>
+
+    <div class="view" id="view-history-select">
+        <div class="history-select-content" id="historySelectContent"></div>
+        <div class="select-footer"><button class="btn-primary" id="btnConfirmCompare" onclick="confirmHistoryCompare()" disabled>生成对比报告</button></div>
+    </div>
+</div>
+
+<div class="signal-list-panel" id="signalListPanel">
+    <div class="panel-header"><h3>信号测试点</h3><span style="cursor:pointer;color:var(--text-tertiary);font-size:18px;" onclick="toggleSignalList()">×</span></div>
+    <div id="signalPointList"></div>
+</div>
+
+<div class="modal-overlay" id="compareModal" onclick="closeModal('compareModal',event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+        <div class="modal-handle"></div>
+        <h3>对比优化效果</h3>
+        <div class="modal-option" onclick="startRetest()">
+            <div class="option-icon" style="background:linear-gradient(135deg,#d97706,#f59e0b);"><svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></div>
+            <div class="option-text"><div class="option-title">去测试整改后效果</div><div class="option-desc">重新打点测试，生成整改前后对比</div></div>
+        </div>
+        <div class="modal-option" onclick="openHistorySelect()">
+            <div class="option-icon" style="background:linear-gradient(135deg,#0284c7,#38bdf8);"><svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg></div>
+            <div class="option-text"><div class="option-title">从历史记录中选择对比</div><div class="option-desc">选择同户型热力图进行对比</div></div>
+        </div>
+        <div class="modal-cancel" onclick="closeModalDirect('compareModal')">取消</div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== 数据模型 =====
+const STORAGE_KEYS = { plans:'whw_floorPlans', heatmaps:'whw_heatmaps', comparisons:'whw_comparisons' };
+let floorPlans = [], heatmaps = [], comparisons = [];
+let viewStack = ['home'];
+let currentPlan = null, currentHeatmap = null, currentCompare = null;
+let compareSourceHeatmap = null, selectedHistoryId = null;
+let drawTool = 'wall', isDrawing = false, drawStart = null;
+let walls = [], rooms = [], pendingPoint = null, testPoints = [];
+let retestMode = false; // 整改后重新测试模式
+
+// ===== 默认模板 =====
+const DEFAULT_TEMPLATES = [
+    { id:'tpl_1', name:'一室一厅（模板）', type:'template',
+      walls:[{x1:60,y1:60,x2:320,y2:60},{x1:320,y1:60,x2:320,y2:380},{x1:320,y1:380,x2:60,y2:380},{x1:60,y1:380,x2:60,y2:60},{x1:60,y1:220,x2:200,y2:220},{x1:200,y1:220,x2:200,y2:380}],
+      rooms:[{x:60,y:60,w:260,h:160,label:'客厅'},{x:60,y:220,w:140,h:160,label:'卧室'},{x:200,y:220,w:120,h:160,label:'厨房'}], createdAt:Date.now() },
+    { id:'tpl_2', name:'两室一厅（模板）', type:'template',
+      walls:[{x1:40,y1:40,x2:440,y2:40},{x1:440,y1:40,x2:440,y2:400},{x1:440,y1:400,x2:40,y2:400},{x1:40,y1:400,x2:40,y2:40},{x1:180,y1:40,x2:180,y2:220},{x1:300,y1:40,x2:300,y2:220},{x1:40,y1:220,x2:440,y2:220}],
+      rooms:[{x:40,y:220,w:400,h:180,label:'客厅'},{x:40,y:40,w:140,h:180,label:'主卧'},{x:180,y:40,w:120,h:180,label:'次卧'},{x:300,y:40,w:140,h:180,label:'厨卫'}], createdAt:Date.now() },
+    { id:'tpl_3', name:'三室两厅（模板）', type:'template',
+      walls:[{x1:40,y1:40,x2:560,y2:40},{x1:560,y1:40,x2:560,y2:420},{x1:560,y1:420,x2:40,y2:420},{x1:40,y1:420,x2:40,y2:40},{x1:200,y1:40,x2:200,y2:220},{x1:400,y1:40,x2:400,y2:220},{x1:40,y1:220,x2:560,y2:220},{x1:300,y1:220,x2:300,y2:420}],
+      rooms:[{x:40,y:220,w:260,h:200,label:'客厅'},{x:300,y:220,w:260,h:200,label:'餐厅'},{x:40,y:40,w:160,h:180,label:'主卧'},{x:200,y:40,w:200,h:180,label:'次卧'},{x:400,y:40,w:160,h:180,label:'书房'}], createdAt:Date.now() }
+];
+
+// ===== 持久化 =====
+function saveData() {
+    try {
+        localStorage.setItem(STORAGE_KEYS.plans, JSON.stringify(floorPlans));
+        localStorage.setItem(STORAGE_KEYS.heatmaps, JSON.stringify(heatmaps));
+        localStorage.setItem(STORAGE_KEYS.comparisons, JSON.stringify(comparisons));
+    } catch(e) { console.error('保存失败', e); }
+}
+function loadData() {
+    try {
+        floorPlans = JSON.parse(localStorage.getItem(STORAGE_KEYS.plans) || '[]');
+        heatmaps = JSON.parse(localStorage.getItem(STORAGE_KEYS.heatmaps) || '[]');
+        comparisons = JSON.parse(localStorage.getItem(STORAGE_KEYS.comparisons) || '[]');
+    } catch(e) { floorPlans=[]; heatmaps=[]; comparisons=[]; }
+}
+
+// ===== 工具函数 =====
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+}
+function genId() { return 'id_' + Date.now() + '_' + Math.floor(Math.random()*1000); }
+function formatTime(ts) {
+    const d = new Date(ts), pad = n => String(n).padStart(2,'0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function getSignalColor(s) {
+    if (s >= -50) return '#22c55e';
+    if (s >= -65) return '#84cc16';
+    if (s >= -75) return '#f59e0b';
+    return '#ef4444';
+}
+function getSignalLabel(s) {
+    if (s >= -50) return '优秀';
+    if (s >= -65) return '良好';
+    if (s >= -75) return '一般';
+    return '较差';
+}
+function getPlanBounds(plan) {
+    const pts = [];
+    plan.walls.forEach(w => { pts.push({x:w.x1,y:w.y1},{x:w.x2,y:w.y2}); });
+    plan.rooms.forEach(r => { pts.push({x:r.x,y:r.y},{x:r.x+r.w,y:r.y+r.h}); });
+    if (pts.length === 0) return {x:0,y:0,w:400,h:400};
+    const xs = pts.map(p=>p.x), ys = pts.map(p=>p.y);
+    return {x:Math.min(...xs), y:Math.min(...ys), w:Math.max(Math.max(...xs)-Math.min(...xs),100), h:Math.max(Math.max(...ys)-Math.min(...ys),100)};
+}
+
+// ===== 视图导航 =====
+const VIEW_TITLES = {
+    'home':'全屋WiFi覆盖测试','plan-list':'选择户型图','plan-draw':'绘制户型图',
+    'plan-test':'信号打点测试','heatmap-list':'信号热力图','heatmap-detail':'热力图详情',
+    'compare-list':'对比报告','compare-detail':'对比报告详情','history-select':'选择历史热力图'
+};
+function navigateTo(viewId, title, action) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-'+viewId).classList.add('active');
+    document.getElementById('headerTitle').textContent = title;
+    document.getElementById('backBtn').classList.toggle('hidden', viewId === 'home');
+    const actionEl = document.getElementById('headerAction');
+    if (action) { actionEl.style.display='block'; actionEl.textContent=action.text; actionEl.onclick=action.handler; }
+    else { actionEl.style.display = 'none'; }
+    if (!viewStack.includes(viewId)) viewStack.push(viewId);
+    else viewStack = viewStack.slice(0, viewStack.indexOf(viewId)+1);
+    if (viewId === 'home') updateBadges();
+    else if (viewId === 'plan-list') renderPlanList();
+    else if (viewId === 'plan-draw') initDrawCanvas();
+    else if (viewId === 'plan-test') initTestCanvas();
+    else if (viewId === 'heatmap-list') renderHeatmapList();
+    else if (viewId === 'heatmap-detail') renderHeatmapDetail();
+    else if (viewId === 'compare-list') renderCompareList();
+    else if (viewId === 'compare-detail') renderCompareDetail();
+    else if (viewId === 'history-select') renderHistorySelect();
+    window.scrollTo(0, 0);
+}
+function goBack() {
+    if (viewStack.length > 1) {
+        viewStack.pop();
+        const prev = viewStack[viewStack.length-1];
+        navigateTo(prev, VIEW_TITLES[prev] || '全屋WiFi覆盖测试');
+        viewStack.pop();
+    }
+}
+function updateBadges() {
+    const pb=document.getElementById('planBadge'), hb=document.getElementById('heatmapBadge'), cb=document.getElementById('compareBadge');
+    pb.style.display = floorPlans.length>0?'block':'none'; pb.textContent = floorPlans.length;
+    hb.style.display = heatmaps.length>0?'block':'none'; hb.textContent = heatmaps.length;
+    cb.style.display = comparisons.length>0?'block':'none'; cb.textContent = comparisons.length;
+}
+
+// ===== 户型图列表 =====
+function renderPlanList() {
+    const container = document.getElementById('planListContent');
+    const allPlans = [...DEFAULT_TEMPLATES, ...floorPlans];
+    if (allPlans.length === 0) {
+        container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M3 5v14h18V5H3zm16 12H5V7h14v10zM7 9h6v6H7z"/></svg><p>暂无户型图</p><p class="empty-hint">点击"绘制户型图"创建</p></div>';
+        return;
+    }
+    container.innerHTML = allPlans.map(p => `
+        <div class="list-item" onclick="enterPlanTest('${p.id}')">
+            <div class="item-thumb"><canvas id="thumb_${p.id}"></canvas></div>
+            <div class="item-info">
+                <div class="item-name">${p.name}</div>
+                <div class="item-meta"><span class="tag">${p.type==='template'?'默认模板':'自绘'}</span><span>${p.rooms.length}个区域</span></div>
+                <div class="item-time">${formatTime(p.createdAt)}</div>
+            </div>
+            <div class="item-action"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div>
+        </div>`).join('');
+    allPlans.forEach(p => renderThumb(p, 'thumb_'+p.id));
+}
+function renderThumb(plan, canvasId) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    canvas.width = 144; canvas.height = 144;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#0a1830'; ctx.fillRect(0, 0, 144, 144);
+    const bounds = getPlanBounds(plan);
+    const scale = Math.min(130/bounds.w, 130/bounds.h);
+    ctx.save();
+    ctx.translate((144-bounds.w*scale)/2-bounds.x*scale, (144-bounds.h*scale)/2-bounds.y*scale);
+    ctx.scale(scale, scale);
+    plan.rooms.forEach(r => { ctx.fillStyle='rgba(56,189,248,0.06)'; ctx.fillRect(r.x,r.y,r.w,r.h); ctx.strokeStyle='rgba(56,189,248,0.2)'; ctx.lineWidth=1/scale; ctx.strokeRect(r.x,r.y,r.w,r.h); });
+    plan.walls.forEach(w => { ctx.strokeStyle='rgba(125,211,252,0.7)'; ctx.lineWidth=2/scale; ctx.beginPath(); ctx.moveTo(w.x1,w.y1); ctx.lineTo(w.x2,w.y2); ctx.stroke(); });
+    ctx.restore();
+}
+
+// ===== 绘制户型图 =====
+function initDrawCanvas() {
+    walls = []; rooms = []; drawTool = 'wall';
+    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.tool-btn[data-tool="wall"]').classList.add('active');
+    document.getElementById('planNameInput').value = '';
+    resizeDrawCanvas();
+    setupDrawCanvasEvents();
+}
+function resizeDrawCanvas() {
+    const canvas = document.getElementById('drawCanvas');
+    if (!canvas) return;
+    canvas.width = canvas.parentElement.clientWidth;
+    canvas.height = canvas.parentElement.clientHeight;
+    redrawDrawCanvas();
+}
+function setDrawTool(tool) {
+    drawTool = tool;
+    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.tool-btn[data-tool="${tool}"]`).classList.add('active');
+}
+function clearCanvas() { walls = []; rooms = []; redrawDrawCanvas(); }
+function getCanvasPos(e, canvas) {
+    const rect = canvas.getBoundingClientRect(), touch = e.touches ? e.touches[0] : e;
+    return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+}
+function redrawDrawCanvas() {
+    const canvas = document.getElementById('drawCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#0a1830'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = 'rgba(56,189,248,0.05)'; ctx.lineWidth = 1;
+    for (let x=0; x<canvas.width; x+=20) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
+    for (let y=0; y<canvas.height; y+=20) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
+    rooms.forEach(r => { ctx.fillStyle='rgba(56,189,248,0.06)'; ctx.fillRect(r.x,r.y,r.w,r.h); ctx.strokeStyle='rgba(56,189,248,0.25)'; ctx.lineWidth=1; ctx.strokeRect(r.x,r.y,r.w,r.h); });
+    walls.forEach(w => { ctx.strokeStyle='#7dd3fc'; ctx.lineWidth=3; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(w.x1,w.y1); ctx.lineTo(w.x2,w.y2); ctx.stroke(); });
+    if (isDrawing && drawStart) {
+        ctx.strokeStyle='rgba(56,189,248,0.5)'; ctx.lineWidth=2; ctx.setLineDash([5,5]);
+        ctx.beginPath(); ctx.moveTo(drawStart.x,drawStart.y); ctx.lineTo(drawStart.currentX,drawStart.currentY); ctx.stroke();
+        ctx.setLineDash([]);
+    }
+}
+function setupDrawCanvasEvents() {
+    const canvas = document.getElementById('drawCanvas');
+    if (!canvas || canvas.dataset.bound) return;
+    canvas.dataset.bound = '1';
+    const onStart = (e) => {
+        e.preventDefault();
+        const pos = getCanvasPos(e, canvas);
+        if (drawTool === 'erase') { eraseAt(pos); return; }
+        isDrawing = true;
+        drawStart = {x:pos.x, y:pos.y, currentX:pos.x, currentY:pos.y};
+    };
+    const onMove = (e) => {
+        if (!isDrawing) return;
+        e.preventDefault();
+        const pos = getCanvasPos(e, canvas);
+        drawStart.currentX = pos.x; drawStart.currentY = pos.y;
+        redrawDrawCanvas();
+    };
+    const onEnd = (e) => {
+        if (!isDrawing) return;
+        e.preventDefault();
+        const pos = getCanvasPos(e, canvas);
+        const dx = Math.abs(pos.x-drawStart.x), dy = Math.abs(pos.y-drawStart.y);
+        if (dx > 8 || dy > 8) {
+            if (drawTool === 'wall') walls.push({x1:drawStart.x, y1:drawStart.y, x2:pos.x, y2:pos.y});
+            else if (drawTool === 'room') rooms.push({x:Math.min(drawStart.x,pos.x), y:Math.min(drawStart.y,pos.y), w:dx, h:dy, label:''});
+        }
+        isDrawing = false; drawStart = null;
+        redrawDrawCanvas();
+    };
+    canvas.addEventListener('mousedown', onStart);
+    canvas.addEventListener('mousemove', onMove);
+    canvas.addEventListener('mouseup', onEnd);
+    canvas.addEventListener('mouseleave', onEnd);
+    canvas.addEventListener('touchstart', onStart, {passive:false});
+    canvas.addEventListener('touchmove', onMove, {passive:false});
+    canvas.addEventListener('touchend', onEnd, {passive:false});
+}
+function eraseAt(pos) {
+    for (let i=walls.length-1; i>=0; i--) {
+        const w = walls[i];
+        if (distToSegment(pos, {x:w.x1,y:w.y1}, {x:w.x2,y:w.y2}) < 15) { walls.splice(i,1); redrawDrawCanvas(); return; }
+    }
+    for (let i=rooms.length-1; i>=0; i--) {
+        const r = rooms[i];
+        if (pos.x>=r.x && pos.x<=r.x+r.w && pos.y>=r.y && pos.y<=r.y+r.h) { rooms.splice(i,1); redrawDrawCanvas(); return; }
+    }
+}
+function distToSegment(p, v, w) {
+    const l2 = (v.x-w.x)**2 + (v.y-w.y)**2;
+    if (l2 === 0) return Math.hypot(p.x-v.x, p.y-v.y);
+    let t = ((p.x-v.x)*(w.x-v.x) + (p.y-v.y)*(w.y-v.y)) / l2;
+    t = Math.max(0, Math.min(1, t));
+    return Math.hypot(p.x-(v.x+t*(w.x-v.x)), p.y-(v.y+t*(w.y-v.y)));
+}
+function saveDrawnPlan() {
+    const name = document.getElementById('planNameInput').value.trim();
+    if (!name) { showToast('请输入户型图名称'); return; }
+    if (walls.length === 0 && rooms.length === 0) { showToast('请先绘制户型图'); return; }
+    floorPlans.push({id:genId(), name, type:'drawn', walls:[...walls], rooms:[...rooms], createdAt:Date.now()});
+    saveData();
+    showToast('户型图已保存');
+    setTimeout(() => navigateTo('plan-list','选择户型图'), 800);
+}
+
+// ===== 信号测试 =====
+function enterPlanTest(planId) {
+    const allPlans = [...DEFAULT_TEMPLATES, ...floorPlans];
+    currentPlan = allPlans.find(p => p.id === planId);
+    if (!currentPlan) { showToast('户型图不存在'); return; }
+    testPoints = []; pendingPoint = null; retestMode = false;
+    document.getElementById('testPlanName').textContent = currentPlan.name;
+    document.getElementById('testPointCount').textContent = '0';
+    document.getElementById('footerPointCount').textContent = '0';
+    document.getElementById('btnGenerateHeatmap').disabled = true;
+    document.getElementById('btnGenerateHeatmap').textContent = '生成热力图';
+    navigateTo('plan-test','信号打点测试');
+}
+function initTestCanvas() {
+    resizeTestCanvas();
+    setupTestCanvasEvents();
+    const slider = document.getElementById('signalSlider');
+    slider.oninput = () => { document.getElementById('signalValue').textContent = slider.value; };
+}
+function resizeTestCanvas() {
+    const canvas = document.getElementById('testCanvas');
+    if (!canvas || !currentPlan) return;
+    canvas.width = canvas.parentElement.clientWidth;
+    canvas.height = canvas.parentElement.clientHeight;
+    redrawTestCanvas();
+}
+function setupTestCanvasEvents() {
+    const canvas = document.getElementById('testCanvas');
+    if (!canvas || canvas.dataset.bound) return;
+    canvas.dataset.bound = '1';
+    const onTap = (e) => {
+        e.preventDefault();
+        if (document.getElementById('signalInputPanel').classList.contains('show')) return;
+        const pos = getCanvasPos(e, canvas);
+        pendingPoint = {x:pos.x, y:pos.y};
+        document.getElementById('signalInputPanel').classList.add('show');
+        document.getElementById('signalSlider').value = -55;
+        document.getElementById('signalValue').textContent = -55;
+    };
+    canvas.addEventListener('mousedown', onTap);
+    canvas.addEventListener('touchstart', onTap, {passive:false});
+}
+function cancelAddPoint() { pendingPoint = null; document.getElementById('signalInputPanel').classList.remove('show'); }
+function confirmAddPoint() {
+    if (!pendingPoint) return;
+    const signal = parseInt(document.getElementById('signalSlider').value);
+    testPoints.push({x:pendingPoint.x, y:pendingPoint.y, signal});
+    pendingPoint = null;
+    document.getElementById('signalInputPanel').classList.remove('show');
+    document.getElementById('testPointCount').textContent = testPoints.length;
+    document.getElementById('footerPointCount').textContent = testPoints.length;
+    document.getElementById('btnGenerateHeatmap').disabled = testPoints.length < 2;
+    redrawTestCanvas();
+    updateSignalList();
+}
+function deletePoint(index) {
+    testPoints.splice(index, 1);
+    document.getElementById('testPointCount').textContent = testPoints.length;
+    document.getElementById('footerPointCount').textContent = testPoints.length;
+    document.getElementById('btnGenerateHeatmap').disabled = testPoints.length < 2;
+    redrawTestCanvas();
+    updateSignalList();
+}
+function toggleSignalList() {
+    const panel = document.getElementById('signalListPanel');
+    panel.classList.toggle('show');
+    if (panel.classList.contains('show')) updateSignalList();
+}
+function updateSignalList() {
+    const list = document.getElementById('signalPointList');
+    if (testPoints.length === 0) { list.innerHTML = '<p style="text-align:center;color:var(--text-tertiary);padding:20px;">暂无测试点</p>'; return; }
+    list.innerHTML = testPoints.map((p,i) => `
+        <div class="signal-point-item">
+            <div class="point-num" style="background:${getSignalColor(p.signal)};">${i+1}</div>
+            <div class="point-signal">${p.signal} dBm <span style="color:var(--text-tertiary);font-size:12px;">${getSignalLabel(p.signal)}</span></div>
+            <div class="point-delete" onclick="deletePoint(${i})">删除</div>
+        </div>`).join('');
+}
+function redrawTestCanvas() {
+    const canvas = document.getElementById('testCanvas');
+    if (!canvas || !currentPlan) return;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#0a1830'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const bounds = getPlanBounds(currentPlan);
+    const padding = 20;
+    const scale = Math.min((canvas.width-padding*2)/bounds.w, (canvas.height-padding*2)/bounds.h);
+    ctx.save();
+    ctx.translate((canvas.width-bounds.w*scale)/2-bounds.x*scale, (canvas.height-bounds.h*scale)/2-bounds.y*scale);
+    ctx.scale(scale, scale);
+    ctx.strokeStyle = 'rgba(56,189,248,0.05)'; ctx.lineWidth = 1/scale;
+    for (let x=bounds.x; x<=bounds.x+bounds.w; x+=20) { ctx.beginPath(); ctx.moveTo(x,bounds.y); ctx.lineTo(x,bounds.y+bounds.h); ctx.stroke(); }
+    for (let y=bounds.y; y<=bounds.y+bounds.h; y+=20) { ctx.beginPath(); ctx.moveTo(bounds.x,y); ctx.lineTo(bounds.x+bounds.w,y); ctx.stroke(); }
+    currentPlan.rooms.forEach(r => {
+        ctx.fillStyle='rgba(56,189,248,0.06)'; ctx.fillRect(r.x,r.y,r.w,r.h);
+        ctx.strokeStyle='rgba(56,189,248,0.2)'; ctx.lineWidth=1/scale; ctx.strokeRect(r.x,r.y,r.w,r.h);
+        if (r.label) { ctx.fillStyle='rgba(148,163,200,0.5)'; ctx.font=`${12/scale}px sans-serif`; ctx.textAlign='center'; ctx.fillText(r.label, r.x+r.w/2, r.y+r.h/2); }
+    });
+    currentPlan.walls.forEach(w => { ctx.strokeStyle='#7dd3fc'; ctx.lineWidth=3/scale; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(w.x1,w.y1); ctx.lineTo(w.x2,w.y2); ctx.stroke(); });
+    testPoints.forEach((p,i) => {
+        const color = getSignalColor(p.signal);
+        ctx.fillStyle = color; ctx.beginPath(); ctx.arc(p.x, p.y, 8/scale, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.font = `bold ${10/scale}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(i+1, p.x, p.y);
+    });
+    ctx.restore();
+}
+function generateHeatmap() {
+    if (testPoints.length < 2) { showToast('至少需要2个测试点'); return; }
+    if (retestMode && compareSourceHeatmap) {
+        // 整改后测试模式：生成对比报告
+        const comparison = {
+            id: genId(),
+            planId: currentPlan.id,
+            planName: currentPlan.name,
+            walls: [...currentPlan.walls],
+            rooms: [...currentPlan.rooms],
+            before: { points: [...compareSourceHeatmap.points], createdAt: compareSourceHeatmap.createdAt },
+            after: { points: [...testPoints], createdAt: Date.now() },
+            createdAt: Date.now()
+        };
+        comparisons.push(comparison);
+        saveData();
+        showToast('对比报告已生成');
+        retestMode = false;
+        compareSourceHeatmap = null;
+        setTimeout(() => navigateTo('compare-list','对比报告'), 800);
+    } else {
+        // 普通模式：生成热力图
+        const heatmap = {
+            id: genId(), planId: currentPlan.id, planName: currentPlan.name,
+            walls: [...currentPlan.walls], rooms: [...currentPlan.rooms],
+            points: [...testPoints], createdAt: Date.now()
+        };
+        heatmaps.push(heatmap);
+        saveData();
+        showToast('热力图已生成并保存');
+        setTimeout(() => navigateTo('heatmap-list','信号热力图'), 800);
+    }
+}
+
+// ===== 热力图列表 =====
+function renderHeatmapList() {
+    const container = document.getElementById('heatmapListContent');
+    if (heatmaps.length === 0) {
+        container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M17.66 7.93L12 2.27 6.34 7.93c-3.12 3.12-3.12 8.19 0 11.31C7.9 20.8 9.95 21.58 12 21.58c2.05 0 4.1-.78 5.66-2.34 3.12-3.12 3.12-8.19 0-11.31z"/></svg><p>暂无热力图</p><p class="empty-hint">先选择户型图进行信号打点测试</p></div>';
+        return;
+    }
+    container.innerHTML = heatmaps.map(h => {
+        const avg = Math.round(h.points.reduce((s,p)=>s+p.signal,0)/h.points.length);
+        return `
+        <div class="list-item">
+            <div class="item-thumb" onclick="viewHeatmap('${h.id}')"><canvas id="hm_thumb_${h.id}"></canvas></div>
+            <div class="item-info" onclick="viewHeatmap('${h.id}')">
+                <div class="item-name">${h.planName}</div>
+                <div class="item-meta"><span class="tag">${h.points.length}个测试点</span><span>平均${avg} dBm</span></div>
+                <div class="item-time">${formatTime(h.createdAt)}</div>
+            </div>
+            <div class="item-action"><button class="compare-btn" onclick="openCompareModal('${h.id}',event)">对比优化效果</button></div>
+        </div>`;
+    }).join('');
+    heatmaps.forEach(h => renderHeatmapThumb(h, 'hm_thumb_'+h.id));
+}
+function renderHeatmapThumb(heatmap, canvasId) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    canvas.width = 144; canvas.height = 144;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#0a1830'; ctx.fillRect(0, 0, 144, 144);
+    const bounds = getPlanBounds(heatmap);
+    const scale = Math.min(130/bounds.w, 130/bounds.h);
+    ctx.save();
+    ctx.translate((144-bounds.w*scale)/2-bounds.x*scale, (144-bounds.h*scale)/2-bounds.y*scale);
+    ctx.scale(scale, scale);
+    heatmap.rooms.forEach(r => { ctx.fillStyle='rgba(56,189,248,0.04)'; ctx.fillRect(r.x,r.y,r.w,r.h); });
+    heatmap.walls.forEach(w => { ctx.strokeStyle='rgba(125,211,252,0.4)'; ctx.lineWidth=1.5/scale; ctx.beginPath(); ctx.moveTo(w.x1,w.y1); ctx.lineTo(w.x2,w.y2); ctx.stroke(); });
+    heatmap.points.forEach(p => {
+        const r = 40, color = getSignalColor(p.signal);
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+        grad.addColorStop(0, color+'aa'); grad.addColorStop(0.5, color+'44'); grad.addColorStop(1, color+'00');
+        ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI*2); ctx.fill();
+    });
+    heatmap.points.forEach(p => {
+        ctx.fillStyle = getSignalColor(p.signal); ctx.beginPath(); ctx.arc(p.x, p.y, 4/scale, 0, Math.PI*2); ctx.fill();
+    });
+    ctx.restore();
+}
+
+// ===== 热力图详情 =====
+function viewHeatmap(id) {
+    currentHeatmap = heatmaps.find(h => h.id === id);
+    if (!currentHeatmap) return;
+    navigateTo('heatmap-detail','热力图详情');
+}
+function renderHeatmapDetail() {
+    if (!currentHeatmap) return;
+    const canvas = document.getElementById('heatmapDetailCanvas');
+    const wrap = canvas.parentElement;
+    canvas.width = wrap.clientWidth;
+    const bounds = getPlanBounds(currentHeatmap);
+    const aspectH = bounds.h / bounds.w;
+    canvas.height = canvas.width * aspectH;
+    drawFullHeatmap(canvas, currentHeatmap, currentHeatmap.points);
+    // 统计
+    const points = currentHeatmap.points;
+    const avg = Math.round(points.reduce((s,p)=>s+p.signal,0)/points.length);
+    const good = points.filter(p => p.signal >= -65).length;
+    const poor = points.filter(p => p.signal < -75).length;
+    document.getElementById('heatmapStats').innerHTML = `
+        <div class="stat-card"><div class="stat-label">平均信号</div><div class="stat-value">${avg}<span class="unit"> dBm</span></div></div>
+        <div class="stat-card"><div class="stat-label">覆盖良好</div><div class="stat-value">${Math.round(good/points.length*100)}<span class="unit">%</span></div></div>
+        <div class="stat-card"><div class="stat-label">盲区数</div><div class="stat-value">${poor}<span class="unit"> 个</span></div></div>`;
+}
+function drawFullHeatmap(canvas, plan, points) {
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#0a1830'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const bounds = getPlanBounds(plan);
+    const padding = 16;
+    const scale = Math.min((canvas.width-padding*2)/bounds.w, (canvas.height-padding*2)/bounds.h);
+    ctx.save();
+    ctx.translate((canvas.width-bounds.w*scale)/2-bounds.x*scale, (canvas.height-bounds.h*scale)/2-bounds.y*scale);
+    ctx.scale(scale, scale);
+    plan.rooms.forEach(r => { ctx.fillStyle='rgba(56,189,248,0.05)'; ctx.fillRect(r.x,r.y,r.w,r.h); ctx.strokeStyle='rgba(56,189,248,0.2)'; ctx.lineWidth=1/scale; ctx.strokeRect(r.x,r.y,r.w,r.h); if(r.label){ctx.fillStyle='rgba(148,163,200,0.5)';ctx.font=`${14/scale}px sans-serif`;ctx.textAlign='center';ctx.fillText(r.label,r.x+r.w/2,r.y+r.h/2);} });
+    plan.walls.forEach(w => { ctx.strokeStyle='#7dd3fc'; ctx.lineWidth=3/scale; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(w.x1,w.y1); ctx.lineTo(w.x2,w.y2); ctx.stroke(); });
+    // 热力图
+    points.forEach(p => {
+        const r = 50, color = getSignalColor(p.signal);
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+        grad.addColorStop(0, color+'cc'); grad.addColorStop(0.5, color+'55'); grad.addColorStop(1, color+'00');
+        ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI*2); ctx.fill();
+    });
+    // 信号点
+    points.forEach((p,i) => {
+        ctx.fillStyle = getSignalColor(p.signal); ctx.beginPath(); ctx.arc(p.x, p.y, 7/scale, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.font = `bold ${10/scale}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(i+1, p.x, p.y);
+    });
+    ctx.restore();
+}
+
+// ===== 对比优化效果弹窗 =====
+function openCompareModal(heatmapId, e) {
+    if (e) e.stopPropagation();
+    compareSourceHeatmap = heatmaps.find(h => h.id === heatmapId);
+    if (!compareSourceHeatmap) return;
+    document.getElementById('compareModal').classList.add('show');
+}
+function closeModal(id, e) { if (e.target === e.currentTarget) document.getElementById(id).classList.remove('show'); }
+function closeModalDirect(id) { document.getElementById(id).classList.remove('show'); }
+
+// 选项1：去测试整改后效果
+function startRetest() {
+    closeModalDirect('compareModal');
+    if (!compareSourceHeatmap) return;
+    // 用源热力图的户型图进行重新测试
+    const allPlans = [...DEFAULT_TEMPLATES, ...floorPlans];
+    currentPlan = allPlans.find(p => p.id === compareSourceHeatmap.planId);
+    if (!currentPlan) {
+        // 如果找不到原户型图，用热力图中的walls/rooms构造
+        currentPlan = { id: compareSourceHeatmap.planId, name: compareSourceHeatmap.planName, type:'drawn', walls: compareSourceHeatmap.walls, rooms: compareSourceHeatmap.rooms, createdAt: Date.now() };
+    }
+    testPoints = []; pendingPoint = null; retestMode = true;
+    document.getElementById('testPlanName').textContent = currentPlan.name + '（整改后）';
+    document.getElementById('testPointCount').textContent = '0';
+    document.getElementById('footerPointCount').textContent = '0';
+    document.getElementById('btnGenerateHeatmap').disabled = true;
+    document.getElementById('btnGenerateHeatmap').textContent = '生成对比报告';
+    navigateTo('plan-test','整改后打点测试');
+}
+
+// 选项2：从历史记录中选择对比
+function openHistorySelect() {
+    closeModalDirect('compareModal');
+    selectedHistoryId = null;
+    document.getElementById('btnConfirmCompare').disabled = true;
+    navigateTo('history-select','选择历史热力图');
+}
+function renderHistorySelect() {
+    if (!compareSourceHeatmap) { goBack(); return; }
+    const container = document.getElementById('historySelectContent');
+    // 只显示同户型的热力图，排除当前源热力图
+    const candidates = heatmaps.filter(h => h.planId === compareSourceHeatmap.planId && h.id !== compareSourceHeatmap.id);
+    if (candidates.length === 0) {
+        container.innerHTML = `<div class="select-hint">当前户型：<strong>${compareSourceHeatmap.planName}</strong></div>
+            <div class="empty-state"><svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>
+            <p>暂无同户型历史热力图</p><p class="empty-hint">需要至少2个同户型热力图才能对比</p></div>`;
+        return;
+    }
+    container.innerHTML = `<div class="select-hint">当前户型：<strong>${compareSourceHeatmap.planName}</strong>，请选择一个历史热力图作为对比基准</div>` +
+        candidates.map(h => {
+            const avg = Math.round(h.points.reduce((s,p)=>s+p.signal,0)/h.points.length);
+            return `
+            <div class="history-item ${selectedHistoryId===h.id?'selected':''}" onclick="selectHistory('${h.id}')">
+                <div class="radio"></div>
+                <div class="item-thumb" style="width:56px;height:56px;"><canvas id="hist_thumb_${h.id}"></canvas></div>
+                <div class="history-info">
+                    <div class="history-name">平均${avg} dBm · ${h.points.length}个点</div>
+                    <div class="history-time">${formatTime(h.createdAt)}</div>
+                </div>
+            </div>`;
+        }).join('');
+    candidates.forEach(h => renderHeatmapThumb(h, 'hist_thumb_'+h.id));
+}
+function selectHistory(id) {
+    selectedHistoryId = id;
+    document.querySelectorAll('.history-item').forEach(item => item.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    document.getElementById('btnConfirmCompare').disabled = false;
+}
+function confirmHistoryCompare() {
+    if (!selectedHistoryId || !compareSourceHeatmap) return;
+    const afterHeatmap = heatmaps.find(h => h.id === selectedHistoryId);
+    if (!afterHeatmap) return;
+    // 判断哪个是整改前哪个是整改后（按时间排序）
+    const before = compareSourceHeatmap.createdAt < afterHeatmap.createdAt ? compareSourceHeatmap : afterHeatmap;
+    const after = compareSourceHeatmap.createdAt < afterHeatmap.createdAt ? afterHeatmap : compareSourceHeatmap;
+    const comparison = {
+        id: genId(),
+        planId: before.planId,
+        planName: before.planName,
+        walls: [...before.walls],
+        rooms: [...before.rooms],
+        before: { points: [...before.points], createdAt: before.createdAt },
+        after: { points: [...after.points], createdAt: after.createdAt },
+        createdAt: Date.now()
+    };
+    comparisons.push(comparison);
+    saveData();
+    showToast('对比报告已生成');
+    compareSourceHeatmap = null;
+    selectedHistoryId = null;
+    setTimeout(() => navigateTo('compare-list','对比报告'), 800);
+}
+
+// ===== 对比报告列表 =====
+function renderCompareList() {
+    const container = document.getElementById('compareListContent');
+    if (comparisons.length === 0) {
+        container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M9 16H5v-6h4v6zm6 0h-4V8h4v8zm6 0h-4V4h4v12z"/></svg><p>暂无对比报告</p><p class="empty-hint">从热力图列表中发起对比</p></div>';
+        return;
+    }
+    container.innerHTML = comparisons.map(c => {
+        const beforeAvg = Math.round(c.before.points.reduce((s,p)=>s+p.signal,0)/c.before.points.length);
+        const afterAvg = Math.round(c.after.points.reduce((s,p)=>s+p.signal,0)/c.after.points.length);
+        const improve = afterAvg - beforeAvg;
+        return `
+        <div class="list-item" onclick="viewCompare('${c.id}')">
+            <div class="item-thumb" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(34,197,94,0.15));">
+                <span style="font-size:20px;font-weight:700;color:${improve>=0?'var(--accent-green)':'var(--accent-red)'};">${improve>=0?'+':''}${improve}</span>
+            </div>
+            <div class="item-info">
+                <div class="item-name">${c.planName}</div>
+                <div class="item-meta"><span class="tag">前${beforeAvg}dBm</span><span class="tag" style="background:rgba(34,197,94,0.1);color:var(--accent-green);">后${afterAvg}dBm</span></div>
+                <div class="item-time">${formatTime(c.createdAt)}</div>
+            </div>
+            <div class="item-action"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div>
+        </div>`;
+    }).join('');
+}
+function viewCompare(id) {
+    currentCompare = comparisons.find(c => c.id === id);
+    if (!currentCompare) return;
+    navigateTo('compare-detail','对比报告详情');
+}
+function renderCompareDetail() {
+    if (!currentCompare) return;
+    const c = currentCompare;
+    const beforeAvg = Math.round(c.before.points.reduce((s,p)=>s+p.signal,0)/c.before.points.length);
+    const afterAvg = Math.round(c.after.points.reduce((s,p)=>s+p.signal,0)/c.after.points.length);
+    const improve = afterAvg - beforeAvg;
+    const beforeGood = c.before.points.filter(p => p.signal >= -65).length;
+    const afterGood = c.after.points.filter(p => p.signal >= -65).length;
+    const beforePoor = c.before.points.filter(p => p.signal < -75).length;
+    const afterPoor = c.after.points.filter(p => p.signal < -75).length;
+    const plan = { walls: c.walls, rooms: c.rooms };
+
+    document.getElementById('compareDetailContent').innerHTML = `
+        <div class="improvement-banner">
+            <div class="improve-label">信号平均提升</div>
+            <div class="improve-value">${improve>=0?'+':''}${improve}<span class="unit"> dBm</span></div>
+        </div>
+        <div class="compare-cards">
+            <div class="compare-card">
+                <div class="compare-label before">整改前</div>
+                <div class="compare-canvas-wrap"><canvas id="cmp_before"></canvas></div>
+                <div class="compare-stats">
+                    <div class="compare-stat-row"><span class="label">平均信号</span><span class="value">${beforeAvg} dBm</span></div>
+                    <div class="compare-stat-row"><span class="label">良好覆盖</span><span class="value">${Math.round(beforeGood/c.before.points.length*100)}%</span></div>
+                    <div class="compare-stat-row"><span class="label">盲区数</span><span class="value">${beforePoor} 个</span></div>
+                    <div class="compare-stat-row"><span class="label">测试点</span><span class="value">${c.before.points.length} 个</span></div>
+                </div>
+            </div>
+            <div class="compare-card after">
+                <div class="compare-label after">整改后</div>
+                <div class="compare-canvas-wrap"><canvas id="cmp_after"></canvas></div>
+                <div class="compare-stats">
+                    <div class="compare-stat-row"><span class="label">平均信号</span><span class="value">${afterAvg} dBm</span></div>
+                    <div class="compare-stat-row"><span class="label">良好覆盖</span><span class="value">${Math.round(afterGood/c.after.points.length*100)}%</span></div>
+                    <div class="compare-stat-row"><span class="label">盲区数</span><span class="value">${afterPoor} 个</span></div>
+                    <div class="compare-stat-row"><span class="label">测试点</span><span class="value">${c.after.points.length} 个</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="legend-bar"><span>弱</span><div class="legend-gradient"></div><span>强</span></div>`;
+
+    // 绘制对比热力图
+    setTimeout(() => {
+        const cb = document.getElementById('cmp_before');
+        const ca = document.getElementById('cmp_after');
+        if (cb) { cb.width = cb.parentElement.clientWidth; cb.height = cb.width; drawFullHeatmap(cb, plan, c.before.points); }
+        if (ca) { ca.width = ca.parentElement.clientWidth; ca.height = ca.width; drawFullHeatmap(ca, plan, c.after.points); }
+    }, 50);
+}
+
+// ===== 初始化 =====
+window.addEventListener('resize', () => {
+    const activeView = document.querySelector('.view.active');
+    if (!activeView) return;
+    if (activeView.id === 'view-plan-draw') resizeDrawCanvas();
+    else if (activeView.id === 'view-plan-test') resizeTestCanvas();
+});
+window.addEventListener('load', () => {
+    loadData();
+    updateBadges();
+});
+</script>
+</body>
+</html>
