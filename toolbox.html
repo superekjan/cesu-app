@@ -219,6 +219,15 @@
             opacity: 1;
         }
 
+        .tool-icon.patrol {
+            background: rgba(248, 113, 113, 0.15);
+        }
+
+        .tool-icon.patrol svg {
+            fill: #f87171;
+            opacity: 1;
+        }
+
         /* WiFi信息卡片 */
         .wifi-info-card {
             background: var(--bg-card);
@@ -577,6 +586,21 @@
                         <div class="tool-info">
                             <div class="tool-name">全屋WiFi</div>
                             <div class="tool-desc">信号覆盖测试</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 信号巡检卡片 -->
+                <div class="tool-card" onclick="location.href='signal-patrol.html'">
+                    <div class="tool-header">
+                        <div class="tool-icon patrol">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                            </svg>
+                        </div>
+                        <div class="tool-info">
+                            <div class="tool-name">信号巡检</div>
+                            <div class="tool-desc">行走采集信号</div>
                         </div>
                     </div>
                 </div>

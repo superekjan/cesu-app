@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WiFi信号巡检</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        :root {
+            --bg-primary:#060d1f; --bg-secondary:#0a162e; --bg-card:rgba(14,28,60,0.55);
+            --accent-blue:#00aaff; --accent-cyan:#38bdf8; --accent-green:#22c55e;
+            --accent-orange:#f59e0b; --accent-red:#ef4444; --accent-purple:#a78bfa;
+            --text-primary:#e8f0ff; --text-secondary:#94a3c8; --text-tertiary:#5a6a8a;
+            --border-subtle:rgba(56,189,248,0.12); --border-active:rgba(56,189,248,0.4);
+        }
+        body {
+            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif;
+            background:linear-gradient(180deg,#060d1f 0%,#0a162e 50%,#071024 100%);
+            color:var(--text-primary); min-height:100vh; overflow-x:hidden;
+        }
+        .container { max-width:480px; margin:0 auto; min-height:100vh; display:flex; flex-direction:column; }
+
+        /* 顶部导航 */
+        .header {
+            padding:16px 20px 12px; position:sticky; top:0; z-index:100;
+            background:rgba(6,13,31,0.95); backdrop-filter:blur(12px);
+            border-bottom:1px solid var(--border-subtle);
+            display:flex; align-items:center; gap:12px;
+        }
+        .back-btn {
+            width:36px; height:36px; display:flex; align-items:center; justify-content:center;
+            cursor:pointer; border-radius:50%; transition:background 0.2s;
+        }
+        .back-btn:active { background:rgba(255,255,255,0.08); }
+        .back-btn svg { width:22px; height:22px; fill:var(--text-primary); }
+        .header-title { font-size:17px; font-weight:600; flex:1; }
+
+        /* 视图切换 */
+        .view { display:none; flex:1; flex-direction:column; }
+        .view.active { display:flex; }
+
+        /* 主页 */
+        .home-content { padding:24px 20px; display:flex; flex-direction:column; gap:20px; }
+        .hero {
+            text-align:center; padding:32px 0 20px;
+        }
+        .hero-icon {
+            width:80px; height:80px; margin:0 auto 18px; border-radius:24px;
+            background:linear-gradient(135deg,var(--accent-red),var(--accent-orange));
+            display:flex; align-items:center; justify-content:center;
+            box-shadow:0 8px 32px rgba(248,113,113,0.3);
+        }
+        .hero-icon svg { width:44px; height:44px; fill:#fff; }
+        .hero h1 { font-size:24px; font-weight:700; margin-bottom:8px; }
+        .hero p { font-size:14px; color:var(--text-secondary); line-height:1.6; }
+
+        .start-btn {
+            background:linear-gradient(135deg,var(--accent-red),var(--accent-orange));
+            color:#fff; border:none; padding:18px; border-radius:16px;
+            font-size:17px; font-weight:700; cursor:pointer;
+            display:flex; align-items:center; justify-content:center; gap:10px;
+            box-shadow:0 6px 20px rgba(239,68,68,0.3);
+            transition:transform 0.15s;
+        }
+        .start-btn:active { transform:scale(0.97); }
+        .start-btn svg { width:22px; height:22px; fill:#fff; }
+
+        .history-section { margin-top:8px; }
+        .section-title {
+            font-size:14px; font-weight:600; color:var(--text-secondary);
+            margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;
+        }
+        .section-title .count { color:var(--accent-cyan); }
+
+        .history-item {
+            background:var(--bg-card); border:1px solid var(--border-subtle);
+            border-radius:14px; padding:14px; margin-bottom:12px; cursor:pointer;
+            transition:all 0.2s;
+        }
+        .history-item:active { transform:scale(0.98); border-color:var(--border-active); }
+        .history-item-head {
+            display:flex; justify-content:space-between; align-items:center;
+            margin-bottom:10px;
+        }
+        .history-name { font-size:15px; font-weight:600; }
+        .history-time { font-size:11px; color:var(--text-tertiary); }
+        .history-stats {
+            display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
+        }
+        .stat-mini {
+            background:rgba(0,0,0,0.2); border-radius:8px; padding:8px 6px; text-align:center;
+        }
+        .stat-mini .label { font-size:10px; color:var(--text-tertiary); margin-bottom:3px; }
+        .stat-mini .value { font-size:13px; font-weight:600; }
+        .stat-mini .value.good { color:var(--accent-green); }
+        .stat-mini .value.warn { color:var(--accent-orange); }
+        .stat-mini .value.bad { color:var(--accent-red); }
+
+        /* 测试中视图 */
+        .testing-content { flex:1; display:flex; flex-direction:column; padding:16px 20px 24px; gap:16px; }
+        .live-signal-card {
+            background:var(--bg-card); border:1px solid var(--border-subtle);
+            border-radius:18px; padding:24px 20px; text-align:center;
+        }
+        .live-label { font-size:13px; color:var(--text-secondary); margin-bottom:10px; }
+        .live-value {
+            font-size:64px; font-weight:800; line-height:1;
+            background:linear-gradient(135deg,var(--accent-green),var(--accent-cyan));
+            -webkit-background-clip:text; background-clip:text; color:transparent;
+            transition:all 0.3s;
+        }
+        .live-value.warn {
+            background:linear-gradient(135deg,var(--accent-orange),var(--accent-red));
+            -webkit-background-clip:text; background-clip:text; color:transparent;
+        }
+        .live-value.bad {
+            background:linear-gradient(135deg,var(--accent-red),#dc2626);
+            -webkit-background-clip:text; background-clip:text; color:transparent;
+        }
+        .live-unit { font-size:14px; color:var(--text-secondary); margin-top:4px; }
+        .live-bar {
+            height:8px; background:rgba(255,255,255,0.05); border-radius:4px;
+            margin-top:20px; overflow:hidden; position:relative;
+        }
+        .live-bar-fill {
+            height:100%; border-radius:4px;
+            background:linear-gradient(90deg,var(--accent-red) 0%,var(--accent-orange) 40%,var(--accent-green) 100%);
+            transition:width 0.3s;
+        }
+        .live-meta {
+            display:flex; justify-content:space-between; margin-top:10px;
+            font-size:11px; color:var(--text-tertiary);
+        }
+        .threshold-hint {
+            background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3);
+            border-radius:10px; padding:10px 12px; font-size:12px;
+            color:var(--accent-red); display:flex; align-items:center; gap:8px;
+        }
+        .threshold-hint svg { width:14px; height:14px; fill:var(--accent-red); flex-shrink:0; }
+
+        .abnormal-section { flex:1; display:flex; flex-direction:column; min-height:0; }
+        .abnormal-list {
+            flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px;
+            max-height:40vh;
+        }
+        .abnormal-item {
+            background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2);
+            border-radius:12px; padding:12px 14px;
+            display:flex; align-items:center; gap:12px;
+        }
+        .abnormal-signal {
+            width:48px; height:48px; border-radius:10px;
+            background:linear-gradient(135deg,var(--accent-red),#dc2626);
+            display:flex; align-items:center; justify-content:center;
+            color:#fff; font-size:12px; font-weight:700; flex-shrink:0;
+        }
+        .abnormal-info { flex:1; min-width:0; }
+        .abnormal-tag {
+            font-size:14px; font-weight:600; margin-bottom:2px;
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+        .abnormal-time { font-size:11px; color:var(--text-tertiary); }
+
+        .stop-btn {
+            position:sticky; bottom:0; z-index:50;
+            background:linear-gradient(135deg,#7c2d12,var(--accent-red));
+            color:#fff; border:none; padding:16px; border-radius:14px;
+            font-size:16px; font-weight:700; cursor:pointer;
+            display:flex; align-items:center; justify-content:center; gap:8px;
+            box-shadow:0 4px 16px rgba(239,68,68,0.4);
+            margin-top:8px;
+        }
+        .stop-btn:active { transform:scale(0.97); }
+        .stop-btn svg { width:20px; height:20px; fill:#fff; }
+
+        /* 结果视图 */
+        .result-content { padding:20px; flex:1; overflow-y:auto; }
+        .result-banner {
+            background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(56,189,248,0.1));
+            border:1px solid rgba(34,197,94,0.3); border-radius:16px;
+            padding:20px; text-align:center; margin-bottom:16px;
+        }
+        .result-banner .icon {
+            width:56px; height:56px; margin:0 auto 10px;
+            background:linear-gradient(135deg,var(--accent-green),var(--accent-cyan));
+            border-radius:14px; display:flex; align-items:center; justify-content:center;
+        }
+        .result-banner .icon svg { width:30px; height:30px; fill:#fff; }
+        .result-banner h2 { font-size:18px; margin-bottom:6px; }
+        .result-banner p { font-size:13px; color:var(--text-secondary); }
+
+        .result-stats {
+            display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:16px;
+        }
+        .stat-card {
+            background:var(--bg-card); border:1px solid var(--border-subtle);
+            border-radius:14px; padding:16px;
+        }
+        .stat-card .stat-label { font-size:12px; color:var(--text-secondary); margin-bottom:6px; }
+        .stat-card .stat-value { font-size:22px; font-weight:700; }
+        .stat-card .stat-value.good { color:var(--accent-green); }
+        .stat-card .stat-value.warn { color:var(--accent-orange); }
+        .stat-card .stat-value.bad { color:var(--accent-red); }
+        .stat-card .stat-unit { font-size:12px; color:var(--text-tertiary); margin-left:2px; }
+
+        .abnormal-result-section { margin-bottom:16px; }
+        .abnormal-result-title {
+            font-size:14px; font-weight:600; margin-bottom:10px;
+            display:flex; align-items:center; gap:8px;
+        }
+        .abnormal-result-title .badge {
+            background:var(--accent-red); color:#fff; font-size:11px;
+            padding:2px 8px; border-radius:10px;
+        }
+        .abnormal-result-list { display:flex; flex-direction:column; gap:8px; }
+        .abnormal-result-item {
+            background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.2);
+            border-radius:12px; padding:12px 14px;
+            display:flex; align-items:center; justify-content:space-between; gap:10px;
+        }
+        .abnormal-result-item .tag-name { font-size:14px; font-weight:500; flex:1; }
+        .abnormal-result-item .tag-signal {
+            font-size:14px; font-weight:700; color:var(--accent-red);
+        }
+
+        .result-actions { display:flex; gap:10px; margin-top:8px; margin-bottom: 80px; }
+        .btn-primary {
+            flex:1; background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));
+            color:#fff; border:none; padding:14px; border-radius:12px;
+            font-size:14px; font-weight:600; cursor:pointer;
+        }
+        .btn-primary:active { transform:scale(0.97); }
+        .btn-secondary {
+            flex:1; background:rgba(255,255,255,0.06); color:var(--text-primary);
+            border:1px solid var(--border-subtle); padding:14px; border-radius:12px;
+            font-size:14px; cursor:pointer;
+        }
+        .btn-secondary:active { transform:scale(0.97); }
+        .btn-danger {
+            flex:1; background:linear-gradient(135deg,#7c2d12,var(--accent-red));
+            color:#fff; border:none; padding:14px; border-radius:12px;
+            font-size:14px; font-weight:600; cursor:pointer;
+            box-shadow:0 4px 12px rgba(239,68,68,0.3);
+        }
+        .btn-danger:active { transform:scale(0.97); }
+
+        /* 对比报告视图 */
+        .compare-content { padding:20px; flex:1; overflow-y:auto; }
+        .improve-banner {
+            background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(56,189,248,0.1));
+            border:1px solid rgba(34,197,94,0.3); border-radius:16px;
+            padding:20px; text-align:center; margin-bottom:16px;
+        }
+        .improve-label { font-size:13px; color:var(--text-secondary); margin-bottom:6px; }
+        .improve-value { font-size:36px; font-weight:800; color:var(--accent-green); }
+        .improve-value .unit { font-size:14px; color:var(--text-secondary); margin-left:4px; }
+
+        .compare-table {
+            background:var(--bg-card); border:1px solid var(--border-subtle);
+            border-radius:14px; overflow:hidden; margin-bottom:16px;
+        }
+        .compare-row {
+            display:grid; grid-template-columns:1fr 1fr 1fr;
+            padding:12px 14px; border-bottom:1px solid var(--border-subtle);
+            font-size:13px; align-items:center;
+        }
+        .compare-row:last-child { border:none; }
+        .compare-row.head { background:rgba(56,189,248,0.06); font-weight:600; }
+        .compare-row .col-label { color:var(--text-secondary); }
+        .compare-row .col-before { color:var(--accent-red); text-align:center; font-weight:600; }
+        .compare-row .col-after { color:var(--accent-green); text-align:center; font-weight:600; }
+
+        .compare-detail-list { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+        .compare-detail-item {
+            background:var(--bg-card); border:1px solid var(--border-subtle);
+            border-radius:12px; padding:12px 14px;
+        }
+        .compare-detail-tag { font-size:14px; font-weight:600; margin-bottom:8px; }
+        .compare-detail-row {
+            display:flex; align-items:center; gap:10px; padding:4px 0; font-size:13px;
+        }
+        .compare-detail-row .arrow { color:var(--text-tertiary); }
+        .compare-detail-row .before-val { color:var(--accent-red); font-weight:600; }
+        .compare-detail-row .after-val { color:var(--accent-green); font-weight:600; }
+        .compare-detail-row .delta { margin-left:auto; font-size:12px; color:var(--accent-green); }
+
+        /* 模态框 */
+        .modal-mask {
+            position:fixed; inset:0; background:rgba(0,0,0,0.7);
+            backdrop-filter:blur(4px); z-index:1000;
+            display:none; align-items:center; justify-content:center; padding:20px;
+        }
+        .modal-mask.show { display:flex; }
+        .modal {
+            background:var(--bg-secondary); border:1px solid var(--border-active);
+            border-radius:18px; padding:20px; width:100%; max-width:360px;
+            animation:modalIn 0.25s ease;
+        }
+        @keyframes modalIn { from { transform:scale(0.9); opacity:0; } to { transform:scale(1); opacity:1; } }
+        .modal-title {
+            font-size:17px; font-weight:700; margin-bottom:8px;
+            display:flex; align-items:center; gap:8px;
+        }
+        .modal-title .warn-icon {
+            width:24px; height:24px; background:var(--accent-red); border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+        }
+        .modal-title .warn-icon svg { width:14px; height:14px; fill:#fff; }
+        .modal-desc { font-size:13px; color:var(--text-secondary); margin-bottom:16px; line-height:1.5; }
+        .modal-signal {
+            background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3);
+            border-radius:10px; padding:10px; text-align:center; margin-bottom:16px;
+        }
+        .modal-signal .val { font-size:24px; font-weight:700; color:var(--accent-red); }
+        .modal-signal .lbl { font-size:11px; color:var(--text-secondary); }
+        .modal-input {
+            width:100%; background:rgba(255,255,255,0.05);
+            border:1px solid var(--border-subtle); border-radius:10px;
+            padding:12px 14px; color:var(--text-primary); font-size:14px;
+            margin-bottom:12px;
+        }
+        .modal-input:focus { outline:none; border-color:var(--border-active); }
+        .modal-tags {
+            display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px;
+        }
+        .modal-tag {
+            background:rgba(56,189,248,0.1); border:1px solid var(--border-subtle);
+            color:var(--accent-cyan); padding:6px 12px; border-radius:16px;
+            font-size:12px; cursor:pointer;
+        }
+        .modal-tag:active { transform:scale(0.95); }
+        .modal-actions { display:flex; gap:10px; }
+        .modal-btn {
+            flex:1; padding:12px; border-radius:10px; font-size:14px;
+            font-weight:600; cursor:pointer; border:none;
+        }
+        .modal-btn.primary {
+            background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan)); color:#fff;
+        }
+        .modal-btn.secondary {
+            background:rgba(255,255,255,0.06); color:var(--text-secondary);
+            border:1px solid var(--border-subtle);
+        }
+
+        /* Toast */
+        .toast {
+            position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+            background:rgba(10,22,46,0.95); border:1px solid var(--border-active);
+            color:var(--text-primary); padding:10px 20px; border-radius:24px;
+            font-size:13px; z-index:2000; opacity:0; pointer-events:none;
+            transition:opacity 0.25s;
+        }
+        .toast.show { opacity:1; }
+
+        .empty-state { text-align:center; padding:40px 20px; color:var(--text-tertiary); }
+        .empty-state svg { width:56px; height:56px; fill:var(--text-tertiary); opacity:0.3; margin-bottom:12px; }
+        .empty-state p { font-size:14px; }
+
+        /* 历史记录对比选择 */
+        .history-item .item-compare-btn {
+            background:rgba(56,189,248,0.1); border:1px solid var(--border-subtle);
+            color:var(--accent-cyan); padding:5px 10px; border-radius:8px;
+            font-size:11px; cursor:pointer; white-space:nowrap;
+        }
+        .history-item .item-compare-btn:active { transform:scale(0.95); }
+        .history-item .item-compare-btn.active {
+            background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));
+            color:#fff; border-color:transparent;
+        }
+        /* 顶部对比记录按钮（升级样式） */
+        #compareModeBtn {
+            display:inline-flex; align-items:center; gap:5px;
+            background:linear-gradient(135deg,rgba(168,139,250,0.15),rgba(56,189,248,0.12));
+            border:1px solid rgba(168,139,250,0.3);
+            color:var(--accent-purple); padding:6px 14px; border-radius:20px;
+            font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap;
+            transition:all 0.2s;
+        }
+        #compareModeBtn::before {
+            content:''; width:6px; height:6px; border-radius:50%;
+            background:var(--accent-purple);
+        }
+        #compareModeBtn.active {
+            background:linear-gradient(135deg,var(--accent-purple),var(--accent-blue));
+            color:#fff; border-color:transparent;
+        }
+        #compareModeBtn.active::before { background:#fff; }
+        .history-item.selected {
+            border-color:var(--accent-cyan);
+            background:rgba(56,189,248,0.08);
+            box-shadow:0 0 0 1px var(--accent-cyan);
+        }
+        .history-item .select-badge {
+            display:none; padding:4px 10px; border-radius:10px;
+            font-size:11px; font-weight:700; align-items:center; justify-content:center;
+            flex-shrink:0;
+        }
+        .history-item.selected .select-badge { display:flex; }
+        .history-item .select-badge.badge-before {
+            background:linear-gradient(135deg,#dc2626,var(--accent-red)); color:#fff;
+        }
+        .history-item .select-badge.badge-after {
+            background:linear-gradient(135deg,var(--accent-green),var(--accent-cyan)); color:#fff;
+        }
+        .history-item.selected { border-color:var(--accent-cyan); }
+        .history-item.selected .select-badge.badge-before ~ * ,
+        .history-item:has(.badge-before) { border-color:var(--accent-red); }
+        .history-item:has(.badge-after) { border-color:var(--accent-green); }
+        .history-item-head .item-actions { display:flex; align-items:center; gap:8px; }
+
+        .compare-bar {
+            position:fixed; bottom:calc(70px + env(safe-area-inset-bottom));
+            left:50%; transform:translateX(-50%);
+            width:calc(100% - 32px); max-width:448px;
+            background:var(--bg-secondary); border:1px solid var(--border-active);
+            border-radius:14px; padding:12px 16px;
+            display:none; align-items:center; gap:12px;
+            box-shadow:0 -4px 20px rgba(0,0,0,0.4); z-index:150;
+        }
+        .compare-bar.show { display:flex; }
+        .compare-bar .bar-info { flex:1; font-size:13px; }
+        .compare-bar .bar-info .count { color:var(--accent-cyan); font-weight:700; }
+        .compare-bar .bar-btn { padding:8px 14px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; border:none; }
+        .compare-bar .bar-btn.cancel { background:rgba(255,255,255,0.06); color:var(--text-secondary); }
+        .compare-bar .bar-btn.confirm { background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan)); color:#fff; }
+        .compare-bar .bar-btn.confirm:disabled { opacity:0.4; cursor:not-allowed; }
+
+        .compare-section-title {
+            font-size:14px; font-weight:600; margin-bottom:10px;
+            display:flex; align-items:center; gap:8px;
+        }
+        .compare-section-title .tag-a { color:var(--accent-red); }
+        .compare-section-title .tag-b { color:var(--accent-green); }
+
+        .bottom-nav {
+            position:fixed; bottom:0; left:0; right:0;
+            background:rgba(22,27,34,0.98); backdrop-filter:blur(20px);
+            border-top:1px solid var(--border-subtle);
+            display:flex; justify-content:space-around;
+            padding:8px 0 calc(12px + env(safe-area-inset-bottom));
+            z-index:100; max-width:480px; margin:0 auto;
+        }
+        .nav-item {
+            display:flex; flex-direction:column; align-items:center; gap:4px;
+            padding:6px 20px; cursor:pointer; text-decoration:none;
+            border-radius:12px;
+        }
+        .nav-item.active .nav-icon, .nav-item.active .nav-label { color:var(--accent-blue); fill:var(--accent-blue); }
+        .nav-icon { width:24px; height:24px; fill:var(--text-tertiary); }
+        .nav-label { font-size:11px; color:var(--text-tertiary); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="back-btn" id="backBtn" onclick="goBack()">
+            <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </div>
+        <div class="header-title" id="headerTitle">WiFi信号巡检</div>
+    </div>
+
+    <!-- 主页 -->
+    <div class="view active" id="view-home">
+        <div class="home-content">
+            <div class="hero">
+                <div class="hero-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                </div>
+                <h1>WiFi信号巡检</h1>
+                <p>点击开始测试，沿着房间行走采集信号<br>信号低于 -70 dBm 时将自动记录异常点</p>
+            </div>
+            <button class="start-btn" onclick="startTest()">
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                开始测试
+            </button>
+            <div class="history-section">
+                <div class="section-title">
+                    <span>历史巡检记录</span>
+                    <span style="display:flex;align-items:center;gap:10px;">
+                        <span class="count" id="historyCount">0</span>
+                        <button id="compareModeBtn" onclick="toggleCompareMode()">对比记录</button>
+                    </span>
+                </div>
+                <div id="historyList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 测试中视图 -->
+    <div class="view" id="view-testing">
+        <div class="testing-content">
+            <div class="live-signal-card">
+                <div class="live-label">实时信号强度</div>
+                <div class="live-value" id="liveValue">-45</div>
+                <div class="live-unit">dBm</div>
+                <div class="live-bar">
+                    <div class="live-bar-fill" id="liveBar" style="width:75%"></div>
+                </div>
+                <div class="live-meta">
+                    <span>-100</span>
+                    <span>阈值 -70</span>
+                    <span>-30</span>
+                </div>
+            </div>
+            <div class="threshold-hint">
+                <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+                <span>当信号弱于 -70 dBm 时，将自动弹出标记框</span>
+            </div>
+            <div class="abnormal-section">
+                <div class="section-title">
+                    <span>异常点 (<span id="abnormalCount">0</span>)</span>
+                </div>
+                <div class="abnormal-list" id="abnormalList">
+                    <div class="empty-state" id="abnormalEmpty">
+                        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                        <p>暂无异常点</p>
+                    </div>
+                </div>
+            </div>
+            <button class="stop-btn" onclick="stopTest()">
+                <svg viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/></svg>
+                结束测试
+            </button>
+        </div>
+    </div>
+
+    <!-- 结果视图 -->
+    <div class="view" id="view-result">
+        <div class="result-content">
+            <div class="result-banner">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                </div>
+                <h2>测试完成</h2>
+                <p id="resultSummary"></p>
+            </div>
+            <div class="result-stats" id="resultStats"></div>
+            <div class="abnormal-result-section">
+                <div class="abnormal-result-title">
+                    信号差的位置
+                    <span class="badge" id="abnormalResultCount">0</span>
+                </div>
+                <div class="abnormal-result-list" id="abnormalResultList"></div>
+            </div>
+            <div class="result-actions">
+                <button class="btn-danger" onclick="confirmDeleteRecord()">删除报告</button>
+                <button class="btn-primary" onclick="navigate('view-home','WiFi信号巡检')">完成</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除确认弹窗 -->
+    <div class="modal-mask" id="deleteModal">
+        <div class="modal" style="max-width:320px;">
+            <div class="modal-title" style="color:var(--accent-red);">
+                <span class="warn-icon">
+                    <svg viewBox="0 0 24 24" style="fill:var(--accent-red);"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                </span>
+                删除报告
+            </div>
+            <div class="modal-desc" style="margin-bottom:16px;">确定要删除该测试报告吗？此操作不可恢复。</div>
+            <div class="modal-actions">
+                <button class="modal-btn secondary" onclick="closeDeleteModal()">取消</button>
+                <button class="modal-btn" style="background:linear-gradient(135deg,#7c2d12,var(--accent-red));color:#fff;" onclick="doDeleteRecord()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 对比报告视图 -->
+    <div class="view" id="view-compare">
+        <div class="compare-content">
+            <div class="improve-banner">
+                <div class="improve-label">平均信号提升</div>
+                <div class="improve-value" id="improveValue">+0<span class="unit">dBm</span></div>
+            </div>
+            <div class="compare-table">
+                <div class="compare-row head">
+                    <div class="col-label">指标</div>
+                    <div class="col-before">整改前</div>
+                    <div class="col-after">整改后</div>
+                </div>
+                <div class="compare-row">
+                    <div class="col-label">测试时间</div>
+                    <div class="col-before" id="cmpBeforeTime" style="font-size:11px;font-weight:500;">-</div>
+                    <div class="col-after" id="cmpAfterTime" style="font-size:11px;font-weight:500;">-</div>
+                </div>
+                <div class="compare-row">
+                    <div class="col-label">平均信号</div>
+                    <div class="col-before" id="cmpBeforeAvg">-</div>
+                    <div class="col-after" id="cmpAfterAvg">-</div>
+                </div>
+                <div class="compare-row">
+                    <div class="col-label">最高信号</div>
+                    <div class="col-before" id="cmpBeforeMax">-</div>
+                    <div class="col-after" id="cmpAfterMax">-</div>
+                </div>
+                <div class="compare-row">
+                    <div class="col-label">最低信号</div>
+                    <div class="col-before" id="cmpBeforeMin">-</div>
+                    <div class="col-after" id="cmpAfterMin">-</div>
+                </div>
+                <div class="compare-row">
+                    <div class="col-label">异常点数</div>
+                    <div class="col-before" id="cmpBeforeAbn">-</div>
+                    <div class="col-after" id="cmpAfterAbn">-</div>
+                </div>
+            </div>
+            <div class="section-title">各点对比详情</div>
+            <div class="compare-detail-list" id="compareDetailList"></div>
+            <button class="btn-primary" style="width:100%;margin-bottom:80px;" onclick="navigate('view-home','WiFi信号巡检')">完成</button>
+        </div>
+    </div>
+</div>
+
+<!-- 异常点标记弹窗 -->
+<div class="modal-mask" id="markModal">
+    <div class="modal">
+        <div class="modal-title">
+            <span class="warn-icon">
+                <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+            </span>
+            信号异常
+        </div>
+        <div class="modal-desc">检测到当前信号较弱，请标记当前位置以便后续整改</div>
+        <div class="modal-signal">
+            <div class="val" id="modalSignalVal">-75 dBm</div>
+            <div class="lbl">当前信号强度</div>
+        </div>
+        <input type="text" class="modal-input" id="markInput" placeholder="输入位置标记（如：卧室床头柜）">
+        <div class="modal-tags" id="quickTags"></div>
+        <div class="modal-actions">
+            <button class="modal-btn secondary" onclick="cancelMark()">稍后</button>
+            <button class="modal-btn primary" onclick="confirmMark()">确认标记</button>
+        </div>
+        <button class="modal-btn" style="width:100%;margin-top:10px;background:rgba(239,68,68,0.12);color:var(--accent-red);border:1px solid rgba(239,68,68,0.3);" onclick="document.getElementById('markModal').classList.remove('show');stopTest();">结束测试</button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- 对比选择浮动栏 -->
+<div class="compare-bar" id="compareBar">
+    <div class="bar-info">已选 <span class="count" id="selCount">0</span>/2 条记录</div>
+    <button class="bar-btn cancel" onclick="cancelCompare()">取消</button>
+    <button class="bar-btn confirm" id="confirmCompareBtn" disabled onclick="doCompare()">开始对比</button>
+</div>
+
+<!-- 底部导航 -->
+<nav class="bottom-nav">
+    <a href="index.html" class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <span class="nav-label">测速</span>
+    </a>
+    <a href="toolbox.html" class="nav-item active">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
+        <span class="nav-label">工具箱</span>
+    </a>
+    <a href="staff-reports.html" class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+        <span class="nav-label">报告</span>
+    </a>
+    <a href="profile.html" class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <span class="nav-label">我的</span>
+    </a>
+</nav>
+
+<script>
+// ============== 数据模型 ==============
+const STORAGE_KEY = 'wifi_patrol_records';
+let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+const THRESHOLD = -70;
+const QUICK_TAGS = ['卧室床头柜','卧室门口','客厅沙发','客厅窗户','卫生间马桶','卫生间门口','厨房','阳台','玄关','餐厅','书房','儿童房'];
+
+// 测试状态
+let testing = false;
+let allSamples = [];      // 所有采样点 {signal, time}
+let abnormalPoints = [];  // 异常点 {signal, tag, time}
+let timer = null;
+let currentSignal = -45;
+let pendingSignal = null;  // 待标记的异常信号值
+let lastAbnormalTime = 0;  // 上次异常记录时间（防抖）
+
+// 当前测试/对比状态
+let currentRecord = null;
+
+// 历史记录对比模式
+let compareMode = false;
+let selectedIds = [];  // 对比模式下选中的记录ID（最多2个，按选择顺序：第1个=整改前，第2个=整改后）
+
+// ============== 工具函数 ==============
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function fmtTime(t) {
+    const d = new Date(t);
+    const pad = n => String(n).padStart(2,'0');
+    return `${d.getMonth()+1}月${d.getDate()}日 ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// ============== 视图导航 ==============
+const viewStack = ['view-home'];
+function navigate(viewId, title) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(viewId).classList.add('active');
+    document.getElementById('headerTitle').textContent = title;
+    if (viewStack[viewStack.length-1] !== viewId) viewStack.push(viewId);
+    document.getElementById('backBtn').classList.toggle('hidden', viewId === 'view-home');
+    // 测试中隐藏底部导航，避免误触丢失测试数据，并防止遮挡停止按钮
+    const nav = document.querySelector('.bottom-nav');
+    if (nav) nav.style.display = (viewId === 'view-testing') ? 'none' : 'flex';
+    // 返回主页时刷新历史列表
+    if (viewId === 'view-home') renderHistory();
+    window.scrollTo(0, 0);
+}
+function goBack() {
+    // 测试进行中按返回：先停止采集，避免后台继续运行
+    if (testing && viewStack[viewStack.length-1] === 'view-testing') {
+        if (allSamples.length > 0) {
+            stopTest();
+            return;
+        } else {
+            testing = false;
+            clearInterval(timer);
+            document.getElementById('markModal').classList.remove('show');
+        }
+    }
+    if (viewStack.length > 1) {
+        viewStack.pop();
+        const target = viewStack[viewStack.length-1];
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById(target).classList.add('active');
+        const titles = {
+            'view-home':'WiFi信号巡检',
+            'view-testing':'测试进行中',
+            'view-result':'测试结果',
+            'view-compare':'对比报告'
+        };
+        document.getElementById('headerTitle').textContent = titles[target] || 'WiFi信号巡检';
+        document.getElementById('backBtn').classList.toggle('hidden', target === 'view-home');
+        const nav = document.querySelector('.bottom-nav');
+        if (nav) nav.style.display = (target === 'view-testing') ? 'none' : 'flex';
+        window.scrollTo(0, 0);
+    } else {
+        location.href = 'toolbox.html';
+    }
+}
+
+// ============== 信号模拟 ==============
+// 模拟WiFi信号采集：基础-50dBm，随机波动±15，偶尔跌至-80
+function simulateSignal() {
+    const r = Math.random();
+    if (r < 0.15) {
+        // 信号跌落（模拟盲区）
+        return -75 - Math.floor(Math.random() * 15); // -75 ~ -89
+    } else if (r < 0.4) {
+        // 中等信号
+        return -65 - Math.floor(Math.random() * 10); // -65 ~ -74
+    } else {
+        // 良好信号
+        return -35 - Math.floor(Math.random() * 30); // -35 ~ -64
+    }
+}
+
+function signalToColor(s) {
+    if (s >= -55) return '';
+    if (s >= -70) return 'warn';
+    return 'bad';
+}
+
+function signalToBarPercent(s) {
+    // -100 -> 0%, -30 -> 100%
+    const p = Math.max(0, Math.min(100, (s + 100) / 70 * 100));
+    return p + '%';
+}
+
+// ============== 测试流程 ==============
+function startTest() {
+    if (testing) { showToast('测试进行中'); return; }
+    testing = true;
+    allSamples = [];
+    abnormalPoints = [];
+    currentSignal = -45;
+    lastAbnormalTime = 0;
+    renderAbnormalList();
+    navigate('view-testing', '测试进行中');
+    updateLiveUI();
+    // 每800ms采集一次
+    timer = setInterval(() => {
+        currentSignal = simulateSignal();
+        allSamples.push({ signal: currentSignal, time: Date.now() });
+        updateLiveUI();
+        // 异常检测（带3秒防抖），弹窗打开期间不再弹
+        if (currentSignal < THRESHOLD && Date.now() - lastAbnormalTime > 3000 && !document.getElementById('markModal').classList.contains('show')) {
+            lastAbnormalTime = Date.now();
+            triggerAbnormalMark(currentSignal);
+        }
+    }, 800);
+}
+
+function updateLiveUI() {
+    const v = document.getElementById('liveValue');
+    v.textContent = currentSignal;
+    v.className = 'live-value ' + signalToColor(currentSignal);
+    document.getElementById('liveBar').style.width = signalToBarPercent(currentSignal);
+}
+
+function triggerAbnormalMark(signal) {
+    if (document.getElementById('markModal').classList.contains('show')) return;
+    pendingSignal = signal;
+    document.getElementById('modalSignalVal').textContent = signal + ' dBm';
+    document.getElementById('markInput').value = '';
+    // 渲染快捷标签
+    const tagsBox = document.getElementById('quickTags');
+    tagsBox.innerHTML = QUICK_TAGS.map(t => `<div class="modal-tag" onclick="pickTag('${t}')">${t}</div>`).join('');
+    document.getElementById('markModal').classList.add('show');
+    setTimeout(() => document.getElementById('markInput').focus(), 300);
+}
+
+function pickTag(tag) {
+    document.getElementById('markInput').value = tag;
+}
+
+function confirmMark() {
+    const tag = document.getElementById('markInput').value.trim();
+    if (!tag) { showToast('请输入或选择位置标记'); return; }
+    abnormalPoints.push({
+        signal: pendingSignal,
+        tag: tag,
+        time: Date.now()
+    });
+    document.getElementById('markModal').classList.remove('show');
+    renderAbnormalList();
+    showToast('已记录异常点');
+}
+
+function cancelMark() {
+    // 稍后处理：仍然记录为异常但标记为"未标记"
+    abnormalPoints.push({
+        signal: pendingSignal,
+        tag: '未标记位置',
+        time: Date.now(),
+        unmarked: true
+    });
+    document.getElementById('markModal').classList.remove('show');
+    renderAbnormalList();
+}
+
+function renderAbnormalList() {
+    const list = document.getElementById('abnormalList');
+    document.getElementById('abnormalCount').textContent = abnormalPoints.length;
+    if (abnormalPoints.length === 0) {
+        list.innerHTML = `<div class="empty-state">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            <p>暂无异常点</p>
+        </div>`;
+        return;
+    }
+    // 最新异常点显示在最上面
+    const sorted = [...abnormalPoints].sort((a, b) => b.time - a.time);
+    list.innerHTML = sorted.map((p, i) => `
+        <div class="abnormal-item">
+            <div class="abnormal-signal">${p.signal}<br><span style="font-size:9px;font-weight:400;opacity:0.8">dBm</span></div>
+            <div class="abnormal-info">
+                <div class="abnormal-tag">${i === 0 ? '<span style="color:var(--accent-cyan);font-size:10px;">最新</span> ' : ''}${p.tag}</div>
+                <div class="abnormal-time">${fmtTime(p.time)}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function stopTest() {
+    if (!testing) return;
+    testing = false;
+    clearInterval(timer);
+    // 关闭可能打开的弹窗
+    document.getElementById('markModal').classList.remove('show');
+    if (allSamples.length === 0) {
+        showToast('未采集到数据');
+        navigate('view-home', 'WiFi信号巡检');
+        return;
+    }
+    // 生成记录
+    const signals = allSamples.map(s => s.signal);
+    const record = {
+        id: genId(),
+        startTime: allSamples[0].time,
+        endTime: allSamples[allSamples.length-1].time,
+        samples: allSamples,
+        abnormalPoints: [...abnormalPoints],
+        stats: {
+            count: allSamples.length,
+            avg: Math.round(signals.reduce((a,b)=>a+b,0) / signals.length),
+            max: Math.max(...signals),
+            min: Math.min(...signals),
+            abnormalCount: abnormalPoints.length
+        },
+        recheck: null  // 整改后重新检测数据
+    };
+    records.unshift(record);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    currentRecord = record;
+    showResult(record);
+}
+
+function showResult(r) {
+    const s = r.stats;
+    document.getElementById('resultSummary').textContent = `共采集 ${s.count} 个样本，耗时 ${Math.round((r.endTime-r.startTime)/1000)} 秒`;
+    document.getElementById('resultStats').innerHTML = `
+        <div class="stat-card">
+            <div class="stat-label">采集数</div>
+            <div class="stat-value">${s.count}<span class="stat-unit">个</span></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">平均信号</div>
+            <div class="stat-value ${signalToColor(s.avg)}">${s.avg}<span class="stat-unit">dBm</span></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">最高信号</div>
+            <div class="stat-value good">${s.max}<span class="stat-unit">dBm</span></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">最低信号</div>
+            <div class="stat-value bad">${s.min}<span class="stat-unit">dBm</span></div>
+        </div>
+        <div class="stat-card" style="grid-column:span 2;">
+            <div class="stat-label">异常点数</div>
+            <div class="stat-value ${s.abnormalCount>0?'bad':'good'}">${s.abnormalCount}<span class="stat-unit">个</span></div>
+        </div>
+    `;
+    document.getElementById('abnormalResultCount').textContent = r.abnormalPoints.length;
+    const abList = document.getElementById('abnormalResultList');
+    if (r.abnormalPoints.length === 0) {
+        abList.innerHTML = `<div class="empty-state"><p>本次测试未发现异常点</p></div>`;
+    } else {
+        abList.innerHTML = r.abnormalPoints.map(p => `
+            <div class="abnormal-result-item">
+                <span class="tag-name">${p.tag}</span>
+                <span class="tag-signal">${p.signal} dBm</span>
+            </div>
+        `).join('');
+    }
+    navigate('view-result', '测试结果');
+}
+
+// ============== 删除报告 ==============
+function confirmDeleteRecord() {
+    if (!currentRecord) {
+        showToast('无报告可删除');
+        return;
+    }
+    document.getElementById('deleteModal').classList.add('show');
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.remove('show');
+}
+
+function doDeleteRecord() {
+    if (!currentRecord) return;
+    const id = currentRecord.id;
+    // 记录在 records 中的位置（如果存在）
+    const idx = records.findIndex(r => r.id === id);
+    if (idx >= 0) {
+        records.splice(idx, 1);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    }
+    currentRecord = null;
+    closeDeleteModal();
+    showToast('报告已删除');
+    setTimeout(() => navigate('view-home', 'WiFi信号巡检'), 300);
+}
+
+// ============== 历史记录 ==============
+function renderHistory() {
+    const list = document.getElementById('historyList');
+    document.getElementById('historyCount').textContent = records.length;
+    if (records.length === 0) {
+        list.innerHTML = `<div class="empty-state">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            <p>暂无历史记录</p>
+        </div>`;
+        return;
+    }
+    list.innerHTML = records.map(r => {
+        const s = r.stats;
+        const isSelected = selectedIds.includes(r.id);
+        const selLabel = isSelected ? (selectedIds.indexOf(r.id) === 0 ? '整改前' : '整改后') : '';
+        const onClickAction = compareMode
+            ? `toggleSelectRecord('${r.id}')`
+            : `viewRecordDetail('${r.id}')`;
+        return `
+        <div class="history-item ${isSelected?'selected':''}" onclick="${onClickAction}">
+            <div class="history-item-head">
+                <div class="history-name">${fmtTime(r.startTime)}</div>
+                <div class="item-actions">
+                    ${compareMode ? `<div class="select-badge ${selLabel==='整改前'?'badge-before':'badge-after'}">${selLabel}</div>` : `<div class="history-time">${Math.round((r.endTime-r.startTime)/1000)}秒</div>`}
+                </div>
+            </div>
+            <div class="history-stats">
+                <div class="stat-mini">
+                    <div class="label">采集</div>
+                    <div class="value">${s.count}</div>
+                </div>
+                <div class="stat-mini">
+                    <div class="label">平均</div>
+                    <div class="value ${signalToColor(s.avg)}">${s.avg}</div>
+                </div>
+                <div class="stat-mini">
+                    <div class="label">最低</div>
+                    <div class="value bad">${s.min}</div>
+                </div>
+                <div class="stat-mini">
+                    <div class="label">异常</div>
+                    <div class="value ${s.abnormalCount>0?'bad':'good'}">${s.abnormalCount}</div>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function viewRecordDetail(id) {
+    const r = records.find(x => x.id === id);
+    if (!r) return;
+    currentRecord = r;
+    showResult(r);
+}
+
+// ============== 历史记录对比模式 ==============
+function toggleCompareMode() {
+    compareMode = !compareMode;
+    selectedIds = [];
+    document.getElementById('compareModeBtn').classList.toggle('active', compareMode);
+    document.getElementById('compareModeBtn').textContent = compareMode ? '退出对比' : '对比记录';
+    document.getElementById('compareBar').classList.toggle('show', compareMode);
+    renderHistory();
+    updateCompareBar();
+}
+
+function toggleSelectRecord(id) {
+    const idx = selectedIds.indexOf(id);
+    if (idx >= 0) {
+        selectedIds.splice(idx, 1);
+    } else {
+        if (selectedIds.length >= 2) {
+            selectedIds.shift();  // 移除最早的，保持最多2个
+        }
+        selectedIds.push(id);
+    }
+    renderHistory();
+    updateCompareBar();
+}
+
+function updateCompareBar() {
+    document.getElementById('selCount').textContent = selectedIds.length;
+    document.getElementById('confirmCompareBtn').disabled = selectedIds.length !== 2;
+}
+
+function cancelCompare() {
+    toggleCompareMode();
+}
+
+function doCompare() {
+    if (selectedIds.length !== 2) return;
+    // 按选择顺序：第1个选中的为"整改前"，第2个选中的为"整改后"
+    const before = records.find(r => r.id === selectedIds[0]);
+    const after = records.find(r => r.id === selectedIds[1]);
+    if (!before || !after) return;
+    showCompareRecords(before, after);
+    toggleCompareMode();
+}
+
+// 两份独立记录的对比
+function showCompareRecords(beforeRec, afterRec) {
+    const bStats = beforeRec.stats;
+    const aStats = afterRec.stats;
+    const improve = aStats.avg - bStats.avg;
+
+    document.getElementById('improveValue').innerHTML = `${improve>=0?'+':''}${improve}<span class="unit">dBm</span>`;
+    document.getElementById('cmpBeforeTime').textContent = fmtTime(beforeRec.startTime);
+    document.getElementById('cmpAfterTime').textContent = fmtTime(afterRec.startTime);
+    document.getElementById('cmpBeforeAvg').textContent = bStats.avg + ' dBm';
+    document.getElementById('cmpAfterAvg').textContent = aStats.avg + ' dBm';
+    document.getElementById('cmpBeforeMax').textContent = bStats.max + ' dBm';
+    document.getElementById('cmpAfterMax').textContent = aStats.max + ' dBm';
+    document.getElementById('cmpBeforeMin').textContent = bStats.min + ' dBm';
+    document.getElementById('cmpAfterMin').textContent = aStats.min + ' dBm';
+    document.getElementById('cmpBeforeAbn').textContent = bStats.abnormalCount + ' 个';
+    document.getElementById('cmpAfterAbn').textContent = aStats.abnormalCount + ' 个';
+
+    // 各异常点对比：按标签匹配
+    const beforePoints = beforeRec.abnormalPoints;
+    const afterPoints = afterRec.abnormalPoints;
+    // 收集所有标签
+    const allTags = [...new Set([
+        ...beforePoints.map(p => p.tag),
+        ...afterPoints.map(p => p.tag)
+    ])];
+    const detailList = document.getElementById('compareDetailList');
+    if (allTags.length === 0) {
+        detailList.innerHTML = `<div class="empty-state"><p>两次测试均无异常点</p></div>`;
+    } else {
+        detailList.innerHTML = allTags.map(tag => {
+            const b = beforePoints.find(p => p.tag === tag);
+            const a = afterPoints.find(p => p.tag === tag);
+            const bStr = b ? `${b.signal} dBm` : '—';
+            const aStr = a ? `${a.signal} dBm` : '—';
+            const delta = (b && a) ? a.signal - b.signal : null;
+            const deltaStr = delta !== null
+                ? `<span class="delta">${delta>=0?'+':''}${delta} dBm</span>`
+                : '<span class="delta" style="color:var(--text-tertiary)">无匹配</span>';
+            return `
+            <div class="compare-detail-item">
+                <div class="compare-detail-tag">${tag}</div>
+                <div class="compare-detail-row">
+                    <span class="before-val">${bStr}</span>
+                    <span class="arrow">→</span>
+                    <span class="after-val">${aStr}</span>
+                    ${deltaStr}
+                </div>
+            </div>`;
+        }).join('');
+    }
+    navigate('view-compare', '对比报告');
+}
+
+// ============== 初始化 ==============
+renderHistory();
+</script>
+</body>
+</html>
