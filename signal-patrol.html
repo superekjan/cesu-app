@@ -216,12 +216,82 @@
         .abnormal-result-item {
             background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.2);
             border-radius:12px; padding:12px 14px;
+            display:flex; flex-direction:column; gap:10px;
+        }
+        .abnormal-result-item.has-recheck {
+            background:rgba(34,197,94,0.05); border-color:rgba(34,197,94,0.25);
+        }
+        .abnormal-result-row {
             display:flex; align-items:center; justify-content:space-between; gap:10px;
         }
         .abnormal-result-item .tag-name { font-size:14px; font-weight:500; flex:1; }
         .abnormal-result-item .tag-signal {
             font-size:14px; font-weight:700; color:var(--accent-red);
         }
+        .recheck-btn {
+            background:linear-gradient(135deg,var(--accent-orange),var(--accent-green));
+            color:#fff; border:none; padding:6px 14px; border-radius:8px;
+            font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap;
+        }
+        .recheck-btn:active { transform:scale(0.95); }
+        .recheck-btn.done {
+            background:rgba(34,197,94,0.15); color:var(--accent-green);
+            border:1px solid rgba(34,197,94,0.3);
+        }
+        .recheck-result {
+            background:rgba(34,197,94,0.08); border-radius:8px; padding:8px 10px;
+            display:flex; align-items:center; gap:10px; font-size:12px;
+            border:1px dashed rgba(34,197,94,0.3);
+        }
+        .recheck-result .label {
+            color:var(--accent-green); font-weight:600; flex-shrink:0;
+        }
+        .recheck-result .vals {
+            flex:1; display:flex; gap:12px; color:var(--text-primary);
+        }
+        .recheck-result .vals span b { font-weight:700; }
+        .recheck-result .delta {
+            font-size:11px; color:var(--accent-green); font-weight:700;
+        }
+
+        /* 整改采集弹窗 */
+        .recheck-modal { max-width:340px; }
+        .recheck-modal .modal-desc { font-size:13px; line-height:1.5; margin:8px 0 14px; }
+        .recheck-live {
+            background:var(--bg-secondary); border-radius:12px; padding:14px;
+            margin-bottom:14px; text-align:center;
+        }
+        .recheck-live .live-label {
+            font-size:11px; color:var(--text-secondary); margin-bottom:6px;
+            display:flex; align-items:center; justify-content:center; gap:6px;
+        }
+        .recheck-live .live-dot {
+            width:8px; height:8px; border-radius:50%; background:var(--accent-red);
+            animation:pulse 1s infinite;
+        }
+        .recheck-live .live-dot.idle { background:var(--text-tertiary); animation:none; }
+        .recheck-live .live-val {
+            font-size:32px; font-weight:800; line-height:1.1;
+        }
+        .recheck-live .live-unit { font-size:12px; color:var(--text-secondary); }
+        .recheck-progress {
+            height:4px; background:rgba(255,255,255,0.06); border-radius:2px;
+            overflow:hidden; margin-top:10px;
+        }
+        .recheck-progress-bar {
+            height:100%; background:linear-gradient(90deg,var(--accent-red),var(--accent-orange),var(--accent-green));
+            width:0%; transition:width 0.3s;
+        }
+        .recheck-summary {
+            display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+            margin-bottom:14px;
+        }
+        .recheck-summary-item {
+            background:var(--bg-secondary); border-radius:8px; padding:8px;
+            text-align:center;
+        }
+        .recheck-summary-item .label { font-size:10px; color:var(--text-secondary); }
+        .recheck-summary-item .value { font-size:15px; font-weight:700; margin-top:2px; }
 
         .result-actions { display:flex; gap:10px; margin-top:8px; margin-bottom: 80px; }
         .btn-primary {
@@ -270,19 +340,43 @@
         .compare-row .col-before { color:var(--accent-red); text-align:center; font-weight:600; }
         .compare-row .col-after { color:var(--accent-green); text-align:center; font-weight:600; }
 
-        .compare-detail-list { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
-        .compare-detail-item {
+        .compare-detail-list { display:flex; flex-direction:column; gap:14px; margin-bottom:20px; }
+        .compare-detail-wrap {
+            display:grid; grid-template-columns:1fr 1fr; gap:10px;
+        }
+        .compare-detail-group {
             background:var(--bg-card); border:1px solid var(--border-subtle);
-            border-radius:12px; padding:12px 14px;
+            border-radius:12px; padding:12px 12px;
+            display:flex; flex-direction:column;
         }
-        .compare-detail-tag { font-size:14px; font-weight:600; margin-bottom:8px; }
-        .compare-detail-row {
-            display:flex; align-items:center; gap:10px; padding:4px 0; font-size:13px;
+        .compare-detail-group-title {
+            font-size:13px; font-weight:700; margin-bottom:10px;
+            display:flex; align-items:center; gap:6px;
+            padding-bottom:8px; border-bottom:1px solid var(--border-subtle);
         }
-        .compare-detail-row .arrow { color:var(--text-tertiary); }
-        .compare-detail-row .before-val { color:var(--accent-red); font-weight:600; }
-        .compare-detail-row .after-val { color:var(--accent-green); font-weight:600; }
-        .compare-detail-row .delta { margin-left:auto; font-size:12px; color:var(--accent-green); }
+        .compare-detail-group-title .count {
+            font-size:11px; font-weight:500; padding:2px 8px; border-radius:10px;
+            background:rgba(255,255,255,0.08);
+        }
+        .compare-detail-group.before-group .compare-detail-group-title { color:var(--accent-red); }
+        .compare-detail-group.after-group .compare-detail-group-title { color:var(--accent-green); }
+        .compare-detail-items {
+            display:flex; flex-direction:column; gap:4px; flex:1;
+        }
+        .compare-detail-item {
+            display:flex; flex-direction:column; gap:2px;
+            padding:6px 8px; font-size:12px;
+            background:rgba(255,255,255,0.03); border-radius:6px;
+        }
+        .compare-detail-tag {
+            font-size:11px; font-weight:500; color:var(--text-secondary);
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+        .compare-detail-item .before-val { color:var(--accent-red); font-weight:700; font-size:14px; }
+        .compare-detail-item .after-val { color:var(--accent-green); font-weight:700; font-size:14px; }
+        .compare-detail-empty {
+            font-size:12px; color:var(--text-tertiary); text-align:center; padding:14px 0;
+        }
 
         /* 模态框 */
         .modal-mask {
@@ -297,6 +391,7 @@
             animation:modalIn 0.25s ease;
         }
         @keyframes modalIn { from { transform:scale(0.9); opacity:0; } to { transform:scale(1); opacity:1; } }
+        @keyframes pulse { 0%,100% { transform:scale(1); opacity:1; } 50% { transform:scale(1.4); opacity:0.6; } }
         .modal-title {
             font-size:17px; font-weight:700; margin-bottom:8px;
             display:flex; align-items:center; gap:8px;
@@ -562,6 +657,48 @@
             <div class="modal-actions">
                 <button class="modal-btn secondary" onclick="closeDeleteModal()">取消</button>
                 <button class="modal-btn" style="background:linear-gradient(135deg,#7c2d12,var(--accent-red));color:#fff;" onclick="doDeleteRecord()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 整改采集弹窗 -->
+    <div class="modal-mask" id="recheckModal">
+        <div class="modal recheck-modal">
+            <div class="modal-title">
+                <span style="display:inline-flex;align-items:center;gap:6px;">
+                    <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:var(--accent-green);"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    整改检查
+                </span>
+            </div>
+            <div class="modal-desc">
+                位置标签：<b id="recheckTagDisplay" style="color:var(--accent-cyan);">-</b><br>
+                整改前信号：<b id="recheckBeforeDisplay" style="color:var(--accent-red);">- dBm</b>
+            </div>
+            <div class="recheck-live">
+                <div class="live-label">
+                    <span class="live-dot idle" id="recheckLiveDot"></span>
+                    <span id="recheckLiveLabel">点击下方按钮开始采集</span>
+                </div>
+                <div class="live-val" id="recheckLiveVal">--<span class="live-unit"> dBm</span></div>
+                <div class="recheck-progress"><div class="recheck-progress-bar" id="recheckProgressBar"></div></div>
+            </div>
+            <div class="recheck-summary" id="recheckSummary" style="display:none;">
+                <div class="recheck-summary-item">
+                    <div class="label">最小值</div>
+                    <div class="value bad" id="recheckMinVal">-</div>
+                </div>
+                <div class="recheck-summary-item">
+                    <div class="label">最大值</div>
+                    <div class="value good" id="recheckMaxVal">-</div>
+                </div>
+                <div class="recheck-summary-item">
+                    <div class="label">平均值</div>
+                    <div class="value" id="recheckAvgVal">-</div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn secondary" onclick="cancelRecheck()">取消</button>
+                <button class="modal-btn" id="recheckActionBtn" style="background:linear-gradient(135deg,var(--accent-orange),var(--accent-green));color:#fff;" onclick="recheckAction()">开始采集</button>
             </div>
         </div>
     </div>
@@ -938,12 +1075,29 @@ function showResult(r) {
     if (r.abnormalPoints.length === 0) {
         abList.innerHTML = `<div class="empty-state"><p>本次测试未发现异常点</p></div>`;
     } else {
-        abList.innerHTML = r.abnormalPoints.map(p => `
-            <div class="abnormal-result-item">
-                <span class="tag-name">${p.tag}</span>
-                <span class="tag-signal">${p.signal} dBm</span>
-            </div>
-        `).join('');
+        abList.innerHTML = r.abnormalPoints.map((p, i) => {
+            const hasRecheck = !!p.recheck;
+            const rc = p.recheck;
+            const delta = hasRecheck ? rc.avg - p.signal : 0;
+            return `
+            <div class="abnormal-result-item ${hasRecheck?'has-recheck':''}">
+                <div class="abnormal-result-row">
+                    <span class="tag-name">${p.tag}</span>
+                    <span class="tag-signal">${p.signal} dBm</span>
+                    <button class="recheck-btn ${hasRecheck?'done':''}" onclick="openRecheckModal(${i})">${hasRecheck?'重新检查':'整改检查'}</button>
+                </div>
+                ${hasRecheck ? `
+                <div class="recheck-result">
+                    <span class="label">整改后</span>
+                    <div class="vals">
+                        <span>最小 <b class="bad">${rc.min}</b></span>
+                        <span>最大 <b class="good">${rc.max}</b></span>
+                        <span>平均 <b>${rc.avg}</b> dBm</span>
+                    </div>
+                    <span class="delta">${delta>=0?'+':''}${delta} dBm</span>
+                </div>` : ''}
+            </div>`;
+        }).join('');
     }
     navigate('view-result', '测试结果');
 }
@@ -974,6 +1128,148 @@ function doDeleteRecord() {
     closeDeleteModal();
     showToast('报告已删除');
     setTimeout(() => navigate('view-home', 'WiFi信号巡检'), 300);
+}
+
+// ============== 整改检查（单点采集） ==============
+let recheckState = {
+    pointIndex: -1,
+    phase: 'idle',  // idle | collecting | done
+    samples: [],
+    timer: null,
+    startTime: 0,
+    pendingSave: null
+};
+const RECHECK_DURATION = 8000;  // 采集8秒
+const RECHECK_INTERVAL = 400;   // 每400ms采样
+
+function openRecheckModal(pointIndex) {
+    if (!currentRecord || !currentRecord.abnormalPoints[pointIndex]) return;
+    recheckState.pointIndex = pointIndex;
+    recheckState.phase = 'idle';
+    recheckState.samples = [];
+    recheckState.pendingSave = null;
+    const p = currentRecord.abnormalPoints[pointIndex];
+    document.getElementById('recheckTagDisplay').textContent = p.tag;
+    document.getElementById('recheckBeforeDisplay').textContent = p.signal + ' dBm';
+    document.getElementById('recheckLiveVal').innerHTML = `--<span class="live-unit"> dBm</span>`;
+    document.getElementById('recheckLiveLabel').textContent = '点击下方按钮开始采集';
+    document.getElementById('recheckLiveDot').classList.add('idle');
+    document.getElementById('recheckProgressBar').style.width = '0%';
+    document.getElementById('recheckSummary').style.display = 'none';
+    updateRecheckBtn();
+    document.getElementById('recheckModal').classList.add('show');
+}
+
+function updateRecheckBtn() {
+    const btn = document.getElementById('recheckActionBtn');
+    if (recheckState.phase === 'idle') {
+        btn.textContent = '开始采集';
+        btn.style.background = 'linear-gradient(135deg,var(--accent-orange),var(--accent-green))';
+    } else if (recheckState.phase === 'collecting') {
+        btn.textContent = '结束采集';
+        btn.style.background = 'linear-gradient(135deg,#7c2d12,var(--accent-red))';
+    } else if (recheckState.phase === 'done') {
+        btn.textContent = '保存结果';
+        btn.style.background = 'linear-gradient(135deg,var(--accent-blue),var(--accent-cyan))';
+    }
+}
+
+function cancelRecheck() {
+    stopRecheckCollecting(false);
+    document.getElementById('recheckModal').classList.remove('show');
+}
+
+function recheckAction() {
+    if (recheckState.phase === 'idle') {
+        startRecheckCollecting();
+    } else if (recheckState.phase === 'collecting') {
+        stopRecheckCollecting(true);
+    } else if (recheckState.phase === 'done') {
+        saveRecheckResult();
+    }
+}
+
+function startRecheckCollecting() {
+    recheckState.phase = 'collecting';
+    recheckState.samples = [];
+    recheckState.startTime = Date.now();
+    const p = currentRecord.abnormalPoints[recheckState.pointIndex];
+    document.getElementById('recheckLiveLabel').textContent = '采集中...';
+    document.getElementById('recheckLiveDot').classList.remove('idle');
+    document.getElementById('recheckSummary').style.display = 'none';
+    updateRecheckBtn();
+
+    recheckState.timer = setInterval(() => {
+        // 模拟整改后信号采集：基于原信号 + 整改改善(8~20) + 随机波动
+        const base = p.signal + 8 + Math.random() * 12;
+        const noise = (Math.random() - 0.5) * 8;
+        const sample = Math.round(base + noise);
+        recheckState.samples.push(sample);
+        // 更新实时显示
+        document.getElementById('recheckLiveVal').innerHTML = `${sample}<span class="live-unit"> dBm</span>`;
+        const elapsed = Date.now() - recheckState.startTime;
+        const progress = Math.min(100, (elapsed / RECHECK_DURATION) * 100);
+        document.getElementById('recheckProgressBar').style.width = progress + '%';
+        // 到时自动结束
+        if (elapsed >= RECHECK_DURATION) {
+            stopRecheckCollecting(true);
+        }
+    }, RECHECK_INTERVAL);
+}
+
+function stopRecheckCollecting(finished) {
+    if (recheckState.timer) {
+        clearInterval(recheckState.timer);
+        recheckState.timer = null;
+    }
+    document.getElementById('recheckLiveDot').classList.add('idle');
+
+    if (!finished || recheckState.samples.length === 0) {
+        recheckState.phase = 'idle';
+        if (finished && recheckState.samples.length === 0) {
+            showToast('未采集到样本');
+            document.getElementById('recheckLiveLabel').textContent = '未采集到数据，请重试';
+        } else {
+            document.getElementById('recheckLiveLabel').textContent = '已取消采集';
+        }
+        updateRecheckBtn();
+        return;
+    }
+
+    // 计算统计值
+    const samples = recheckState.samples;
+    const min = Math.min(...samples);
+    const max = Math.max(...samples);
+    const avg = Math.round(samples.reduce((a,b)=>a+b,0) / samples.length);
+
+    document.getElementById('recheckLiveLabel').textContent = `采集完成（${samples.length} 个样本）`;
+    document.getElementById('recheckLiveVal').innerHTML = `${avg}<span class="live-unit"> dBm (均值)</span>`;
+    document.getElementById('recheckMinVal').textContent = min;
+    document.getElementById('recheckMaxVal').textContent = max;
+    document.getElementById('recheckAvgVal').textContent = avg;
+    document.getElementById('recheckSummary').style.display = 'grid';
+    recheckState.phase = 'done';
+    recheckState.pendingSave = { min, max, avg, samples: [...samples], time: Date.now() };
+    updateRecheckBtn();
+}
+
+function saveRecheckResult() {
+    if (!recheckState.pendingSave || !currentRecord) return;
+    const idx = recheckState.pointIndex;
+    const result = recheckState.pendingSave;
+    currentRecord.abnormalPoints[idx].recheck = result;
+    // 持久化
+    const recIdx = records.findIndex(r => r.id === currentRecord.id);
+    if (recIdx >= 0) {
+        records[recIdx] = currentRecord;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    }
+    recheckState.pendingSave = null;
+    recheckState.phase = 'idle';
+    document.getElementById('recheckModal').classList.remove('show');
+    showToast('整改检查结果已保存');
+    // 刷新结果页
+    showResult(currentRecord);
 }
 
 // ============== 历史记录 ==============
@@ -1093,38 +1389,47 @@ function showCompareRecords(beforeRec, afterRec) {
     document.getElementById('cmpBeforeAbn').textContent = bStats.abnormalCount + ' 个';
     document.getElementById('cmpAfterAbn').textContent = aStats.abnormalCount + ' 个';
 
-    // 各异常点对比：按标签匹配
+    // 各异常点详情：整改前与整改后分别罗列，不做匹配
     const beforePoints = beforeRec.abnormalPoints;
     const afterPoints = afterRec.abnormalPoints;
-    // 收集所有标签
-    const allTags = [...new Set([
-        ...beforePoints.map(p => p.tag),
-        ...afterPoints.map(p => p.tag)
-    ])];
     const detailList = document.getElementById('compareDetailList');
-    if (allTags.length === 0) {
-        detailList.innerHTML = `<div class="empty-state"><p>两次测试均无异常点</p></div>`;
-    } else {
-        detailList.innerHTML = allTags.map(tag => {
-            const b = beforePoints.find(p => p.tag === tag);
-            const a = afterPoints.find(p => p.tag === tag);
-            const bStr = b ? `${b.signal} dBm` : '—';
-            const aStr = a ? `${a.signal} dBm` : '—';
-            const delta = (b && a) ? a.signal - b.signal : null;
-            const deltaStr = delta !== null
-                ? `<span class="delta">${delta>=0?'+':''}${delta} dBm</span>`
-                : '<span class="delta" style="color:var(--text-tertiary)">无匹配</span>';
+
+    const renderPointList = (points, isAfter) => {
+        if (points.length === 0) {
+            return `<div class="compare-detail-empty">无异常点</div>`;
+        }
+        return points.map(p => {
+            const valClass = isAfter ? 'after-val' : 'before-val';
+            const recheckStr = (isAfter && p.recheck)
+                ? `<span style="font-size:11px;color:var(--accent-green);margin-left:6px;">整改检查均${p.recheck.avg}</span>`
+                : '';
             return `
             <div class="compare-detail-item">
-                <div class="compare-detail-tag">${tag}</div>
-                <div class="compare-detail-row">
-                    <span class="before-val">${bStr}</span>
-                    <span class="arrow">→</span>
-                    <span class="after-val">${aStr}</span>
-                    ${deltaStr}
-                </div>
+                <span class="compare-detail-tag">${p.tag}${recheckStr}</span>
+                <span class="${valClass}">${p.signal} dBm</span>
             </div>`;
         }).join('');
+    };
+
+    if (beforePoints.length === 0 && afterPoints.length === 0) {
+        detailList.innerHTML = `<div class="empty-state"><p>两次测试均无异常点</p></div>`;
+    } else {
+        detailList.innerHTML = `
+            <div class="compare-detail-wrap">
+                <div class="compare-detail-group before-group">
+                    <div class="compare-detail-group-title">
+                        整改前 <span class="count">${beforePoints.length}</span>
+                    </div>
+                    <div class="compare-detail-items">${renderPointList(beforePoints, false)}</div>
+                </div>
+                <div class="compare-detail-group after-group">
+                    <div class="compare-detail-group-title">
+                        整改后 <span class="count">${afterPoints.length}</span>
+                    </div>
+                    <div class="compare-detail-items">${renderPointList(afterPoints, true)}</div>
+                </div>
+            </div>
+        `;
     }
     navigate('view-compare', '对比报告');
 }
