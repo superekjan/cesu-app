@@ -378,6 +378,102 @@
             font-size:12px; color:var(--text-tertiary); text-align:center; padding:14px 0;
         }
 
+        /* 阈值设置按钮 */
+        .threshold-set-btn {
+            display:flex; align-items:center; justify-content:center; gap:8px;
+            width:100%; margin-top:12px; padding:12px 16px;
+            background:var(--bg-card); border:1px solid var(--border-subtle);
+            border-radius:12px; color:var(--text-primary); font-size:14px;
+            cursor:pointer; transition:all 0.2s;
+        }
+        .threshold-set-btn:active { transform:scale(0.98); border-color:var(--accent-cyan); }
+        .threshold-set-btn svg { width:16px; height:16px; fill:var(--accent-cyan); }
+        .threshold-set-btn .threshold-val {
+            margin-left:auto; padding:2px 10px; border-radius:10px;
+            background:rgba(245,158,11,0.15); color:var(--accent-orange);
+            font-weight:700; font-size:13px;
+        }
+        .threshold-set-btn .arrow-right { width:14px; height:14px; fill:var(--text-tertiary); }
+
+        /* 阈值设置弹窗 */
+        .threshold-display {
+            text-align:center; margin:12px 0 16px;
+        }
+        .threshold-display .val {
+            font-size:44px; font-weight:800; color:var(--accent-orange);
+            line-height:1;
+        }
+        .threshold-display .unit { font-size:14px; color:var(--text-secondary); margin-left:4px; }
+        .threshold-slider {
+            width:100%; -webkit-appearance:none; appearance:none;
+            height:6px; border-radius:3px;
+            background:linear-gradient(90deg,var(--accent-red),var(--accent-orange),var(--accent-green));
+            outline:none; margin:8px 0 6px;
+        }
+        .threshold-slider::-webkit-slider-thumb {
+            -webkit-appearance:none; appearance:none;
+            width:22px; height:22px; border-radius:50%;
+            background:#fff; border:3px solid var(--accent-orange);
+            cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.3);
+        }
+        .threshold-range {
+            display:flex; justify-content:space-between;
+            font-size:11px; color:var(--text-tertiary); margin-bottom:14px;
+        }
+        .threshold-presets {
+            display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px;
+        }
+        .threshold-presets button {
+            padding:8px 4px; background:var(--bg-secondary);
+            border:1px solid var(--border-subtle); border-radius:8px;
+            color:var(--text-primary); font-size:12px; cursor:pointer;
+        }
+        .threshold-presets button.active {
+            border-color:var(--accent-orange); background:rgba(245,158,11,0.12);
+            color:var(--accent-orange); font-weight:600;
+        }
+
+        /* WiFi信息卡片 */
+        .wifi-info-card {
+            background:var(--bg-card); border:1px solid var(--border-subtle);
+            border-radius:14px; padding:14px; margin-bottom:12px;
+        }
+        .wifi-info-header {
+            display:flex; align-items:center; gap:8px;
+            padding-bottom:10px; margin-bottom:10px;
+            border-bottom:1px solid var(--border-subtle);
+        }
+        .wifi-info-header svg { width:18px; height:18px; fill:var(--accent-cyan); }
+        .wifi-info-header .wifi-ssid {
+            font-size:15px; font-weight:700; color:var(--text-primary);
+        }
+        .wifi-info-header .band-tag {
+            margin-left:auto; padding:2px 10px; border-radius:10px;
+            font-size:11px; font-weight:600;
+        }
+        .wifi-info-header .band-tag.band5 {
+            background:rgba(34,197,94,0.15); color:var(--accent-green);
+        }
+        .wifi-info-header .band-tag.band2 {
+            background:rgba(56,189,248,0.15); color:var(--accent-cyan);
+        }
+        .wifi-info-grid {
+            display:grid; grid-template-columns:1fr 1fr; gap:8px 12px;
+        }
+        .wifi-info-item {
+            display:flex; flex-direction:column; gap:2px;
+        }
+        .wifi-info-item .label {
+            font-size:11px; color:var(--text-secondary);
+        }
+        .wifi-info-item .value {
+            font-size:13px; font-weight:600; color:var(--text-primary);
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+        .wifi-info-item .value.channel-val {
+            color:var(--accent-orange);
+        }
+
         /* 模态框 */
         .modal-mask {
             position:fixed; inset:0; background:rgba(0,0,0,0.7);
@@ -562,11 +658,17 @@
                     <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                 </div>
                 <h1>WiFi信号巡检</h1>
-                <p>点击开始测试，沿着房间行走采集信号<br>信号低于 -70 dBm 时将自动记录异常点</p>
+                <p id="homeHeroDesc">点击开始测试，沿着房间行走采集信号<br>信号低于 -70 dBm 时将自动记录异常点</p>
             </div>
             <button class="start-btn" onclick="startTest()">
                 <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                 开始测试
+            </button>
+            <button class="threshold-set-btn" onclick="openThresholdModal()">
+                <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                异常信号阈值
+                <span class="threshold-val" id="homeThresholdVal">-70 dBm</span>
+                <svg class="arrow-right" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
             </button>
             <div class="history-section">
                 <div class="section-title">
@@ -593,13 +695,13 @@
                 </div>
                 <div class="live-meta">
                     <span>-100</span>
-                    <span>阈值 -70</span>
+                    <span id="liveThresholdLabel">阈值 -70</span>
                     <span>-30</span>
                 </div>
             </div>
             <div class="threshold-hint">
                 <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
-                <span>当信号弱于 -70 dBm 时，将自动弹出标记框</span>
+                <span id="liveThresholdHint">当信号弱于 -70 dBm 时，将自动弹出标记框</span>
             </div>
             <div class="abnormal-section">
                 <div class="section-title">
@@ -629,6 +731,7 @@
                 <h2>测试完成</h2>
                 <p id="resultSummary"></p>
             </div>
+            <div class="wifi-info-card" id="wifiInfoCard"></div>
             <div class="result-stats" id="resultStats"></div>
             <div class="abnormal-result-section">
                 <div class="abnormal-result-title">
@@ -703,6 +806,32 @@
         </div>
     </div>
 
+    <!-- 阈值设置弹窗 -->
+    <div class="modal-mask" id="thresholdModal">
+        <div class="modal" style="max-width:340px;">
+            <div class="modal-title">异常信号阈值设置</div>
+            <div class="modal-desc" style="margin-bottom:8px;">当采集信号弱于该阈值时，将自动弹出位置标记框</div>
+            <div class="threshold-display">
+                <span class="val" id="thresholdDisplayVal">-70</span>
+                <span class="unit">dBm</span>
+            </div>
+            <input type="range" id="thresholdSlider" class="threshold-slider" min="-90" max="-50" step="-1" value="-70" oninput="onThresholdSliderChange(this.value)">
+            <div class="threshold-range">
+                <span>-90 极敏感</span>
+                <span>-50 宽松</span>
+            </div>
+            <div class="threshold-presets" id="thresholdPresets">
+                <button data-val="-80" onclick="setThresholdPreset(-80)">-80 严格</button>
+                <button data-val="-70" onclick="setThresholdPreset(-70)">-70 标准</button>
+                <button data-val="-65" onclick="setThresholdPreset(-65)">-65 宽松</button>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn secondary" onclick="closeThresholdModal()">取消</button>
+                <button class="modal-btn" style="background:linear-gradient(135deg,var(--accent-orange),var(--accent-green));color:#fff;" onclick="saveThreshold()">保存设置</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 对比报告视图 -->
     <div class="view" id="view-compare">
         <div class="compare-content">
@@ -740,6 +869,11 @@
                     <div class="col-label">异常点数</div>
                     <div class="col-before" id="cmpBeforeAbn">-</div>
                     <div class="col-after" id="cmpAfterAbn">-</div>
+                </div>
+                <div class="compare-row">
+                    <div class="col-label">合格覆盖率</div>
+                    <div class="col-before" id="cmpBeforeRate">-</div>
+                    <div class="col-after" id="cmpAfterRate">-</div>
                 </div>
             </div>
             <div class="section-title">各点对比详情</div>
@@ -807,7 +941,7 @@
 const STORAGE_KEY = 'wifi_patrol_records';
 let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 
-const THRESHOLD = -70;
+let threshold = parseInt(localStorage.getItem('wifi_patrol_threshold') || '-70');
 const QUICK_TAGS = ['卧室床头柜','卧室门口','客厅沙发','客厅窗户','卫生间马桶','卫生间门口','厨房','阳台','玄关','餐厅','书房','儿童房'];
 
 // 测试状态
@@ -818,6 +952,7 @@ let timer = null;
 let currentSignal = -45;
 let pendingSignal = null;  // 待标记的异常信号值
 let lastAbnormalTime = 0;  // 上次异常记录时间（防抖）
+let currentWifiInfo = null;  // 当前测试WiFi信息
 
 // 当前测试/对比状态
 let currentRecord = null;
@@ -916,6 +1051,82 @@ function signalToBarPercent(s) {
     return p + '%';
 }
 
+// ============== 阈值设置 ==============
+function updateThresholdUI() {
+    const txt = `${threshold} dBm`;
+    const el1 = document.getElementById('homeThresholdVal');
+    if (el1) el1.textContent = txt;
+    const el2 = document.getElementById('homeHeroDesc');
+    if (el2) el2.innerHTML = `点击开始测试，沿着房间行走采集信号<br>信号低于 ${threshold} dBm 时将自动记录异常点`;
+    const el3 = document.getElementById('liveThresholdLabel');
+    if (el3) el3.textContent = `阈值 ${threshold}`;
+    const el4 = document.getElementById('liveThresholdHint');
+    if (el4) el4.textContent = `当信号弱于 ${threshold} dBm 时，将自动弹出标记框`;
+}
+
+let pendingThreshold = -70;
+function openThresholdModal() {
+    pendingThreshold = threshold;
+    document.getElementById('thresholdSlider').value = threshold;
+    document.getElementById('thresholdDisplayVal').textContent = threshold;
+    updatePresetActive(threshold);
+    document.getElementById('thresholdModal').classList.add('show');
+}
+function closeThresholdModal() {
+    document.getElementById('thresholdModal').classList.remove('show');
+}
+function onThresholdSliderChange(val) {
+    pendingThreshold = parseInt(val);
+    document.getElementById('thresholdDisplayVal').textContent = pendingThreshold;
+    updatePresetActive(pendingThreshold);
+}
+function setThresholdPreset(val) {
+    pendingThreshold = val;
+    document.getElementById('thresholdSlider').value = val;
+    document.getElementById('thresholdDisplayVal').textContent = val;
+    updatePresetActive(val);
+}
+function updatePresetActive(val) {
+    document.querySelectorAll('#thresholdPresets button').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.val) === val);
+    });
+}
+function saveThreshold() {
+    threshold = pendingThreshold;
+    localStorage.setItem('wifi_patrol_threshold', String(threshold));
+    updateThresholdUI();
+    closeThresholdModal();
+    showToast(`阈值已设置为 ${threshold} dBm`);
+}
+
+// ============== WiFi信息生成 ==============
+function genWifiInfo() {
+    const ssids = ['ChinaNet-Home','TP-LINK_5G','MERCURY_Home','Xiaomi-Router','Huawei-AX6','Home-WiFi-5G'];
+    const band = Math.random() > 0.4 ? '5GHz' : '2.4GHz';
+    const channels2G = [1,6,11,3,9,13];
+    const channels5G = [36,40,44,48,149,153,157,161];
+    const channel = band === '2.4GHz'
+        ? channels2G[Math.floor(Math.random()*channels2G.length)]
+        : channels5G[Math.floor(Math.random()*channels5G.length)];
+    const securities = ['WPA2-PSK','WPA3-SAE','WPA2/WPA3'];
+    const hex = '0123456789ABCDEF';
+    let bssid = '';
+    for (let i=0;i<6;i++) {
+        bssid += (i?':':'') + hex[Math.floor(Math.random()*16)] + hex[Math.floor(Math.random()*16)];
+    }
+    const linkRate = band === '2.4GHz'
+        ? (Math.floor(Math.random()*200)+100)
+        : (Math.floor(Math.random()*800)+400);
+    return {
+        ssid: ssids[Math.floor(Math.random()*ssids.length)],
+        bssid: bssid,
+        band: band,
+        channel: channel,
+        security: securities[Math.floor(Math.random()*securities.length)],
+        linkRate: linkRate
+    };
+}
+
 // ============== 测试流程 ==============
 function startTest() {
     if (testing) { showToast('测试进行中'); return; }
@@ -924,7 +1135,9 @@ function startTest() {
     abnormalPoints = [];
     currentSignal = -45;
     lastAbnormalTime = 0;
+    currentWifiInfo = genWifiInfo();
     renderAbnormalList();
+    updateThresholdUI();
     navigate('view-testing', '测试进行中');
     updateLiveUI();
     // 每800ms采集一次
@@ -933,7 +1146,7 @@ function startTest() {
         allSamples.push({ signal: currentSignal, time: Date.now() });
         updateLiveUI();
         // 异常检测（带3秒防抖），弹窗打开期间不再弹
-        if (currentSignal < THRESHOLD && Date.now() - lastAbnormalTime > 3000 && !document.getElementById('markModal').classList.contains('show')) {
+        if (currentSignal < threshold && Date.now() - lastAbnormalTime > 3000 && !document.getElementById('markModal').classList.contains('show')) {
             lastAbnormalTime = Date.now();
             triggerAbnormalMark(currentSignal);
         }
@@ -1024,18 +1237,23 @@ function stopTest() {
     }
     // 生成记录
     const signals = allSamples.map(s => s.signal);
+    const qualifiedCount = allSamples.filter(s => s.signal >= threshold).length;
+    const qualifiedRate = Math.round(qualifiedCount / allSamples.length * 100);
     const record = {
         id: genId(),
         startTime: allSamples[0].time,
         endTime: allSamples[allSamples.length-1].time,
         samples: allSamples,
         abnormalPoints: [...abnormalPoints],
+        wifiInfo: currentWifiInfo,
+        threshold: threshold,
         stats: {
             count: allSamples.length,
             avg: Math.round(signals.reduce((a,b)=>a+b,0) / signals.length),
             max: Math.max(...signals),
             min: Math.min(...signals),
-            abnormalCount: abnormalPoints.length
+            abnormalCount: abnormalPoints.length,
+            qualifiedRate: qualifiedRate
         },
         recheck: null  // 整改后重新检测数据
     };
@@ -1048,6 +1266,34 @@ function stopTest() {
 function showResult(r) {
     const s = r.stats;
     document.getElementById('resultSummary').textContent = `共采集 ${s.count} 个样本，耗时 ${Math.round((r.endTime-r.startTime)/1000)} 秒`;
+    // WiFi信息卡片
+    const w = r.wifiInfo || {};
+    const bandClass = w.band === '5GHz' ? 'band5' : 'band2';
+    document.getElementById('wifiInfoCard').innerHTML = w.ssid ? `
+        <div class="wifi-info-header">
+            <svg viewBox="0 0 24 24"><path d="M12.01 21.49L23.64 7c-.45-.34-4.93-4-11.64-4C5.28 3 .81 6.66.36 7l11.63 14.49.01.01.01-.01z"/></svg>
+            <span class="wifi-ssid">${w.ssid}</span>
+            <span class="band-tag ${bandClass}">${w.band || '-'}</span>
+        </div>
+        <div class="wifi-info-grid">
+            <div class="wifi-info-item">
+                <span class="label">信道</span>
+                <span class="value channel-val">${w.channel || '-'}</span>
+            </div>
+            <div class="wifi-info-item">
+                <span class="label">安全类型</span>
+                <span class="value">${w.security || '-'}</span>
+            </div>
+            <div class="wifi-info-item">
+                <span class="label">链接速率</span>
+                <span class="value">${w.linkRate ? w.linkRate + ' Mbps' : '-'}</span>
+            </div>
+            <div class="wifi-info-item">
+                <span class="label">BSSID</span>
+                <span class="value" style="font-size:11px;">${w.bssid || '-'}</span>
+            </div>
+        </div>
+    ` : '';
     document.getElementById('resultStats').innerHTML = `
         <div class="stat-card">
             <div class="stat-label">采集数</div>
@@ -1065,9 +1311,13 @@ function showResult(r) {
             <div class="stat-label">最低信号</div>
             <div class="stat-value bad">${s.min}<span class="stat-unit">dBm</span></div>
         </div>
-        <div class="stat-card" style="grid-column:span 2;">
+        <div class="stat-card">
             <div class="stat-label">异常点数</div>
             <div class="stat-value ${s.abnormalCount>0?'bad':'good'}">${s.abnormalCount}<span class="stat-unit">个</span></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">合格覆盖率</div>
+            <div class="stat-value ${(s.qualifiedRate||0)>=80?'good':(s.qualifiedRate||0)>=60?'warn':'bad'}">${s.qualifiedRate||0}<span class="stat-unit">%</span></div>
         </div>
     `;
     document.getElementById('abnormalResultCount').textContent = r.abnormalPoints.length;
@@ -1388,6 +1638,8 @@ function showCompareRecords(beforeRec, afterRec) {
     document.getElementById('cmpAfterMin').textContent = aStats.min + ' dBm';
     document.getElementById('cmpBeforeAbn').textContent = bStats.abnormalCount + ' 个';
     document.getElementById('cmpAfterAbn').textContent = aStats.abnormalCount + ' 个';
+    document.getElementById('cmpBeforeRate').textContent = (bStats.qualifiedRate||0) + ' %';
+    document.getElementById('cmpAfterRate').textContent = (aStats.qualifiedRate||0) + ' %';
 
     // 各异常点详情：整改前与整改后分别罗列，不做匹配
     const beforePoints = beforeRec.abnormalPoints;
@@ -1436,6 +1688,7 @@ function showCompareRecords(beforeRec, afterRec) {
 
 // ============== 初始化 ==============
 renderHistory();
+updateThresholdUI();
 </script>
 </body>
 </html>
