@@ -115,19 +115,46 @@
         .legend-bar { display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--bg-card); border-radius:10px; font-size:12px; color:var(--text-secondary); }
         .legend-gradient { flex:1; height:8px; border-radius:4px; background:linear-gradient(90deg,#ef4444,#f59e0b,#22c55e); }
         .compare-detail-content { padding:16px; flex:1; }
-        .compare-cards { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
-        .compare-card { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:14px; padding:12px; }
+        .compare-card { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:14px; padding:12px; margin-bottom:14px; }
         .compare-card.after { border-color:rgba(34,197,94,0.3); }
-        .compare-label { font-size:13px; font-weight:600; margin-bottom:10px; text-align:center; padding:4px; border-radius:6px; }
+        .compare-card-header {
+            display:flex; align-items:center; justify-content:space-between;
+            margin-bottom:10px;
+        }
+        .compare-label { font-size:13px; font-weight:600; padding:4px 12px; border-radius:6px; }
         .compare-label.before { background:rgba(239,68,68,0.1); color:var(--accent-orange); }
         .compare-label.after { background:rgba(34,197,94,0.1); color:var(--accent-green); }
-        .compare-canvas-wrap { background:var(--bg-canvas); border-radius:8px; overflow:hidden; margin-bottom:10px; }
+        .compare-time { font-size:11px; color:var(--text-tertiary); }
+        .compare-canvas-wrap { background:var(--bg-canvas); border-radius:10px; overflow:hidden; }
         .compare-canvas-wrap canvas { width:100%; display:block; }
-        .compare-stats { font-size:12px; }
-        .compare-stat-row { display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid var(--border-subtle); }
-        .compare-stat-row:last-child { border-bottom:none; }
-        .compare-stat-row .label { color:var(--text-secondary); }
-        .compare-stat-row .value { font-weight:600; }
+
+        /* 指标对比表 */
+        .compare-table {
+            background:var(--bg-card); border:1px solid var(--border-subtle);
+            border-radius:14px; padding:14px 12px; margin-bottom:16px;
+        }
+        .compare-table-title {
+            font-size:13px; font-weight:600; color:var(--text-secondary);
+            margin-bottom:10px; padding-bottom:8px;
+            border-bottom:1px solid var(--border-subtle);
+        }
+        .compare-table-row {
+            display:grid; grid-template-columns:1.2fr 1fr 1fr 1fr;
+            align-items:center; gap:6px; padding:9px 0; font-size:13px;
+            border-bottom:1px dashed var(--border-subtle);
+        }
+        .compare-table-row:last-child { border-bottom:none; }
+        .compare-table-row.head {
+            font-size:11px; color:var(--text-secondary); font-weight:500;
+            padding:6px 0;
+        }
+        .compare-table-row .ct-label { color:var(--text-secondary); font-size:12px; }
+        .compare-table-row .ct-before { color:var(--accent-orange); font-weight:600; text-align:center; }
+        .compare-table-row .ct-after { color:var(--accent-green); font-weight:600; text-align:center; }
+        .compare-table-row .ct-delta { text-align:center; font-size:12px; font-weight:600; }
+        .compare-table-row .ct-delta.up { color:var(--accent-green); }
+        .compare-table-row .ct-delta.down { color:var(--accent-red); }
+        .compare-table-row .ct-delta.flat { color:var(--text-tertiary); }
         .improvement-banner { background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(56,189,248,0.1)); border:1px solid rgba(34,197,94,0.3); border-radius:14px; padding:16px; text-align:center; margin-bottom:16px; }
         .improvement-banner .improve-label { font-size:12px; color:var(--text-secondary); margin-bottom:6px; }
         .improvement-banner .improve-value { font-size:32px; font-weight:700; background:linear-gradient(135deg,var(--accent-green),var(--accent-cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
@@ -657,6 +684,20 @@ function redrawTestCanvas() {
     });
     ctx.restore();
 }
+function genWifiInfo() {
+    const ssids = ['ChinaNet-Home','TP-LINK_5G','MERCURY_Home','Xiaomi-Router','Huawei-AX6','Home-WiFi-5G'];
+    const band = Math.random() > 0.4 ? '5GHz' : '2.4GHz';
+    const channels2G = [1,6,11,3,9,13];
+    const channels5G = [36,40,44,48,149,153,157,161];
+    const channel = band === '2.4GHz'
+        ? channels2G[Math.floor(Math.random()*channels2G.length)]
+        : channels5G[Math.floor(Math.random()*channels5G.length)];
+    return {
+        ssid: ssids[Math.floor(Math.random()*ssids.length)],
+        band: band,
+        channel: channel
+    };
+}
 function generateHeatmap() {
     if (testPoints.length < 2) { showToast('至少需要2个测试点'); return; }
     if (retestMode && compareSourceHeatmap) {
@@ -667,8 +708,8 @@ function generateHeatmap() {
             planName: currentPlan.name,
             walls: [...currentPlan.walls],
             rooms: [...currentPlan.rooms],
-            before: { points: [...compareSourceHeatmap.points], createdAt: compareSourceHeatmap.createdAt },
-            after: { points: [...testPoints], createdAt: Date.now() },
+            before: { points: [...compareSourceHeatmap.points], createdAt: compareSourceHeatmap.createdAt, wifiInfo: compareSourceHeatmap.wifiInfo || genWifiInfo() },
+            after: { points: [...testPoints], createdAt: Date.now(), wifiInfo: genWifiInfo() },
             createdAt: Date.now()
         };
         comparisons.push(comparison);
@@ -682,7 +723,8 @@ function generateHeatmap() {
         const heatmap = {
             id: genId(), planId: currentPlan.id, planName: currentPlan.name,
             walls: [...currentPlan.walls], rooms: [...currentPlan.rooms],
-            points: [...testPoints], createdAt: Date.now()
+            points: [...testPoints], createdAt: Date.now(),
+            wifiInfo: genWifiInfo()
         };
         heatmaps.push(heatmap);
         saveData();
@@ -761,7 +803,7 @@ function renderHeatmapDetail() {
     document.getElementById('heatmapStats').innerHTML = `
         <div class="stat-card"><div class="stat-label">平均信号</div><div class="stat-value">${avg}<span class="unit"> dBm</span></div></div>
         <div class="stat-card"><div class="stat-label">覆盖良好</div><div class="stat-value">${Math.round(good/points.length*100)}<span class="unit">%</span></div></div>
-        <div class="stat-card"><div class="stat-label">盲区数</div><div class="stat-value">${poor}<span class="unit"> 个</span></div></div>`;
+        <div class="stat-card"><div class="stat-label">异常点</div><div class="stat-value">${poor}<span class="unit"> 个</span></div></div>`;
 }
 function drawFullHeatmap(canvas, plan, points) {
     const ctx = canvas.getContext('2d');
@@ -872,8 +914,8 @@ function confirmHistoryCompare() {
         planName: before.planName,
         walls: [...before.walls],
         rooms: [...before.rooms],
-        before: { points: [...before.points], createdAt: before.createdAt },
-        after: { points: [...after.points], createdAt: after.createdAt },
+        before: { points: [...before.points], createdAt: before.createdAt, wifiInfo: before.wifiInfo || genWifiInfo() },
+        after: { points: [...after.points], createdAt: after.createdAt, wifiInfo: after.wifiInfo || genWifiInfo() },
         createdAt: Date.now()
     };
     comparisons.push(comparison);
@@ -920,42 +962,118 @@ function renderCompareDetail() {
     const beforeAvg = Math.round(c.before.points.reduce((s,p)=>s+p.signal,0)/c.before.points.length);
     const afterAvg = Math.round(c.after.points.reduce((s,p)=>s+p.signal,0)/c.after.points.length);
     const improve = afterAvg - beforeAvg;
-    const beforeGood = c.before.points.filter(p => p.signal >= -65).length;
-    const afterGood = c.after.points.filter(p => p.signal >= -65).length;
+    const beforeGoodPct = Math.round(c.before.points.filter(p => p.signal >= -65).length / c.before.points.length * 100);
+    const afterGoodPct = Math.round(c.after.points.filter(p => p.signal >= -65).length / c.after.points.length * 100);
     const beforePoor = c.before.points.filter(p => p.signal < -75).length;
     const afterPoor = c.after.points.filter(p => p.signal < -75).length;
     const plan = { walls: c.walls, rooms: c.rooms };
+
+    // 格式化时间
+    const fmtT = (ts) => {
+        const d = new Date(ts);
+        const mm = String(d.getMonth()+1).padStart(2,'0');
+        const dd = String(d.getDate()).padStart(2,'0');
+        const hh = String(d.getHours()).padStart(2,'0');
+        const mi = String(d.getMinutes()).padStart(2,'0');
+        return `${mm}-${dd} ${hh}:${mi}`;
+    };
+
+    // 差值辅助：信号值越大越好（up=绿色），盲区数越小越好（down=绿色）
+    const deltaCls = (delta, higherBetter=true) => {
+        if (delta === 0) return 'flat';
+        const positive = higherBetter ? delta > 0 : delta < 0;
+        return positive ? 'up' : 'down';
+    };
+    const deltaStr = (delta, unit='', higherBetter=true) => {
+        const cls = deltaCls(delta, higherBetter);
+        const sign = delta > 0 ? '+' : '';
+        return `<span class="ct-delta ${cls}">${sign}${delta}${unit}</span>`;
+    };
+
+    const goodPctDelta = afterGoodPct - beforeGoodPct;
+    const poorDelta = afterPoor - beforePoor;
+    const ptsDelta = c.after.points.length - c.before.points.length;
+
+    const bw = c.before.wifiInfo || {};
+    const aw = c.after.wifiInfo || {};
 
     document.getElementById('compareDetailContent').innerHTML = `
         <div class="improvement-banner">
             <div class="improve-label">信号平均提升</div>
             <div class="improve-value">${improve>=0?'+':''}${improve}<span class="unit"> dBm</span></div>
         </div>
-        <div class="compare-cards">
-            <div class="compare-card">
-                <div class="compare-label before">整改前</div>
-                <div class="compare-canvas-wrap"><canvas id="cmp_before"></canvas></div>
-                <div class="compare-stats">
-                    <div class="compare-stat-row"><span class="label">平均信号</span><span class="value">${beforeAvg} dBm</span></div>
-                    <div class="compare-stat-row"><span class="label">良好覆盖</span><span class="value">${Math.round(beforeGood/c.before.points.length*100)}%</span></div>
-                    <div class="compare-stat-row"><span class="label">盲区数</span><span class="value">${beforePoor} 个</span></div>
-                    <div class="compare-stat-row"><span class="label">测试点</span><span class="value">${c.before.points.length} 个</span></div>
-                </div>
+
+        <div class="compare-table">
+            <div class="compare-table-title">指标对比</div>
+            <div class="compare-table-row head">
+                <span class="ct-label">指标</span>
+                <span class="ct-before">整改前</span>
+                <span class="ct-after">整改后</span>
+                <span class="ct-delta flat">差值</span>
             </div>
-            <div class="compare-card after">
-                <div class="compare-label after">整改后</div>
-                <div class="compare-canvas-wrap"><canvas id="cmp_after"></canvas></div>
-                <div class="compare-stats">
-                    <div class="compare-stat-row"><span class="label">平均信号</span><span class="value">${afterAvg} dBm</span></div>
-                    <div class="compare-stat-row"><span class="label">良好覆盖</span><span class="value">${Math.round(afterGood/c.after.points.length*100)}%</span></div>
-                    <div class="compare-stat-row"><span class="label">盲区数</span><span class="value">${afterPoor} 个</span></div>
-                    <div class="compare-stat-row"><span class="label">测试点</span><span class="value">${c.after.points.length} 个</span></div>
-                </div>
+            <div class="compare-table-row">
+                <span class="ct-label">WiFi名称</span>
+                <span class="ct-before">${bw.ssid || '-'}</span>
+                <span class="ct-after">${aw.ssid || '-'}</span>
+                <span class="ct-delta flat">-</span>
+            </div>
+            <div class="compare-table-row">
+                <span class="ct-label">频段</span>
+                <span class="ct-before">${bw.band || '-'}</span>
+                <span class="ct-after">${aw.band || '-'}</span>
+                <span class="ct-delta flat">-</span>
+            </div>
+            <div class="compare-table-row">
+                <span class="ct-label">信道</span>
+                <span class="ct-before">${bw.channel || '-'}</span>
+                <span class="ct-after">${aw.channel || '-'}</span>
+                <span class="ct-delta flat">-</span>
+            </div>
+            <div class="compare-table-row">
+                <span class="ct-label">平均信号</span>
+                <span class="ct-before">${beforeAvg} dBm</span>
+                <span class="ct-after">${afterAvg} dBm</span>
+                ${deltaStr(improve, ' dBm', true)}
+            </div>
+            <div class="compare-table-row">
+                <span class="ct-label">良好覆盖</span>
+                <span class="ct-before">${beforeGoodPct}%</span>
+                <span class="ct-after">${afterGoodPct}%</span>
+                ${deltaStr(goodPctDelta, '%', true)}
+            </div>
+            <div class="compare-table-row">
+                <span class="ct-label">异常点</span>
+                <span class="ct-before">${beforePoor} 个</span>
+                <span class="ct-after">${afterPoor} 个</span>
+                ${deltaStr(poorDelta, ' 个', false)}
+            </div>
+            <div class="compare-table-row">
+                <span class="ct-label">测试点</span>
+                <span class="ct-before">${c.before.points.length} 个</span>
+                <span class="ct-after">${c.after.points.length} 个</span>
+                ${deltaStr(ptsDelta, ' 个', true)}
             </div>
         </div>
+
+        <div class="compare-card">
+            <div class="compare-card-header">
+                <span class="compare-label before">整改前</span>
+                <span class="compare-time">${fmtT(c.before.createdAt)}</span>
+            </div>
+            <div class="compare-canvas-wrap"><canvas id="cmp_before"></canvas></div>
+        </div>
+
+        <div class="compare-card after">
+            <div class="compare-card-header">
+                <span class="compare-label after">整改后</span>
+                <span class="compare-time">${fmtT(c.after.createdAt)}</span>
+            </div>
+            <div class="compare-canvas-wrap"><canvas id="cmp_after"></canvas></div>
+        </div>
+
         <div class="legend-bar"><span>弱</span><div class="legend-gradient"></div><span>强</span></div>`;
 
-    // 绘制对比热力图
+    // 绘制对比热力图（占满宽度）
     setTimeout(() => {
         const cb = document.getElementById('cmp_before');
         const ca = document.getElementById('cmp_after');
