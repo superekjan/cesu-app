@@ -227,6 +227,7 @@
         .abnormal-result-item .tag-name { font-size:14px; font-weight:500; flex:1; }
         .abnormal-result-item .tag-signal {
             font-size:14px; font-weight:700; color:var(--accent-red);
+            display:inline-flex; align-items:center;
         }
         .recheck-btn {
             background:linear-gradient(135deg,var(--accent-orange),var(--accent-green));
@@ -469,6 +470,65 @@
         .wifi-info-item .value {
             font-size:13px; font-weight:600; color:var(--text-primary);
             white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+
+        /* 判定阈值信息条 · 简洁高级 */
+        .threshold-info-bar {
+            background:var(--bg-card);
+            border:1px solid var(--border-subtle);
+            border-radius:12px;
+            padding:11px 14px;
+            margin-bottom:12px;
+            display:flex; align-items:center; gap:12px;
+            font-size:12px;
+        }
+        .threshold-info-bar .tib-label {
+            color:var(--text-secondary); font-weight:500; flex-shrink:0;
+        }
+        .threshold-info-bar .tib-rule {
+            flex:1; display:flex; align-items:center; gap:14px;
+            color:var(--text-tertiary); min-width:0;
+        }
+        .threshold-info-bar .tib-rule .group {
+            display:inline-flex; align-items:center; gap:5px;
+            white-space:nowrap;
+        }
+        .threshold-info-bar .tib-rule .dot {
+            width:6px; height:6px; border-radius:50%; flex-shrink:0;
+        }
+        .threshold-info-bar .tib-rule .dot.ok { background:var(--accent-green); }
+        .threshold-info-bar .tib-rule .dot.bad { background:var(--accent-red); }
+        .threshold-info-bar .tib-rule .group b {
+            color:var(--text-primary); font-weight:600;
+        }
+        .threshold-info-bar .tib-rule .group .val {
+            color:var(--text-secondary); font-weight:500;
+        }
+        .threshold-info-bar .tib-value {
+            font-size:15px; font-weight:700; color:var(--accent-cyan);
+            letter-spacing:0.3px; flex-shrink:0;
+            padding-left:12px; border-left:1px solid var(--border-subtle);
+            line-height:1;
+        }
+        .threshold-info-bar .tib-value .unit {
+            font-size:10px; color:var(--text-secondary);
+            font-weight:500; margin-left:2px;
+        }
+
+        /* stat-card 判定依据小字 */
+        .stat-card .stat-hint {
+            margin-top:6px; font-size:10px; color:var(--text-tertiary);
+            line-height:1.3;
+        }
+        .stat-card .stat-hint b { color:var(--text-secondary); font-weight:600; }
+
+        /* 异常点项 "低于阈值" 小标签 */
+        .below-threshold-tag {
+            font-size:10px; font-weight:600;
+            color:var(--accent-red);
+            background:rgba(239,68,68,0.10);
+            padding:1px 6px; border-radius:5px; margin-left:4px;
+            white-space:nowrap;
         }
         .wifi-info-item .value.channel-val {
             color:var(--accent-orange);
@@ -732,6 +792,7 @@
                 <p id="resultSummary"></p>
             </div>
             <div class="wifi-info-card" id="wifiInfoCard"></div>
+            <div class="threshold-info-bar" id="thresholdInfoBar"></div>
             <div class="result-stats" id="resultStats"></div>
             <div class="abnormal-result-section">
                 <div class="abnormal-result-title">
@@ -1266,6 +1327,16 @@ function stopTest() {
 function showResult(r) {
     const s = r.stats;
     document.getElementById('resultSummary').textContent = `共采集 ${s.count} 个样本，耗时 ${Math.round((r.endTime-r.startTime)/1000)} 秒`;
+    // 判定阈值信息条
+    const th = r.threshold != null ? r.threshold : threshold;
+    document.getElementById('thresholdInfoBar').innerHTML = `
+        <span class="tib-label">判定阈值</span>
+        <div class="tib-rule">
+            <span class="group"><i class="dot ok"></i><span class="val">≥ ${th}</span><b>合格</b></span>
+            <span class="group"><i class="dot bad"></i><span class="val">&lt; ${th}</span><b>异常</b></span>
+        </div>
+        <span class="tib-value">${th}<span class="unit">dBm</span></span>
+    `;
     // WiFi信息卡片
     const w = r.wifiInfo || {};
     const bandClass = w.band === '5GHz' ? 'band5' : 'band2';
@@ -1314,10 +1385,12 @@ function showResult(r) {
         <div class="stat-card">
             <div class="stat-label">异常点数</div>
             <div class="stat-value ${s.abnormalCount>0?'bad':'good'}">${s.abnormalCount}<span class="stat-unit">个</span></div>
+            <div class="stat-hint">&lt; <b>${th} dBm</b></div>
         </div>
         <div class="stat-card">
             <div class="stat-label">合格覆盖率</div>
             <div class="stat-value ${(s.qualifiedRate||0)>=80?'good':(s.qualifiedRate||0)>=60?'warn':'bad'}">${s.qualifiedRate||0}<span class="stat-unit">%</span></div>
+            <div class="stat-hint">≥ <b>${th} dBm</b></div>
         </div>
     `;
     document.getElementById('abnormalResultCount').textContent = r.abnormalPoints.length;
@@ -1333,7 +1406,7 @@ function showResult(r) {
             <div class="abnormal-result-item ${hasRecheck?'has-recheck':''}">
                 <div class="abnormal-result-row">
                     <span class="tag-name">${p.tag}</span>
-                    <span class="tag-signal">${p.signal} dBm</span>
+                    <span class="tag-signal">${p.signal} dBm<span class="below-threshold-tag">&lt; ${th}</span></span>
                     <button class="recheck-btn ${hasRecheck?'done':''}" onclick="openRecheckModal(${i})">${hasRecheck?'重新检查':'整改检查'}</button>
                 </div>
                 ${hasRecheck ? `
