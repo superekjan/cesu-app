@@ -1007,13 +1007,15 @@ const QUICK_TAGS = ['卧室床头柜','卧室门口','客厅沙发','客厅窗�
 
 // 测试状态
 let testing = false;
-let allSamples = [];      // 所有采样点 {signal, time}
+let allSamples = [];      // 所有采样点 {signal, time, bssid}
 let abnormalPoints = [];  // 异常点 {signal, tag, time}
 let timer = null;
 let currentSignal = -45;
 let pendingSignal = null;  // 待标记的异常信号值
 let lastAbnormalTime = 0;  // 上次异常记录时间（防抖）
 let currentWifiInfo = null;  // 当前测试WiFi信息
+let currentBssid = '';      // 当前关联AP的BSSID
+let apBssidList = [];       // 同SSID下的多AP BSSID列表（用于漫游判定）
 
 // 当前测试/对比状态
 let currentRecord = null;
@@ -1161,6 +1163,14 @@ function saveThreshold() {
 }
 
 // ============== WiFi信息生成 ==============
+function genBssid() {
+    const hex = '0123456789ABCDEF';
+    let b = '';
+    for (let i=0;i<6;i++) {
+        b += (i?':':'') + hex[Math.floor(Math.random()*16)] + hex[Math.floor(Math.random()*16)];
+    }
+    return b;
+}
 function genWifiInfo() {
     const ssids = ['ChinaNet-Home','TP-LINK_5G','MERCURY_Home','Xiaomi-Router','Huawei-AX6','Home-WiFi-5G'];
     const band = Math.random() > 0.4 ? '5GHz' : '2.4GHz';
@@ -1197,6 +1207,11 @@ function startTest() {
     currentSignal = -45;
     lastAbnormalTime = 0;
     currentWifiInfo = genWifiInfo();
+    // 生成同SSID下的多AP列表（3~5个），用于模拟漫游
+    const apCount = 3 + Math.floor(Math.random()*3);
+    apBssidList = [currentWifiInfo.bssid];
+    for (let i=1;i<apCount;i++) apBssidList.push(genBssid());
+    currentBssid = currentWifiInfo.bssid;
     renderAbnormalList();
     updateThresholdUI();
     navigate('view-testing', '测试进行中');
@@ -1204,7 +1219,12 @@ function startTest() {
     // 每800ms采集一次
     timer = setInterval(() => {
         currentSignal = simulateSignal();
-        allSamples.push({ signal: currentSignal, time: Date.now() });
+        // 10%概率发生漫游切换（切到列表中另一个AP）
+        if (Math.random() < 0.1 && apBssidList.length > 1) {
+            const others = apBssidList.filter(b => b !== currentBssid);
+            currentBssid = others[Math.floor(Math.random()*others.length)];
+        }
+        allSamples.push({ signal: currentSignal, time: Date.now(), bssid: currentBssid });
         updateLiveUI();
         // 异常检测（带3秒防抖），弹窗打开期间不再弹
         if (currentSignal < threshold && Date.now() - lastAbnormalTime > 3000 && !document.getElementById('markModal').classList.contains('show')) {
@@ -1300,6 +1320,29 @@ function stopTest() {
     const signals = allSamples.map(s => s.signal);
     const qualifiedCount = allSamples.filter(s => s.signal >= threshold).length;
     const qualifiedRate = Math.round(qualifiedCount / allSamples.length * 100);
+    // 漫游统计：检测 BSSID 变化点
+    let roamingTotal = 0;       // 漫游总次数
+    let roamingAbnormal = 0;    // 漫游异常次数（切换后信号低于切换前）
+    let roamingAbnormalPoints = []; // 漫游异常点列表
+    for (let i=1;i<allSamples.length;i++) {
+        if (allSamples[i].bssid && allSamples[i-1].bssid && allSamples[i].bssid !== allSamples[i-1].bssid) {
+            roamingTotal++;
+            const before = allSamples[i-1].signal;
+            const after = allSamples[i].signal;
+            if (after < before) {
+                roamingAbnormal++;
+                roamingAbnormalPoints.push({
+                    bssid: allSamples[i].bssid,
+                    beforeBssid: allSamples[i-1].bssid,
+                    before: before,
+                    after: after,
+                    time: allSamples[i].time,
+                    tag: '漫游切换'
+                });
+            }
+        }
+    }
+    const roamingAbnormalRate = roamingTotal > 0 ? Math.round(roamingAbnormal / roamingTotal * 100) : 0;
     const record = {
         id: genId(),
         startTime: allSamples[0].time,
@@ -1314,8 +1357,12 @@ function stopTest() {
             max: Math.max(...signals),
             min: Math.min(...signals),
             abnormalCount: abnormalPoints.length,
-            qualifiedRate: qualifiedRate
+            qualifiedRate: qualifiedRate,
+            roamingTotal: roamingTotal,
+            roamingAbnormal: roamingAbnormal,
+            roamingAbnormalRate: roamingAbnormalRate
         },
+        roamingAbnormalPoints: roamingAbnormalPoints,
         recheck: null  // 整改后重新检测数据
     };
     records.unshift(record);
@@ -1391,6 +1438,16 @@ function showResult(r) {
             <div class="stat-label">合格覆盖率</div>
             <div class="stat-value ${(s.qualifiedRate||0)>=80?'good':(s.qualifiedRate||0)>=60?'warn':'bad'}">${s.qualifiedRate||0}<span class="stat-unit">%</span></div>
             <div class="stat-hint">≥ <b>${th} dBm</b></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">漫游异常点</div>
+            <div class="stat-value ${(s.roamingAbnormal||0)>0?'bad':'good'}">${s.roamingAbnormal||0}<span class="stat-unit">/${s.roamingTotal||0}</span></div>
+            <div class="stat-hint">切换后信号下降</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">漫游异常率</div>
+            <div class="stat-value ${(s.roamingAbnormalRate||0)===0?'good':(s.roamingAbnormalRate||0)<=30?'warn':'bad'}">${s.roamingAbnormalRate||0}<span class="stat-unit">%</span></div>
+            <div class="stat-hint">异常 / 总漫游</div>
         </div>
     `;
     document.getElementById('abnormalResultCount').textContent = r.abnormalPoints.length;
