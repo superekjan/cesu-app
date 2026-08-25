@@ -601,7 +601,332 @@
             border-color: rgba(255, 255, 255, 0.1);
         }
 
+        /* 导出PDF按钮（独立配色，与主次按钮区分） */
+        .btn-pdf {
+            background: linear-gradient(135deg, #6d28d9 0%, #7c6cf0 100%);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+        }
+        .btn-pdf:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
+        }
+        .btn-pdf:active {
+            transform: translateY(0);
+        }
+
+        /* ========== 导出PDF报告（移出屏幕外，供html2canvas截取） ========== */
+        #printReport {
+            position: fixed;
+            left: -10000px;
+            top: 0;
+            width: 794px;
+            background: #fff;
+            z-index: -1;
+        }
+        #printReport .pr-page {
+            width: 794px;
+        }
+        @media print {
+            body {
+                background: #fff;
+            }
+            .container {
+                display: none !important;
+            }
+            #printReport {
+                position: static;
+                left: auto;
+                top: auto;
+                width: auto;
+                z-index: auto;
+                display: block !important;
+            }
+        }
+
+        /* ========== 网络诊断报告 · A4 双页专业版式 ========== */
+        .pr-sheet {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'Microsoft YaHei', Helvetica, Arial, sans-serif;
+            color: #1e293b;
+            background: #fff;
+            line-height: 1.6;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .pr-page {
+            width: 794px;
+            height: 1123px;
+            box-sizing: border-box;
+            position: relative;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        /* ---- 文档头 ---- */
+        .pr-head {
+            background: linear-gradient(115deg, #0b1e3d 0%, #14335f 62%, #1a4076 100%);
+            color: #fff;
+            padding: 30px 40px 26px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .pr-head-brand { display: flex; align-items: center; gap: 14px; }
+        .pr-head-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .pr-head-logo svg { width: 24px; height: 24px; fill: #fff; }
+        .pr-head-title { font-size: 21px; font-weight: 800; letter-spacing: 3px; }
+        .pr-head-sub {
+            font-size: 8.5px;
+            color: rgba(255, 255, 255, 0.55);
+            letter-spacing: 3px;
+            margin-top: 5px;
+            font-family: 'SF Mono', Menlo, Consolas, monospace;
+        }
+        .pr-head-meta { text-align: right; font-size: 10px; color: rgba(255, 255, 255, 0.72); line-height: 2.1; }
+        .pr-head-meta b { color: #fff; font-weight: 600; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+
+        /* 概要信息条 */
+        .pr-strip { display: flex; border-bottom: 1px solid #e2e8f0; background: #f8fafc; }
+        .pr-strip-item { flex: 1; padding: 11px 24px; border-right: 1px solid #e2e8f0; }
+        .pr-strip-item:first-child { padding-left: 40px; }
+        .pr-strip-item:last-child { border-right: none; padding-right: 40px; }
+        .pr-strip-k { font-size: 9px; color: #94a3b8; letter-spacing: 1.5px; margin-bottom: 2px; }
+        .pr-strip-v { font-size: 12.5px; font-weight: 700; color: #1e293b; }
+        .pr-strip-v.danger { color: #dc2626; }
+
+        /* 续页页眉 */
+        .pr-cont {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 40px 12px;
+            border-bottom: 2px solid #14335f;
+            font-size: 10px;
+            color: #64748b;
+            letter-spacing: 1px;
+        }
+        .pr-cont b { color: #14335f; font-weight: 800; letter-spacing: 2px; }
+
+        /* ---- 正文区 ---- */
+        .pr-body { padding: 24px 40px 0; }
+
+        /* 报告摘要 */
+        .pr-sum { display: flex; align-items: center; gap: 26px; }
+        .pr-score {
+            width: 98px;
+            height: 98px;
+            border-radius: 50%;
+            border: 9px solid #dc2626;
+            box-sizing: border-box;
+            background: #fff;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .pr-score.poor { border-color: #dc2626; }
+        .pr-score.mid { border-color: #f59e0b; }
+        .pr-score.good { border-color: #059669; }
+        .pr-score-v { font-size: 28px; font-weight: 800; color: #0f172a; line-height: 1; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+        .pr-score-u { font-size: 9px; color: #94a3b8; margin-top: 4px; letter-spacing: 2px; }
+        .pr-sum-main { flex: 1; }
+        .pr-sum-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .pr-sum-badge { font-size: 12px; font-weight: 700; color: #fff; background: #dc2626; border-radius: 5px; padding: 3px 12px; letter-spacing: 3px; }
+        .pr-sum-title { font-size: 15px; font-weight: 800; color: #0f172a; }
+        .pr-sum-desc { font-size: 11.5px; color: #475569; line-height: 1.85; }
+
+        /* KPI 指标卡 */
+        .pr-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px; }
+        .pr-kpis.c3 { grid-template-columns: repeat(3, 1fr); }
+        .pr-kpi {
+            border: 1px solid #e2e8f0;
+            border-radius: 9px;
+            background: linear-gradient(180deg, #fbfdff 0%, #f5f8fc 100%);
+            padding: 12px 8px 10px;
+            text-align: center;
+        }
+        .pr-kpi-v { font-size: 19px; font-weight: 800; color: #0f172a; font-family: 'SF Mono', Menlo, Consolas, monospace; line-height: 1.15; }
+        .pr-kpi-v span { font-size: 9.5px; color: #94a3b8; font-weight: 500; margin-left: 2px; }
+        .pr-kpi-l { font-size: 10px; color: #64748b; margin-top: 5px; }
+
+        /* ---- 章节标题 ---- */
+        .pr-h2 {
+            display: flex;
+            align-items: baseline;
+            gap: 9px;
+            margin: 20px 0 12px;
+            padding-bottom: 7px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .pr-h2-no { font-family: 'SF Mono', Menlo, Consolas, monospace; font-size: 11px; font-weight: 800; color: #2563eb; letter-spacing: 1px; }
+        .pr-h2-t { font-size: 14.5px; font-weight: 800; color: #0f172a; letter-spacing: 1px; }
+        .pr-h2-e { font-size: 8.5px; color: #94a3b8; letter-spacing: 2px; margin-left: auto; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+
+        /* 小节标题 */
+        .pr-sub { font-size: 11.5px; font-weight: 700; color: #334155; margin: 12px 0 8px; display: flex; align-items: center; gap: 7px; }
+        .pr-sub::before { content: ''; width: 3px; height: 12px; background: #2563eb; border-radius: 2px; }
+        .pr-sub em { font-style: normal; font-weight: 500; color: #94a3b8; font-size: 10px; margin-left: 2px; }
+
+        /* 标签 */
+        .pr-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 11px; }
+        .pr-tag { font-size: 10.5px; padding: 3px 12px; border-radius: 999px; border: 1px solid transparent; }
+        .pr-tag.warn { color: #b45309; background: #fffbeb; border-color: #fde68a; }
+        .pr-tag.ok { color: #15803d; background: #f0fdf4; border-color: #bbf7d0; }
+
+        /* 正文段落 */
+        .pr-p { font-size: 11.5px; color: #475569; line-height: 1.9; }
+        .pr-p b { color: #0f172a; }
+
+        /* 摘要小数据行 */
+        .pr-mini { display: flex; gap: 10px; margin-top: 13px; }
+        .pr-mini-i {
+            flex: 1;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+            padding: 10px 14px;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .pr-mini-i b { font-size: 17px; font-weight: 800; color: #0f172a; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+        .pr-mini-i b i { font-style: normal; font-size: 10px; color: #64748b; font-weight: 500; margin-left: 1px; }
+        .pr-mini-i span { font-size: 10px; color: #94a3b8; }
+
+        /* ---- 信道干扰图表 ---- */
+        .pr-chart { display: flex; align-items: flex-end; gap: 7px; height: 158px; margin-top: 6px; padding: 0 6px; border-bottom: 1px solid #cbd5e1; }
+        .pr-chart-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+        .pr-chart-bar { width: 100%; max-width: 30px; border-radius: 4px 4px 0 0; position: relative; }
+        .pr-chart-bar.s1 { background: linear-gradient(180deg, #f87171, #ef4444); }
+        .pr-chart-bar.s2 { background: linear-gradient(180deg, #fcd34d, #f59e0b); }
+        .pr-chart-bar.s3 { background: linear-gradient(180deg, #34d399, #10b981); }
+        .pr-chart-bar.cur { box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #1d4ed8; }
+        .pr-chart-cur { position: absolute; top: -17px; left: 50%; transform: translateX(-50%); font-size: 8.5px; color: #1d4ed8; font-weight: 700; white-space: nowrap; }
+        .pr-chart-labels { display: flex; gap: 7px; padding: 5px 6px 0; }
+        .pr-chart-label { flex: 1; text-align: center; font-size: 9px; color: #94a3b8; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+        .pr-chart-label.cur { color: #1d4ed8; font-weight: 700; }
+        .pr-legend { display: flex; justify-content: center; gap: 16px; margin-top: 10px; }
+        .pr-legend span { display: flex; align-items: center; gap: 5px; font-size: 9.5px; color: #64748b; }
+        .pr-legend i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+        .pr-legend i.r { background: #ef4444; }
+        .pr-legend i.a { background: #f59e0b; }
+        .pr-legend i.g { background: #10b981; }
+
+        /* ---- 信息网格（键值对） ---- */
+        .pr-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 24px; }
+        .pr-kv {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 9px 2px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .pr-kv-k { font-size: 11.5px; color: #64748b; flex-shrink: 0; }
+        .pr-kv-v { font-size: 12px; font-weight: 700; color: #0f172a; text-align: right; font-family: 'SF Mono', Menlo, Consolas, 'PingFang SC', monospace; }
+
+        /* ---- 连通性列表 ---- */
+        .pr-pings { border: 1px solid #e2e8f0; border-radius: 9px; overflow: hidden; }
+        .pr-ping { display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; border-bottom: 1px solid #f1f5f9; background: #fff; }
+        .pr-ping:last-child { border-bottom: none; }
+        .pr-ping-n { font-size: 12.5px; font-weight: 700; color: #0f172a; }
+        .pr-ping-ip { font-size: 10px; color: #94a3b8; margin-top: 1px; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+        .pr-ping-r { display: flex; align-items: center; gap: 12px; }
+        .pr-ping-ms { font-size: 15px; font-weight: 800; color: #059669; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+        .pr-ping-ms i { font-style: normal; font-size: 10px; color: #94a3b8; font-weight: 500; }
+        .pr-ping-tag { font-size: 10px; color: #15803d; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 999px; padding: 2px 10px; }
+
+        /* ---- 在线终端 ---- */
+        .pr-devs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .pr-dev {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            border: 1px solid #e2e8f0;
+            border-radius: 9px;
+            background: #f8fafc;
+            padding: 11px 14px;
+        }
+        .pr-dev-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15); flex-shrink: 0; }
+        .pr-dev-n { font-size: 12px; font-weight: 700; color: #0f172a; }
+        .pr-dev-s { font-size: 9.5px; color: #94a3b8; margin-top: 1px; font-family: 'SF Mono', Menlo, Consolas, 'PingFang SC', monospace; }
+
+        /* ---- 安全检测 ---- */
+        .pr-checks { border: 1px solid #e2e8f0; border-radius: 9px; overflow: hidden; }
+        .pr-check { display: flex; align-items: center; gap: 11px; padding: 10px 16px; border-bottom: 1px solid #f1f5f9; }
+        .pr-check:last-child { border-bottom: none; }
+        .pr-check-ico { width: 19px; height: 19px; border-radius: 50%; background: #f0fdf4; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .pr-check-ico svg { width: 11px; height: 11px; fill: none; stroke: #059669; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+        .pr-check-t { font-size: 12px; color: #334155; flex: 1; }
+        .pr-check-ok { font-size: 11px; font-weight: 700; color: #059669; }
+
+        /* ---- 汇总表 ---- */
+        .pr-table { width: 100%; border-collapse: collapse; }
+        .pr-table th {
+            background: #f1f5f9;
+            font-size: 10.5px;
+            font-weight: 700;
+            color: #475569;
+            text-align: left;
+            padding: 8px 14px;
+            border-bottom: 1.5px solid #cbd5e1;
+            letter-spacing: 1px;
+        }
+        .pr-table th:last-child { text-align: right; }
+        .pr-table td { font-size: 11.5px; color: #334155; padding: 8.5px 14px; border-bottom: 1px solid #f1f5f9; background: #fff; }
+        .pr-table tr:last-child td { border-bottom: none; }
+        .pr-table .ti { font-weight: 700; color: #0f172a; width: 20%; }
+        .pr-table .tv { font-family: 'SF Mono', Menlo, Consolas, 'PingFang SC', monospace; width: 58%; }
+        .pr-table .ts { text-align: right; width: 22%; }
+        .pr-st { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 11px; border-radius: 999px; }
+        .pr-st.ok { color: #15803d; background: #f0fdf4; border: 1px solid #bbf7d0; }
+        .pr-st.bad { color: #b91c1c; background: #fef2f2; border: 1px solid #fecaca; }
+        .pr-st.mid { color: #b45309; background: #fffbeb; border: 1px solid #fde68a; }
+
+        /* ---- 整改建议 ---- */
+        .pr-suggest {
+            margin-top: 4px;
+            padding: 16px 18px;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-left: 4px solid #d97706;
+            border-radius: 9px;
+        }
+        .pr-suggest-t { font-size: 13px; font-weight: 800; color: #92400e; margin-bottom: 6px; letter-spacing: 1px; }
+        .pr-suggest-d { font-size: 11.5px; color: #78350f; line-height: 1.9; }
+
+        /* ---- 页脚 ---- */
+        .pr-foot {
+            position: absolute;
+            left: 40px;
+            right: 40px;
+            bottom: 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 11px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 9px;
+            color: #94a3b8;
+            letter-spacing: 0.5px;
+        }
+        .pr-foot .pr-page-no { font-family: 'SF Mono', Menlo, Consolas, monospace; }
+
         /* 响应式 */
+        @page {
+            size: A4;
+            margin: 12mm;
+        }
         @media (max-width: 480px) {
             .header {
                 padding: 12px 16px 20px 16px;
@@ -622,6 +947,9 @@
     </style>
 </head>
 <body>
+    <script src="html2canvas.min.js"></script>
+    <script src="jspdf.min.js"></script>
+
     <div class="container">
         <!-- 头部 -->
         <header class="header">
@@ -812,8 +1140,14 @@
         <!-- 按钮 -->
         <div class="button-section">
             <button class="btn btn-primary" onclick="goToDetails()">查看测试详情</button>
+            <button class="btn btn-pdf" id="exportBtn" onclick="exportReport()">导出PDF报告</button>
             <button class="btn btn-secondary" onclick="retest()">重新检测</button>
         </div>
+    </div>
+
+    <!-- 打印报告容器（屏幕隐藏） -->
+    <div id="printReport">
+        <div class="pr-sheet" id="printSheet"></div>
     </div>
 
     <script>
@@ -845,6 +1179,324 @@
         // 重新检测
         function retest() {
             window.location.href = 'index.html';
+        }
+
+        // ============== 导出PDF报告 ==============
+        // 综合 speedtestresult1.html 与 speedtestresult2.html 的诊断数据
+        const R = {
+            no: 'SP-' + Date.now().toString().slice(-8),
+            time: formatDate(),
+            score: 60,
+            grade: '差',
+            gradeTitle: '网络体验欠佳',
+            summary: '综合评分 60 分：当前信号强度良好，但工作信道存在严重干扰，邻近 WiFi 设备占用较多，导致延迟偏高、网速表现一般。建议优化信道配置并优先使用 5GHz 频段。',
+            kpis: [
+                { v: '45.20', u: 'MB/s', l: '下载速度' },
+                { v: '23.80', u: 'MB/s', l: '上传速度' },
+                { v: '10', u: 'ms', l: '外网时延' },
+                { v: '-50', u: 'dBm', l: '信号强度' }
+            ],
+            strip: [
+                { k: 'WIFI 名称', v: 'Meeting_5G' },
+                { k: '工作频段', v: '5GHz' },
+                { k: '信道', v: '161（80MHz）' },
+                { k: '综合评级', v: '差 · 60 分', d: true }
+            ],
+            net: [
+                ['WiFi名称', 'Meeting_5G'],
+                ['频段', '5GHz'],
+                ['IP地址', '192.168.31.102'],
+                ['MAC地址', '92:E8:12:01'],
+                ['信道', '161（80MHz）'],
+                ['路由器品牌', 'ZTE Telecom'],
+                ['连接数', '2']
+            ],
+            env: [
+                ['手机厂家', '华为'],
+                ['手机型号', 'P50 Pro'],
+                ['手机WiFi6', '支持'],
+                ['网关WiFi6', '支持']
+            ],
+            diagTags: [
+                { t: '信号干扰', c: 'warn' },
+                { t: '信道拥挤', c: 'warn' },
+                { t: '连接正常', c: 'ok' }
+            ],
+            diagNote: '当前信道 161 干扰严重，信号强度良好但邻近 WiFi 设备占用较多，导致网络性能下降。当前网络环境下网页平均打开时间约 2.5 秒，网页体验评分 60 分。',
+            signalDesc: '当前信号强度 -50 dBm，属于良好水平，无线信号覆盖稳定；但受同频段设备干扰影响，实际传输性能有所下降。',
+            channels: [
+                { ch: '36', pct: 85, s: 's1' },
+                { ch: '40', pct: 65, s: 's2' },
+                { ch: '44', pct: 35, s: 's3' },
+                { ch: '48', pct: 55, s: 's2' },
+                { ch: '52', pct: 90, s: 's1' },
+                { ch: '56', pct: 60, s: 's2' },
+                { ch: '149', pct: 30, s: 's3' },
+                { ch: '153', pct: 95, s: 's1' },
+                { ch: '157', pct: 88, s: 's1' },
+                { ch: '161', pct: 92, s: 's1', cur: true }
+            ],
+            channelNote: '当前信道 161 干扰严重，信道 52、153、157 同样拥挤；信道 44 与 149 干扰最低。建议将 WiFi 信道切换至 44 或 149，以获得更好的网络体验。',
+            perf: [
+                ['下载速度', '45.20 MB/s'],
+                ['上传速度', '23.80 MB/s'],
+                ['内网上行', '4.68 MB/s'],
+                ['内网下行', '4.68 MB/s'],
+                ['内网时延', '4 ms'],
+                ['外网时延', '10 ms']
+            ],
+            webScore: '60',
+            webTime: '2.5',
+            pings: [
+                { n: '百度', ip: 'IP 180.97.33.107', ms: '10.97', tag: '连接正常 · 丢包 0%' },
+                { n: '网关', ip: 'IP 192.168.31.1', ms: '3.57', tag: '响应优秀 · 丢包 0%' }
+            ],
+            devices: [
+                ['MacBook Pro', '在线 · 5GHz'],
+                ['iPhone 14 Pro', '在线 · 5GHz'],
+                ['iPad Air', '在线 · 2.4GHz'],
+                ['小米智能家居', '在线 · 2.4GHz']
+            ],
+            security: [
+                '未检测到 DNS 劫持',
+                '未检测到 ARP 攻击',
+                '未检测到弱密码风险'
+            ],
+            table: [
+                ['下载速度', '45.20 MB/s', 'ok', '良好'],
+                ['上传速度', '23.80 MB/s', 'ok', '良好'],
+                ['信号强度', '-50 dBm（良好）', 'ok', '正常'],
+                ['外网时延', '10 ms', 'ok', '优秀'],
+                ['信道质量', '信道 161 · 干扰严重', 'bad', '异常'],
+                ['网页体验', '60 分 · 平均打开 2.5s', 'mid', '一般'],
+                ['连通性', '百度 10.97ms · 网关 3.57ms', 'ok', '稳定'],
+                ['安全检测', 'DNS / ARP / 弱密码 均无风险', 'ok', '安全']
+            ],
+            suggest: '建议将路由器更换为 WiFi6 型号，并将手机连接到 5G 频段；同时将 WiFi 信道从拥挤的 161 切换至干扰较低的 44 或 149，并减少同时连接的设备数量，以显著提升网速并降低延迟。'
+        };
+
+        function htmlEscape(s) {
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function formatDate() {
+            const n = new Date();
+            const p = x => String(x).padStart(2, '0');
+            return `${n.getFullYear()}-${p(n.getMonth() + 1)}-${p(n.getDate())} ${p(n.getHours())}:${p(n.getMinutes())}`;
+        }
+
+        // ---- 报告版式组件 ----
+
+        // 文档头（首页）
+        function prHead() {
+            return `<div class="pr-head">
+                    <div class="pr-head-brand">
+                        <div class="pr-head-logo">
+                            <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+                        </div>
+                        <div>
+                            <div class="pr-head-title">网络诊断报告</div>
+                            <div class="pr-head-sub">NETWORK DIAGNOSTIC REPORT</div>
+                        </div>
+                    </div>
+                    <div class="pr-head-meta">报告编号：<b>${R.no}</b><br>生成时间：<b>${R.time}</b></div>
+                </div>`;
+        }
+
+        // 概要信息条
+        function prStrip() {
+            return `<div class="pr-strip">${R.strip.map(i =>
+                `<div class="pr-strip-item"><div class="pr-strip-k">${htmlEscape(i.k)}</div><div class="pr-strip-v${i.d ? ' danger' : ''}">${htmlEscape(i.v)}</div></div>`
+            ).join('')}</div>`;
+        }
+
+        // 续页页眉
+        function prCont(sub) {
+            return `<div class="pr-cont"><span><b>网络诊断报告</b> · ${htmlEscape(sub)}</span><span>报告编号 ${R.no}</span></div>`;
+        }
+
+        // 编号章节标题
+        function prSec(no, t, e, body) {
+            return `<div class="pr-h2"><span class="pr-h2-no">${no}</span><span class="pr-h2-t">${htmlEscape(t)}</span><span class="pr-h2-e">${e}</span></div>${body}`;
+        }
+
+        // 双列键值网格
+        function prGrid(rows) {
+            return `<div class="pr-grid">${rows.map(r =>
+                `<div class="pr-kv"><span class="pr-kv-k">${htmlEscape(r[0])}</span><span class="pr-kv-v">${htmlEscape(r[1])}</span></div>`
+            ).join('')}</div>`;
+        }
+
+        // 摘要数据条
+        function prMini(items) {
+            return `<div class="pr-mini">${items.map(i =>
+                `<div class="pr-mini-i"><b>${i.v}${i.u ? `<i>${htmlEscape(i.u)}</i>` : ''}</b><span>${htmlEscape(i.l)}</span></div>`
+            ).join('')}</div>`;
+        }
+
+        // 信道干扰柱状图
+        function prChart() {
+            const bars = R.channels.map(c => `
+                <div class="pr-chart-col">
+                    <div class="pr-chart-bar ${c.s}${c.cur ? ' cur' : ''}" style="height:${c.pct}%">${c.cur ? '<span class="pr-chart-cur">当前</span>' : ''}</div>
+                </div>`).join('');
+            const labels = R.channels.map(c =>
+                `<div class="pr-chart-label${c.cur ? ' cur' : ''}">${c.ch}</div>`).join('');
+            return `<div class="pr-chart">${bars}</div>
+                <div class="pr-chart-labels">${labels}</div>
+                <div class="pr-legend"><span><i class="r"></i>严重干扰</span><span><i class="a"></i>轻度干扰</span><span><i class="g"></i>无干扰</span></div>`;
+        }
+
+        // 页脚
+        function prFoot(p, total) {
+            return `<div class="pr-foot"><span>本报告由智能网络诊断系统自动生成 · 数据仅供参考</span><span class="pr-page-no">第 ${p} 页 / 共 ${total} 页</span></div>`;
+        }
+
+        function renderReport() {
+            const totalPages = 3;
+
+            // ---- 第 1 页：诊断概览 ----
+            const page1 = `<div class="pr-page">
+                    ${prHead()}
+                    ${prStrip()}
+                    <div class="pr-body">
+                        ${prSec('01', '综合评估', 'OVERVIEW', `
+                            <div class="pr-sum">
+                                <div class="pr-score poor"><span class="pr-score-v">${R.score}</span><span class="pr-score-u">综合评分</span></div>
+                                <div class="pr-sum-main">
+                                    <div class="pr-sum-row"><span class="pr-sum-badge">${htmlEscape(R.grade)}</span><span class="pr-sum-title">${htmlEscape(R.gradeTitle)}</span></div>
+                                    <div class="pr-sum-desc">${htmlEscape(R.summary)}</div>
+                                </div>
+                            </div>
+                            <div class="pr-kpis">${R.kpis.map(k =>
+                                `<div class="pr-kpi"><div class="pr-kpi-v">${htmlEscape(k.v)}<span>${htmlEscape(k.u)}</span></div><div class="pr-kpi-l">${htmlEscape(k.l)}</div></div>`
+                            ).join('')}</div>
+                        `)}
+                        ${prSec('02', '网络配置', 'NETWORK CONFIG', prGrid(R.net))}
+                        ${prSec('03', '检测环境', 'ENVIRONMENT', prGrid(R.env))}
+                        ${prSec('04', '诊断分析', 'DIAGNOSIS', `
+                            <div class="pr-tags">${R.diagTags.map(t =>
+                                `<span class="pr-tag ${t.c}">${htmlEscape(t.t)}</span>`).join('')}
+                            </div>
+                            <div class="pr-p">${htmlEscape(R.diagNote)}</div>
+                        `)}
+                    </div>
+                    ${prFoot(1, totalPages)}
+                </div>`;
+
+            // ---- 第 2 页：检测数据 ----
+            const page2 = `<div class="pr-page">
+                    ${prCont('检测数据')}
+                    <div class="pr-body">
+                        ${prSec('05', '信号质量', 'SIGNAL QUALITY', `
+                            <div class="pr-p">${htmlEscape(R.signalDesc)}</div>
+                            ${prMini([{ v: '-50', u: 'dBm', l: '信号强度' }, { v: '良好', l: '信号评价' }])}
+                        `)}
+                        ${prSec('06', '信道干扰分析', 'CHANNEL ANALYSIS', `
+                            ${prChart()}
+                            <div class="pr-p">${htmlEscape(R.channelNote)}</div>
+                        `)}
+                        ${prSec('07', '速率与时延', 'SPEED & LATENCY', `
+                            ${prGrid(R.perf)}
+                            ${prMini([{ v: R.webScore, u: '分', l: '网页体验评分' }, { v: R.webTime, u: 's', l: '网页平均打开时间' }])}
+                        `)}
+                        ${prSec('08', '在线终端', 'ONLINE DEVICES', `
+                            <div class="pr-devs">${R.devices.map(d => `
+                                <div class="pr-dev"><span class="pr-dev-dot"></span><div><div class="pr-dev-n">${htmlEscape(d[0])}</div><div class="pr-dev-s">${htmlEscape(d[1])}</div></div></div>`).join('')}
+                            </div>
+                        `)}
+                    </div>
+                    ${prFoot(2, totalPages)}
+                </div>`;
+
+            // ---- 第 3 页：连通与安全 ----
+            const page3 = `<div class="pr-page">
+                    ${prCont('连通与安全')}
+                    <div class="pr-body">
+                        ${prSec('09', '连通性测试', 'CONNECTIVITY', `
+                            <div class="pr-pings">${R.pings.map(p => `
+                                <div class="pr-ping">
+                                    <div><div class="pr-ping-n">${htmlEscape(p.n)}</div><div class="pr-ping-ip">${htmlEscape(p.ip)}</div></div>
+                                    <div class="pr-ping-r"><span class="pr-ping-ms">${p.ms}<i>ms</i></span><span class="pr-ping-tag">${htmlEscape(p.tag)}</span></div>
+                                </div>`).join('')}
+                            </div>
+                        `)}
+                        ${prSec('10', '安全检测', 'SECURITY CHECK', `
+                            <div class="pr-checks">${R.security.map(s => `
+                                <div class="pr-check">
+                                    <span class="pr-check-ico"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+                                    <span class="pr-check-t">${htmlEscape(s)}</span><span class="pr-check-ok">安全</span>
+                                </div>`).join('')}
+                            </div>
+                        `)}
+                        ${prSec('11', '检测结论汇总', 'SUMMARY', `
+                            <table class="pr-table">
+                                <tr><th>检测项</th><th>检测结果</th><th>状态</th></tr>
+                                ${R.table.map(r => `<tr><td class="ti">${htmlEscape(r[0])}</td><td class="tv">${htmlEscape(r[1])}</td><td class="ts"><span class="pr-st ${r[2]}">${htmlEscape(r[3])}</span></td></tr>`).join('')}
+                            </table>
+                        `)}
+                        <div class="pr-suggest">
+                            <div class="pr-suggest-t">整改建议</div>
+                            <div class="pr-suggest-d">${htmlEscape(R.suggest)}</div>
+                        </div>
+                    </div>
+                    ${prFoot(3, totalPages)}
+                </div>`;
+
+            document.getElementById('printSheet').innerHTML = page1 + page2 + page3;
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.textContent = msg;
+            t.style.cssText = 'position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:rgba(10,22,46,.95);color:#e8eaf0;padding:10px 20px;border-radius:24px;font-size:13px;z-index:2000;border:1px solid rgba(91,141,239,.25);';
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .25s'; }, 1800);
+            setTimeout(() => t.remove(), 2200);
+        }
+
+        function exportReport() {
+            if (typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
+                showToast('组件未就绪，请刷新后重试');
+                return;
+            }
+            const btn = document.getElementById('exportBtn');
+            const text = btn.textContent;
+            btn.textContent = '正在生成…';
+            btn.disabled = true;
+
+            renderReport();
+            const pages = Array.prototype.slice.call(document.querySelectorAll('#printReport .pr-page'));
+
+            // 等待布局稳定后逐页截图，生成多页PDF
+            setTimeout(async () => {
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'pt', 'a4');
+                    const { width: pageW, height: pageH } = pdf.internal.pageSize;
+
+                    for (let i = 0; i < pages.length; i++) {
+                        const canvas = await html2canvas(pages[i], {
+                            scale: 2,
+                            backgroundColor: '#ffffff',
+                            useCORS: true,
+                            logging: false
+                        });
+                        const data = canvas.toDataURL('image/jpeg', 0.95);
+                        if (i > 0) pdf.addPage();
+                        pdf.addImage(data, 'JPEG', 0, 0, pageW, pageH);
+                    }
+
+                    pdf.save('网络诊断报告.pdf');
+                    showToast('报告已导出');
+                } catch (err) {
+                    console.error('PDF导出失败', err);
+                    showToast('导出失败，请重试');
+                } finally {
+                    btn.textContent = text;
+                    btn.disabled = false;
+                }
+            }, 80);
         }
     </script>
 </body>
