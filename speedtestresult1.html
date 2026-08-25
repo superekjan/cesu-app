@@ -1251,17 +1251,6 @@
                 { n: '百度', ip: 'IP 180.97.33.107', ms: '10.97', tag: '连接正常 · 丢包 0%' },
                 { n: '网关', ip: 'IP 192.168.31.1', ms: '3.57', tag: '响应优秀 · 丢包 0%' }
             ],
-            devices: [
-                ['MacBook Pro', '在线 · 5GHz'],
-                ['iPhone 14 Pro', '在线 · 5GHz'],
-                ['iPad Air', '在线 · 2.4GHz'],
-                ['小米智能家居', '在线 · 2.4GHz']
-            ],
-            security: [
-                '未检测到 DNS 劫持',
-                '未检测到 ARP 攻击',
-                '未检测到弱密码风险'
-            ],
             table: [
                 ['下载速度', '45.20 MB/s', 'ok', '良好'],
                 ['上传速度', '23.80 MB/s', 'ok', '良好'],
@@ -1269,8 +1258,7 @@
                 ['外网时延', '10 ms', 'ok', '优秀'],
                 ['信道质量', '信道 161 · 干扰严重', 'bad', '异常'],
                 ['网页体验', '60 分 · 平均打开 2.5s', 'mid', '一般'],
-                ['连通性', '百度 10.97ms · 网关 3.57ms', 'ok', '稳定'],
-                ['安全检测', 'DNS / ARP / 弱密码 均无风险', 'ok', '安全']
+                ['连通性', '百度 10.97ms · 网关 3.57ms', 'ok', '稳定']
             ],
             suggest: '建议将路由器更换为 WiFi6 型号，并将手机连接到 5G 频段；同时将 WiFi 信道从拥挤的 161 切换至干扰较低的 44 或 149，并减少同时连接的设备数量，以显著提升网速并降低延迟。'
         };
@@ -1400,20 +1388,15 @@
                             ${prGrid(R.perf)}
                             ${prMini([{ v: R.webScore, u: '分', l: '网页体验评分' }, { v: R.webTime, u: 's', l: '网页平均打开时间' }])}
                         `)}
-                        ${prSec('08', '在线终端', 'ONLINE DEVICES', `
-                            <div class="pr-devs">${R.devices.map(d => `
-                                <div class="pr-dev"><span class="pr-dev-dot"></span><div><div class="pr-dev-n">${htmlEscape(d[0])}</div><div class="pr-dev-s">${htmlEscape(d[1])}</div></div></div>`).join('')}
-                            </div>
-                        `)}
                     </div>
                     ${prFoot(2, totalPages)}
                 </div>`;
 
-            // ---- 第 3 页：连通与安全 ----
+            // ---- 第 3 页：连通与汇总 ----
             const page3 = `<div class="pr-page">
-                    ${prCont('连通与安全')}
+                    ${prCont('连通与汇总')}
                     <div class="pr-body">
-                        ${prSec('09', '连通性测试', 'CONNECTIVITY', `
+                        ${prSec('08', '连通性测试', 'CONNECTIVITY', `
                             <div class="pr-pings">${R.pings.map(p => `
                                 <div class="pr-ping">
                                     <div><div class="pr-ping-n">${htmlEscape(p.n)}</div><div class="pr-ping-ip">${htmlEscape(p.ip)}</div></div>
@@ -1421,15 +1404,7 @@
                                 </div>`).join('')}
                             </div>
                         `)}
-                        ${prSec('10', '安全检测', 'SECURITY CHECK', `
-                            <div class="pr-checks">${R.security.map(s => `
-                                <div class="pr-check">
-                                    <span class="pr-check-ico"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
-                                    <span class="pr-check-t">${htmlEscape(s)}</span><span class="pr-check-ok">安全</span>
-                                </div>`).join('')}
-                            </div>
-                        `)}
-                        ${prSec('11', '检测结论汇总', 'SUMMARY', `
+                        ${prSec('09', '检测结论汇总', 'SUMMARY', `
                             <table class="pr-table">
                                 <tr><th>检测项</th><th>检测结果</th><th>状态</th></tr>
                                 ${R.table.map(r => `<tr><td class="ti">${htmlEscape(r[0])}</td><td class="tv">${htmlEscape(r[1])}</td><td class="ts"><span class="pr-st ${r[2]}">${htmlEscape(r[3])}</span></td></tr>`).join('')}
