@@ -1461,8 +1461,12 @@ function adjustHouse(key, delta) {
 }
 
 function updateHouseSummary() {
-    document.getElementById('houseSummary').textContent =
-        houseNum[houseType.bed] + '房' +
+    document.getElementById('houseSummary').textContent = houseTypeText();
+}
+
+// 户型文案，如“三房一厅二卫”
+function houseTypeText() {
+    return houseNum[houseType.bed] + '房' +
         houseNum[houseType.living] + '厅' +
         houseNum[houseType.bath] + '卫';
 }
@@ -2063,7 +2067,7 @@ function showCompareRecords(beforeRec, afterRec) {
         apChanged ? '<span class="net-badge ap-changed">已更换AP</span>' : ''
     ].filter(Boolean).join('');
     document.getElementById('cmpNetName').innerHTML = `${aw.ssid || bw.ssid || '-'}${badges}`;
-    document.getElementById('cmpNetMeta').textContent = `MAC ${aw.bssid || '-'}${aw.channel ? ' · 信道 ' + aw.channel : ''}`;
+    document.getElementById('cmpNetMeta').textContent = `户型 ${houseTypeText()} · MAC ${aw.bssid || '-'}${aw.channel ? ' · 信道 ' + aw.channel : ''}`;
 
     document.getElementById('improveValue').innerHTML = `${improve>=0?'+':''}${improve}<span class="unit">dBm</span>`;
     document.getElementById('improveValue').classList.toggle('neg', improve < 0);
@@ -2312,9 +2316,9 @@ function buildPDFReportHTML() {
 
         <div class="pr-h">三、检测网络信息</div>
         <div class="pr-net">
-            网络名称：<b>${aw.ssid || '-'}</b> ｜ 频段：<b>${aw.band || '-'}</b> ｜ 信道：<b>${aw.channel || '-'}</b>${apChanged?' ｜ <span class="ap-changed">整改后已更换AP</span>':''}<br>
-            AP地址（MAC）：<b>${aw.bssid || '-'}</b>${apChanged?`（原 ${bw.bssid}）`:''} ｜ 加密方式：${aw.security || '-'} ｜ 信号阈值：<b>${th} dBm</b>
-        </div>
+                户型：<b>${houseTypeText()}</b> ｜ 网络名称：<b>${aw.ssid || '-'}</b> ｜ 频段：<b>${aw.band || '-'}</b> ｜ 信道：<b>${aw.channel || '-'}</b>${apChanged?' ｜ <span class="ap-changed">整改后已更换AP</span>':''}<br>
+                AP地址（MAC）：<b>${aw.bssid || '-'}</b>${apChanged?`（原 ${bw.bssid}）`:''} ｜ 加密方式：${aw.security || '-'} ｜ 信号阈值：<b>${th} dBm</b>
+            </div>
 
         <div class="pr-h">四、核心指标对比</div>
         <table class="pr-table">
