@@ -663,11 +663,12 @@
         .modal-input {
             width:100%; background:rgba(255,255,255,0.05);
             border:1px solid var(--border-subtle); border-radius:10px;
-            padding:12px 14px; color:var(--text-primary); font-size:14px;
-            margin-bottom:12px;
+            padding:12px 14px; color:var(--text-primary); font-size:13px;
+            margin-bottom:16px;
+            font-family: inherit;
         }
         .modal-input:focus { outline:none; border-color:var(--border-active); }
-        .field-label { display:block; font-size:13px; color:var(--text-secondary); margin-bottom:8px; }
+        .field-label { display:block; font-size:13px; color:var(--text-primary); margin-bottom:8px; }
         .field-label.req { color:var(--text-primary); }
         .field-label.req::after { content:' *'; color:var(--accent-red); }
         .field-label .opt { font-size:11px; color:var(--text-tertiary); margin-left:4px; }
@@ -699,7 +700,7 @@
             line-height:1.6; resize:vertical; margin-bottom:16px; font-family:inherit;
         }
         .modal-textarea:focus { outline:none; border-color:var(--border-active); }
-        .modal-textarea::placeholder { color:var(--text-tertiary); }
+        .modal-input::placeholder,.modal-textarea::placeholder { color:var(--text-tertiary); }
 
         /* 户型选择 */
         .house-options {
@@ -1197,8 +1198,8 @@
             </span>
         </div>
         <div class="modal-desc">请填写下方信息，将随PDF报告一同导出，便于追溯整改依据</div>
-        <label class="field-label">整改用户信息 <span class="opt">选填</span></label>
-        <input type="text" class="modal-input" id="rectifyUserInput" placeholder="请输入您的称呼，如：张三">
+        <label class="field-label">整改用户信息</label>
+        <input type="text" class="modal-input" id="rectifyUserInput" placeholder="请输入整改用户信息">
         <label class="field-label req">整改措施</label>
         <div class="modal-tags" id="rectifyTags"></div>
         <textarea class="modal-textarea" id="rectifyInput" placeholder="例如：将客厅AP移至电视柜顶层，并在卧室新增1个Mesh子节点覆盖"></textarea>
