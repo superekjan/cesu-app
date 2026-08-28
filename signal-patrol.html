@@ -667,6 +667,10 @@
             margin-bottom:12px;
         }
         .modal-input:focus { outline:none; border-color:var(--border-active); }
+        .field-label { display:block; font-size:13px; color:var(--text-secondary); margin-bottom:8px; }
+        .field-label.req { color:var(--text-primary); }
+        .field-label.req::after { content:' *'; color:var(--accent-red); }
+        .field-label .opt { font-size:11px; color:var(--text-tertiary); margin-left:4px; }
         .modal-tags {
             display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px;
         }
@@ -1192,7 +1196,10 @@
                 填写整改措施
             </span>
         </div>
-        <div class="modal-desc">请填写本次采取的整改措施内容（必填），将随PDF报告一同导出，便于追溯整改依据</div>
+        <div class="modal-desc">请填写下方信息，将随PDF报告一同导出，便于追溯整改依据</div>
+        <label class="field-label">整改用户信息 <span class="opt">选填</span></label>
+        <input type="text" class="modal-input" id="rectifyUserInput" placeholder="请输入您的称呼，如：张三">
+        <label class="field-label req">整改措施</label>
         <div class="modal-tags" id="rectifyTags"></div>
         <textarea class="modal-textarea" id="rectifyInput" placeholder="例如：将客厅AP移至电视柜顶层，并在卧室新增1个Mesh子节点覆盖"></textarea>
         <div class="modal-actions">
@@ -2216,11 +2223,6 @@ function openCompareRetest(i) {
 }
 
 // ============== PDF整改报告导出 ==============
-// 报告接收人手机号（演示数据，可在localStorage中覆盖）
-function getReportPhone() {
-    return localStorage.getItem('wifi_patrol_user_phone') || '139****1010';
-}
-
 function fmtFullTime(t) {
     const d = t ? new Date(t) : new Date();
     const p = n => String(n).padStart(2,'0');
@@ -2293,6 +2295,12 @@ function buildPDFReportHTML() {
         </tr>`;
     }).join('');
 
+    // 称呼：填写了整改用户信息则显示"尊敬的用户 xxx"，否则只显示"尊敬的用户"
+    const userInfo = (afterRec.userInfo || '').trim();
+    const salute = userInfo
+        ? `尊敬的用户 <span class="phone">${escHtml(userInfo)}</span>`
+        : '尊敬的用户';
+
     return `
     <div class="pdf-report">
         <div class="pr-head">
@@ -2300,7 +2308,7 @@ function buildPDFReportHTML() {
             <div class="pr-title">家庭网络整改成效报告</div>
             <div class="pr-no">报告编号：${rptNo} ｜ 生成日期：${fmtFullTime()}</div>
         </div>
-        <div class="pr-salute">尊敬的用户 <span class="phone">${getReportPhone()}</span>：</div>
+        <div class="pr-salute">${salute}：</div>
         <div class="pr-intro">您好！感谢您使用WiFi信号巡检服务。本次针对家庭网络「${aw.ssid || '-'}」的整改复检已完成，前后两轮巡检共采集 ${totalSamples} 个信号样本，信号达标阈值为 ${th} dBm。现将整改前后的对比结果呈报如下，供您参考。</div>
 
         <div class="pr-h">一、整改成效总览</div>
@@ -2383,8 +2391,9 @@ function closeRectifyModal() {
 function exportComparePDF(btn) {
     if (!comparePair) { showToast('暂无对比数据'); return; }
     pendingExportBtn = btn || null;
-    // 预填上次填写的整改措施（保存在整改后记录中）
+    // 预填上次填写的整改措施与用户信息（保存在整改后记录中）
     document.getElementById('rectifyInput').value = (comparePair.afterRec && comparePair.afterRec.rectification) || '';
+    document.getElementById('rectifyUserInput').value = (comparePair.afterRec && comparePair.afterRec.userInfo) || '';
     renderRectifyTags();
     document.getElementById('rectifyModal').classList.add('show');
     setTimeout(() => document.getElementById('rectifyInput').focus(), 300);
@@ -2393,10 +2402,12 @@ function exportComparePDF(btn) {
 function confirmRectifyAndExport() {
     const text = document.getElementById('rectifyInput').value.trim();
     if (!text) { showToast('请填写整改措施内容'); document.getElementById('rectifyInput').focus(); return; }
+    const userInfo = document.getElementById('rectifyUserInput').value.trim();
     // 保存到整改后记录：再次导出时预填，报告可追溯
     const rec = comparePair.afterRec;
     if (rec) {
         rec.rectification = text;
+        rec.userInfo = userInfo;
         const idx = records.findIndex(r => r.id === rec.id);
         if (idx >= 0) { records[idx] = rec; localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
     }
