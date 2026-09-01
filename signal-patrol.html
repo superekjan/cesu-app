@@ -173,6 +173,136 @@
         .stop-btn:active { transform:scale(0.97); }
         .stop-btn svg { width:20px; height:20px; fill:#fff; }
 
+        /* 实时测速入口（测试中视图） */
+        .speed-entry-btn {
+            width:100%; margin-top:16px; padding:12px 14px;
+            background:linear-gradient(135deg,rgba(34,197,94,0.18),rgba(56,189,248,0.14));
+            border:1px solid rgba(34,197,94,0.35); border-radius:12px;
+            color:var(--accent-cyan); font-size:14px; font-weight:600;
+            display:flex; align-items:center; justify-content:center; gap:8px;
+            cursor:pointer; transition:all 0.2s;
+        }
+        .speed-entry-btn svg { width:18px; height:18px; fill:var(--accent-cyan); }
+        .speed-entry-btn:active { transform:scale(0.97); }
+
+        /* 测速弹窗 - 进行中 */
+        .speed-running { }
+        .speed-phase {
+            display:flex; justify-content:space-between; align-items:center;
+            font-size:13px; color:var(--text-secondary); margin-bottom:6px;
+        }
+        .speed-phase b { color:var(--accent-cyan); font-size:18px; font-weight:700; }
+        .speed-line {
+            height:6px; background:rgba(255,255,255,0.06); border-radius:3px;
+            overflow:hidden; margin-bottom:16px;
+        }
+        .speed-line-fill {
+            height:100%; border-radius:3px;
+            background:linear-gradient(90deg,var(--accent-cyan),var(--accent-green));
+            transition:width 0.2s; width:0%;
+        }
+
+        /* 测速弹窗 - 结果 */
+        .speed-result-main {
+            background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(56,189,248,0.12));
+            border:1px solid rgba(34,197,94,0.35); border-radius:16px;
+            padding:20px 16px; text-align:center; margin-bottom:12px;
+        }
+        .speed-result-dn { font-size:12px; color:var(--text-secondary); }
+        .speed-result-dn .b {
+            font-size:44px; font-weight:800; color:var(--accent-green);
+            display:block; line-height:1.15; margin-top:4px;
+        }
+        .speed-result-dn .b .u { font-size:14px; color:var(--text-secondary); font-weight:500; margin-left:2px; }
+        .speed-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px; }
+        .speed-grid-item {
+            background:var(--bg-secondary); border:1px solid var(--border-subtle);
+            border-radius:10px; padding:10px 6px; text-align:center;
+        }
+        .speed-grid-item .l { font-size:10px; color:var(--text-tertiary); }
+        .speed-grid-item .v { font-size:16px; font-weight:700; margin-top:2px; }
+        .speed-grid-item .v .u { font-size:9px; color:var(--text-tertiary); font-weight:400; margin-left:1px; }
+        .speed-signal-tag {
+            font-size:11px; color:var(--accent-orange); background:rgba(245,158,11,0.14);
+            border-radius:8px; padding:7px 10px; margin-bottom:12px;
+            display:flex; align-items:center; justify-content:center; gap:6px; text-align:center;
+        }
+
+        /* 结果视图 - 测速记录 */
+        .speed-history-section { margin-bottom:16px; }
+        .speed-history-title {
+            font-size:14px; font-weight:600; margin-bottom:10px;
+            display:flex; align-items:center; gap:8px;
+        }
+        .speed-history-title .badge {
+            background:var(--accent-cyan); color:#0a162e; font-size:11px;
+            font-weight:700; padding:2px 8px; border-radius:10px;
+        }
+        .speed-history-list { display:flex; flex-direction:column; gap:8px; }
+        .speed-history-item {
+            background:var(--bg-card); border:1px solid var(--border-subtle);
+            border-radius:12px; padding:12px 14px;
+            display:flex; align-items:center; gap:12px;
+        }
+        .speed-history-icon {
+            width:36px; height:36px; border-radius:10px; flex-shrink:0;
+            background:rgba(78,205,196,0.10);
+            border:1px solid rgba(78,205,196,0.18);
+            display:flex; align-items:center; justify-content:center;
+        }
+        .speed-history-icon svg { width:20px; height:20px; }
+        .speed-history-info { flex:1; min-width:0; }
+        .speed-history-head {
+            display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;
+        }
+        .speed-history-head .seq { color:var(--text-tertiary); font-size:11px; font-weight:400; }
+        .speed-history-head .hl { color:var(--accent-cyan); font-weight:600; }
+        .speed-history-time { font-size:11px; color:var(--text-tertiary); margin-top:2px; }
+        .speed-history-right { text-align:right; flex-shrink:0; }
+        .speed-history-dn { font-size:15px; font-weight:700; color:var(--accent-green); }
+        .speed-history-dn .u { font-size:10px; color:var(--text-tertiary); font-weight:400; }
+        .speed-history-sub { font-size:11px; color:var(--text-secondary); margin-top:3px; }
+
+        /* 测试中视图 - 实时测速结果 */
+        .speed-live-section { }
+        .speed-live-head {
+            display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;
+        }
+        .speed-live-head .hub {
+            font-size:13px; font-weight:600; color:var(--text-secondary);
+            display:flex; align-items:center; gap:6px;
+        }
+        .speed-live-head .hub svg { width:14px; height:14px; fill:var(--accent-cyan); }
+        .speed-live-head .count { color:var(--accent-cyan); font-size:12px; font-weight:600; }
+        .speed-live-list {
+            display:flex; flex-direction:column; gap:8px;
+            max-height:24vh; overflow-y:auto;
+        }
+        .speed-live-item {
+            background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(56,189,248,0.07));
+            border:1px solid var(--border-subtle); border-radius:12px; padding:10px 12px;
+        }
+        .speed-live-top {
+            display:flex; align-items:center; gap:8px; margin-bottom:8px;
+        }
+        .speed-live-seq { font-size:12px; font-weight:700; }
+        .speed-live-signal {
+            font-size:11px; font-weight:700;
+            padding:1px 8px; border-radius:8px;
+        }
+        .speed-live-signal.good { color:var(--accent-green); background:rgba(34,197,94,0.12); }
+        .speed-live-signal.warn { color:var(--accent-orange); background:rgba(245,158,11,0.12); }
+        .speed-live-signal.bad { color:var(--accent-red); background:rgba(239,68,68,0.12); }
+        .speed-live-tag { font-size:11px; margin-left:auto; color:var(--text-tertiary); }
+        .speed-live-mid {
+            display:flex; gap:14px; flex-wrap:wrap; font-size:11px; color:var(--text-tertiary);
+        }
+        .speed-live-mid b {
+            font-size:13px; font-weight:700; color:var(--text-primary); margin-left:2px;
+        }
+        .speed-live-mid .sl-dn b { color:var(--accent-green); }
+        .speed-live-mid .sl-lat b { color:var(--accent-cyan); }
+
         /* 结果视图 */
         .result-content { padding:20px; flex:1; overflow-y:auto; }
         .result-banner {
@@ -377,6 +507,7 @@
         .pr-table th { background:#eff6ff; color:#1e40af; font-weight:700; }
         .pr-table th, .pr-table td { border:1px solid #e2e8f0; padding:8px 10px; text-align:center; }
         .pr-table th:first-child, .pr-table td:first-child { text-align:left; }
+        .pr-table.pr-center th, .pr-table.pr-center td { text-align:center; }
         .pr-table .ok { color:#16a34a; font-weight:700; }
         .pr-table .warn { color:#ea580c; font-weight:700; }
         .pr-table .bad { color:#dc2626; font-weight:700; }
@@ -905,10 +1036,24 @@
                     <span id="liveThresholdLabel">阈值 -70</span>
                     <span>-30</span>
                 </div>
+                <button class="speed-entry-btn" onclick="openSpeedModal()">
+                    <svg viewBox="0 0 24 24"><path d="M13 10.05V3.54c0-.97-1.17-1.46-1.86-.78L3.8 11.02c-.4.38-.4 1 .02 1.38L9 16.02v4.44c0 .97 1.17 1.46 1.86.78l7.34-8.26c.4-.38.4-1-.02-1.38L13 10.05z"/></svg>
+                    实时测速
+                </button>
             </div>
             <div class="threshold-hint">
                 <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
                 <span id="liveThresholdHint">当信号弱于 -70 dBm 时，将自动弹出标记框</span>
+            </div>
+            <div class="speed-live-section" id="speedLiveSection" style="display:none;">
+                <div class="speed-live-head">
+                    <span class="hub">
+                        <svg viewBox="0 0 24 24"><path d="M13 10.05V3.54c0-.97-1.17-1.46-1.86-.78L3.8 11.02c-.4.38-.4 1 .02 1.38L9 16.02v4.44c0 .97 1.17 1.46 1.86.78l7.34-8.26c.4-.38.4-1-.02-1.38L13 10.05z"/></svg>
+                        实时测速结果
+                    </span>
+                    <span class="count" id="speedLiveCount">0</span>
+                </div>
+                <div class="speed-live-list" id="speedLiveList"></div>
             </div>
             <div class="abnormal-section">
                 <div class="section-title">
@@ -947,6 +1092,13 @@
                     <span class="badge" id="abnormalResultCount">0</span>
                 </div>
                 <div class="abnormal-result-list" id="abnormalResultList"></div>
+            </div>
+            <div class="speed-history-section" id="speedHistorySection" style="display:none;">
+                <div class="speed-history-title">
+                    测速记录
+                    <span class="badge" id="speedHistoryCount">0</span>
+                </div>
+                <div class="speed-history-list" id="speedHistoryList"></div>
             </div>
             <div class="result-actions">
                 <button class="btn-danger" onclick="confirmDeleteRecord()">删除报告</button>
@@ -1152,6 +1304,36 @@
                     <div class="col-after" id="cmpAfterRate">-</div>
                 </div>
             </div>
+            <div class="speed-cmp-section" id="speedCmpSection" style="display:none;margin-bottom:16px;">
+                <div class="section-title" style="margin-bottom:10px;">测速对比</div>
+                <div class="compare-table">
+                    <div class="compare-row head">
+                        <div class="col-label">测速指标</div>
+                        <div class="col-before">整改前</div>
+                        <div class="col-after">整改后</div>
+                    </div>
+                    <div class="compare-row">
+                        <div class="col-label">测速次数</div>
+                        <div class="col-before" id="cmpSpeedBeforeCount">-</div>
+                        <div class="col-after" id="cmpSpeedAfterCount">-</div>
+                    </div>
+                    <div class="compare-row">
+                        <div class="col-label">平均下载</div>
+                        <div class="col-before" id="cmpSpeedBeforeDown">-</div>
+                        <div class="col-after" id="cmpSpeedAfterDown">-</div>
+                    </div>
+                    <div class="compare-row">
+                        <div class="col-label">平均上传</div>
+                        <div class="col-before" id="cmpSpeedBeforeUp">-</div>
+                        <div class="col-after" id="cmpSpeedAfterUp">-</div>
+                    </div>
+                    <div class="compare-row">
+                        <div class="col-label">平均延迟</div>
+                        <div class="col-before" id="cmpSpeedBeforeLat">-</div>
+                        <div class="col-after" id="cmpSpeedAfterLat">-</div>
+                    </div>
+                </div>
+            </div>
             <div class="section-title">检测点对比</div>
             <div class="cmp-list" id="comparePointList"></div>
             <div class="result-actions" style="margin-bottom:80px;">
@@ -1213,6 +1395,48 @@
 <!-- PDF报告离屏渲染容器（导出时填充，打印兜底时显示） -->
 <div id="pdfReportWrap"></div>
 
+<!-- 实时测速弹窗 -->
+<div class="modal-mask" id="speedModal">
+    <div class="modal speed-modal">
+        <div class="modal-title">
+            <span style="display:inline-flex;align-items:center;gap:6px;">
+                <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:var(--accent-green);"><path d="M13 10.05V3.54c0-.97-1.17-1.46-1.86-.78L3.8 11.02c-.4.38-.4 1 .02 1.38L9 16.02v4.44c0 .97 1.17 1.46 1.86.78l7.34-8.26c.4-.38.4-1-.02-1.38L13 10.05z"/></svg>
+                <span id="speedModalTitle">实时测速</span>
+            </span>
+        </div>
+        <div class="modal-desc" style="margin-bottom:14px;">测速将展示当前网络下的真实体验，不打断信号巡检采集</div>
+
+        <!-- 测速进行中 -->
+        <div id="speedRunning" style="display:none;">
+            <div class="speed-phase"><span id="speedPhaseLabel">延迟测试中</span><b id="speedPhaseValue">-</b></div>
+            <div class="speed-line"><div class="speed-line-fill" id="speedPhaseBar"></div></div>
+        </div>
+
+        <!-- 测速结果 -->
+        <div id="speedResult" style="display:none;">
+            <div class="speed-result-main">
+                <div class="speed-result-dn">下载速度<span class="b" id="speedDown">-<span class="u">MB/s</span></span></div>
+            </div>
+            <div class="speed-grid">
+                <div class="speed-grid-item"><div class="l">上传速度</div><div class="v" id="speedUp">-<span class="u">MB/s</span></div></div>
+                <div class="speed-grid-item"><div class="l">延迟</div><div class="v" id="speedLatency">-<span class="u">ms</span></div></div>
+                <div class="speed-grid-item"><div class="l">抖动</div><div class="v" id="speedJitter">-<span class="u">ms</span></div></div>
+            </div>
+            <div class="speed-signal-tag" id="speedSignalInfo"></div>
+            <input type="text" class="modal-input" id="speedTagInput" placeholder="输入或选择位置标记（如：卧室床头柜）">
+            <div class="modal-tags" id="speedTags" style="margin-bottom:0;"></div>
+        </div>
+
+        <div class="modal-actions" id="speedActions" style="margin-top:14px;">
+            <button class="modal-btn secondary" id="speedCancelBtn" onclick="cancelSpeedTest()" style="display:none;">取消测速</button>
+            <button class="modal-btn secondary" id="speedCloseBtn" onclick="closeSpeedModal()">关闭</button>
+            <button class="modal-btn primary" id="speedStartBtn" onclick="startSpeedTest()">开始测速</button>
+            <button class="modal-btn secondary" id="speedRetestBtn" onclick="openSpeedRetest()" style="display:none;">再测一次</button>
+            <button class="modal-btn primary" id="speedDoneBtn" onclick="closeSpeedResult()" style="display:none;">完成</button>
+        </div>
+    </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- 对比选择浮动栏 -->
@@ -1262,6 +1486,13 @@ let currentWifiInfo = null;  // 当前测试WiFi信息
 let currentBssid = '';      // 当前关联AP的BSSID
 let apBssidList = [];       // 同SSID下的多AP BSSID列表（用于漫游判定）
 
+// 实时测速状态
+let speedTests = [];          // 本次巡检已完成的测速记录 {time, signal, download, upload, latency, jitter, tag}
+let speedRunning = false;     // 是否正在测速中
+let speedTimer = null;        // 测速阶段进度定时器
+let speedCanceled = false;    // 是否取消当前测速
+let pendingSpeedTag = '';     // 测速结果关联的位置标签
+
 // 当前测试/对比状态
 let currentRecord = null;
 
@@ -1308,7 +1539,10 @@ function goBack() {
         } else {
             testing = false;
             clearInterval(timer);
+            speedCanceled = true;
+            clearInterval(speedTimer);
             document.getElementById('markModal').classList.remove('show');
+            document.getElementById('speedModal').classList.remove('show');
         }
     }
     if (viewStack.length > 1) {
@@ -1493,6 +1727,12 @@ function startTestCore() {
     testing = true;
     allSamples = [];
     abnormalPoints = [];
+    speedTests = [];
+    speedRunning = false;
+    speedCanceled = false;
+    pendingSpeedTag = '';
+    const speedLiveSec = document.getElementById('speedLiveSection');
+    if (speedLiveSec) { speedLiveSec.style.display = 'none'; document.getElementById('speedLiveList').innerHTML = ''; }
     currentSignal = -45;
     lastAbnormalTime = 0;
     currentWifiInfo = genWifiInfo();
@@ -1516,7 +1756,7 @@ function startTestCore() {
         allSamples.push({ signal: currentSignal, time: Date.now(), bssid: currentBssid });
         updateLiveUI();
         // 异常检测（带3秒防抖），弹窗打开期间不再弹
-        if (currentSignal < threshold && Date.now() - lastAbnormalTime > 3000 && !document.getElementById('markModal').classList.contains('show')) {
+        if (currentSignal < threshold && Date.now() - lastAbnormalTime > 3000 && !document.getElementById('markModal').classList.contains('show') && !document.getElementById('speedModal').classList.contains('show')) {
             lastAbnormalTime = Date.now();
             triggerAbnormalMark(currentSignal);
         }
@@ -1594,10 +1834,155 @@ function renderAbnormalList() {
     `).join('');
 }
 
+// ============== 实时测速 ==============
+// 由实时信号换算体验系数：信号越强，系数越高（1 强信号 ~ 0.25 弱信号）
+function speedFactor() {
+    const weak = Math.min(80, (-currentSignal - 30));
+    return 1 - weak / 80;
+}
+
+function openSpeedModal() {
+    if (!testing) { showToast('请先开始测试'); return; }
+    pendingSpeedTag = '';
+    document.getElementById('speedRunning').style.display = 'none';
+    document.getElementById('speedResult').style.display = 'none';
+    document.getElementById('speedModalTitle').textContent = '实时测速';
+    document.getElementById('speedPhaseBar').style.width = '0%';
+    document.getElementById('speedTagInput').value = '';
+    renderSpeedActions('idle');
+    document.getElementById('speedModal').classList.add('show');
+}
+
+// 控制测速弹窗操作栏按钮的显隐：idle / running / done
+function renderSpeedActions(mode) {
+    const set = (id, show) => { const el = document.getElementById(id); if (el) el.style.display = show ? '' : 'none'; };
+    set('speedCancelBtn', mode === 'running');
+    set('speedCloseBtn', mode === 'idle');
+    set('speedStartBtn', mode === 'idle');
+    set('speedRetestBtn', mode === 'done');
+    set('speedDoneBtn', mode === 'done');
+}
+
+// 模拟测速：依次进行 延迟 -> 下载 -> 上传
+function startSpeedTest() {
+    if (speedRunning || !testing) return;
+    speedRunning = true;
+    pendingSpeedTag = '';
+    document.getElementById('speedRunning').style.display = 'block';
+    document.getElementById('speedResult').style.display = 'none';
+    document.getElementById('speedModalTitle').textContent = '测速中…';
+    renderSpeedActions('running');
+
+    const f = speedFactor();
+    const latency = Math.round((6 + (-currentSignal - 30) * 0.5) + Math.random() * 10);
+    const jitter = Math.round((2 + (-currentSignal - 30) * 0.25) + Math.random() * 6);
+    const download = Math.round((45 + Math.random() * 30) * f * 100) / 100;
+    const upload = Math.round(download * (0.35 + Math.random() * 0.25) * 100) / 100;
+
+    const phases = [
+        { label: '延迟测试中', dur: 800, val: () => latency },
+        { label: '下载测速中', dur: 2200, val: () => download },
+        { label: '上传测速中', dur: 1600, val: () => upload }
+    ];
+    let p = 0;
+    speedCanceled = false;
+    const runPhase = () => {
+        if (speedCanceled) return;
+        if (p >= phases.length) { finishSpeedTest({ latency, jitter, download, upload }); return; }
+        const ph = phases[p];
+        document.getElementById('speedPhaseLabel').textContent = ph.label;
+        const start = Date.now();
+        speedTimer = setInterval(() => {
+            if (speedCanceled) return;
+            const prog = Math.min(1, (Date.now() - start) / ph.dur);
+            document.getElementById('speedPhaseBar').style.width = (prog * 100) + '%';
+            document.getElementById('speedPhaseValue').textContent = ph.val().toFixed(1);
+        }, 100);
+        setTimeout(() => { clearInterval(speedTimer); p++; runPhase(); }, ph.dur);
+    };
+    runPhase();
+}
+
+function finishSpeedTest(r) {
+    if (!testing) return;
+    speedRunning = false;
+    document.getElementById('speedRunning').style.display = 'none';
+    document.getElementById('speedResult').style.display = 'block';
+    document.getElementById('speedModalTitle').textContent = '测速结果';
+    document.getElementById('speedDown').innerHTML = r.download.toFixed(2) + '<span class="u">MB/s</span>';
+    document.getElementById('speedUp').innerHTML = r.upload.toFixed(2) + '<span class="u">MB/s</span>';
+    document.getElementById('speedLatency').innerHTML = r.latency + '<span class="u">ms</span>';
+    document.getElementById('speedJitter').innerHTML = r.jitter + '<span class="u">ms</span>';
+    const sigOk = currentSignal >= threshold;
+    document.getElementById('speedSignalInfo').innerHTML =
+        `<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        当前信号 ${currentSignal} dBm · ${sigOk ? '信号正常' : '信号偏弱'}（保存时一同记录）`;
+    // 位置标签选择
+    document.getElementById('speedTags').innerHTML = QUICK_TAGS.map(t =>
+        `<div class="modal-tag" data-tag="${t}" onclick="pickSpeedTag('${t}')">${t}</div>`).join('');
+    // 写入本次巡检的测速记录
+    speedTests.push({
+        time: Date.now(),
+        signal: currentSignal,
+        download: r.download,
+        upload: r.upload,
+        latency: r.latency,
+        jitter: r.jitter,
+        tag: ''
+    });
+    renderSpeedLive();
+    renderSpeedActions('done');
+    showToast('已记录本次测速结果');
+}
+
+function pickSpeedTag(tag) {
+    // 与信号异常一致：选择快捷标签时填入输入框，最终以输入框内容为准
+    document.getElementById('speedTagInput').value = tag;
+    document.querySelectorAll('#speedTags .modal-tag').forEach(el => {
+        const active = el.dataset.tag === tag;
+        el.style.borderColor = active ? 'var(--accent-green)' : '';
+        el.style.color = active ? 'var(--accent-green)' : '';
+    });
+    if (speedTests.length) speedTests[speedTests.length - 1].tag = tag;
+}
+
+function openSpeedRetest() {
+    if (speedRunning || !testing) return;
+    pendingSpeedTag = '';
+    document.getElementById('speedTagInput').value = '';
+    startSpeedTest();
+}
+
+function cancelSpeedTest() {
+    speedCanceled = true;
+    speedRunning = false;
+    clearInterval(speedTimer);
+    document.getElementById('speedModal').classList.remove('show');
+}
+
+function closeSpeedModal() {
+    if (speedRunning) return;  // 测速进行中不允许直接关闭，避免丢失本次结果
+    document.getElementById('speedModal').classList.remove('show');
+}
+
+function closeSpeedResult() {
+    // 与信号异常一致：以输入框中的位置标记为准（可输入或选择）
+    const tag = document.getElementById('speedTagInput').value.trim();
+    if (speedTests.length) speedTests[speedTests.length - 1].tag = tag;
+    pendingSpeedTag = tag;
+    renderSpeedLive();
+    closeSpeedModal();
+    showToast(tag ? '测速结果及位置已记入巡检记录' : '测速结果已记入巡检记录');
+}
+
 function stopTest() {
     if (!testing) return;
     testing = false;
     clearInterval(timer);
+    // 停止并关闭测速（若正在进行）
+    speedCanceled = true;
+    clearInterval(speedTimer);
+    document.getElementById('speedModal').classList.remove('show');
     // 关闭可能打开的弹窗
     document.getElementById('markModal').classList.remove('show');
     if (allSamples.length === 0) {
@@ -1652,6 +2037,7 @@ function stopTest() {
             roamingAbnormalRate: roamingAbnormalRate
         },
         roamingAbnormalPoints: roamingAbnormalPoints,
+        speedTests: [...speedTests],
         recheck: null  // 整改后重新检测数据
     };
     records.unshift(record);
@@ -1768,7 +2154,74 @@ function showResult(r) {
             </div>`;
         }).join('');
     }
+    renderSpeedHistory(r);
     navigate('view-result', '测试结果');
+}
+
+// 渲染结果视图的测速记录
+function renderSpeedHistory(r) {
+    const section = document.getElementById('speedHistorySection');
+    const list = document.getElementById('speedHistoryList');
+    const sts = (r.speedTests || []);
+    if (!sts.length) { section.style.display = 'none'; return; }
+    section.style.display = '';
+    document.getElementById('speedHistoryCount').textContent = sts.length;
+    list.innerHTML = sts.map((t, i) => `
+        <div class="speed-history-item">
+            <div class="speed-history-icon">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <defs>
+                        <linearGradient id="sg${i}" x1="0" y1="1" x2="1" y2="0">
+                            <stop offset="0" stop-color="#4ecdc4"/>
+                            <stop offset="1" stop-color="#5b8def"/>
+                        </linearGradient>
+                    </defs>
+                    <circle cx="12" cy="12" r="8.5" stroke="url(#sg${i})" stroke-width="1.6"/>
+                    <path d="M9 3.5h6" stroke="url(#sg${i})" stroke-width="1.6" stroke-linecap="round"/>
+                    <path d="M12 8v4.2l2.6 1.5" stroke="url(#sg${i})" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="12" cy="12" r="1.2" fill="url(#sg${i})"/>
+                </svg>
+            </div>
+            <div class="speed-history-info">
+                <div class="speed-history-head">
+                    <span class="hl">${escHtml(t.tag || '未标记')}</span>
+                    <span class="seq" style="margin-left:auto;">${fmtTime(t.time)}</span>
+                </div>
+                <div class="speed-history-time">信号 ${t.signal} dBm · 上传 ${t.upload.toFixed(2)} MB/s · ${t.latency}ms</div>
+            </div>
+            <div class="speed-history-right">
+                <div class="speed-history-dn">${t.download.toFixed(2)}<span class="u">MB/s</span></div>
+                <div class="speed-history-sub">下载</div>
+            </div>
+        </div>`).join('');
+}
+
+// 渲染测试中视图的实时测速结果（含信号）
+function renderSpeedLive() {
+    const section = document.getElementById('speedLiveSection');
+    if (!section) return;
+    const list = document.getElementById('speedLiveList');
+    if (!speedTests.length) { section.style.display = 'none'; return; }
+    section.style.display = '';
+    document.getElementById('speedLiveCount').textContent = speedTests.length;
+    const total = speedTests.length;
+    list.innerHTML = [...speedTests].reverse().map((t, i) => {
+        const sigCls = t.signal >= threshold ? 'good' : (t.signal >= threshold - 15 ? 'warn' : 'bad');
+        const loc = t.tag ? ` <span class="speed-live-tag">📍 ${t.tag}</span>` : '';
+        return `
+        <div class="speed-live-item">
+            <div class="speed-live-top">
+                <span class="speed-live-seq">测速 ${total - i}</span>
+                <span class="speed-live-signal ${sigCls}">信号 ${t.signal} dBm</span>
+                ${loc}
+            </div>
+            <div class="speed-live-mid">
+                <span class="sl-dn">下载 <b>${t.download.toFixed(2)} MB/s</b></span>
+                <span>上传 <b>${t.upload.toFixed(2)} MB/s</b></span>
+                <span class="sl-lat">延迟 <b>${t.latency} ms</b> · 抖动 <b>${t.jitter} ms</b></span>
+            </div>
+        </div>`;
+    }).join('');
 }
 
 // ============== 删除报告 ==============
@@ -2099,9 +2552,40 @@ function showCompareRecords(beforeRec, afterRec) {
     document.getElementById('cmpBeforeRate').textContent = (bStats.qualifiedRate||0) + ' %';
     document.getElementById('cmpAfterRate').textContent = (aStats.qualifiedRate||0) + ' %';
 
+    // 测速对比
+    renderSpeedCompare(beforeRec, afterRec);
+
     // 检测点统一对比列表（同名同行）
     renderCompareList(beforeRec, afterRec);
     navigate('view-compare', '对比报告');
+}
+
+// 比较整改前后记录的测速聚合指标（无测速则隐藏）
+function speedAgg(rec) {
+    const sts = (rec.speedTests || []);
+    if (!sts.length) return null;
+    const avg = k => Math.round((sts.reduce((s, t) => s + t[k], 0) / sts.length) * 100) / 100;
+    return {
+        n: sts.length,
+        down: avg('download'),
+        up: avg('upload'),
+        lat: Math.round(sts.reduce((s, t) => s + t.latency, 0) / sts.length)
+    };
+}
+function renderSpeedCompare(beforeRec, afterRec) {
+    const sec = document.getElementById('speedCmpSection');
+    const ba = speedAgg(beforeRec), aa = speedAgg(afterRec);
+    if (!ba && !aa) { sec.style.display = 'none'; return; }
+    sec.style.display = '';
+    const fmt = (o, k, unit, dec) => o ? `${o[k].toFixed(dec)}${unit}` : '—';
+    document.getElementById('cmpSpeedBeforeCount').textContent = ba ? ba.n + ' 次' : '—';
+    document.getElementById('cmpSpeedAfterCount').textContent = aa ? aa.n + ' 次' : '—';
+    document.getElementById('cmpSpeedBeforeDown').textContent = fmt(ba, 'down', ' MB/s', 2);
+    document.getElementById('cmpSpeedAfterDown').textContent = fmt(aa, 'down', ' MB/s', 2);
+    document.getElementById('cmpSpeedBeforeUp').textContent = fmt(ba, 'up', ' MB/s', 2);
+    document.getElementById('cmpSpeedAfterUp').textContent = fmt(aa, 'up', ' MB/s', 2);
+    document.getElementById('cmpSpeedBeforeLat').textContent = fmt(ba, 'lat', ' ms', 0);
+    document.getElementById('cmpSpeedAfterLat').textContent = fmt(aa, 'lat', ' ms', 0);
 }
 
 // ============== 检测点统一对比列表 ==============
@@ -2279,6 +2763,53 @@ function buildPDFReportHTML() {
         ['合格覆盖率', (b.qualifiedRate||0) + ' %', (a.qualifiedRate||0) + ' %']
     ].map(m => `<tr><td>${m[0]}</td><td>${m[1]}</td><td>${m[2]}</td></tr>`).join('');
 
+    // 测速对比表（无测速则提示占位行）
+    const speedRowsHtml = (() => {
+        const ba = speedAgg(beforeRec), aa = speedAgg(afterRec);
+        if (!ba && !aa) return '<tr><td colspan="3">两次巡检均未进行实时测速</td></tr>';
+        const fmt = (o, k, unit, dec) => o ? `${o[k].toFixed(dec)}${unit}` : '—';
+        return [
+            ['测速次数', ba ? ba.n + ' 次' : '—', aa ? aa.n + ' 次' : '—'],
+            ['平均下载', fmt(ba, 'down', ' MB/s', 2), fmt(aa, 'down', ' MB/s', 2)],
+            ['平均上传', fmt(ba, 'up', ' MB/s', 2), fmt(aa, 'up', ' MB/s', 2)],
+            ['平均延迟', fmt(ba, 'lat', ' ms', 0), fmt(aa, 'lat', ' ms', 0)]
+        ].map(m => `<tr><td>${m[0]}</td><td>${m[1]}</td><td>${m[2]}</td></tr>`).join('');
+    })();
+
+    // 测速明细：列出整改前/后的每条实时测速（测速结果 · 对应信号 · 位置标记）
+    // 数据来源按「整改前 / 整改后」合并单元格（rowspan），不再区分第几次
+    const speedDetailHtml = (() => {
+        const groups = [];
+        const pushRec = (label, sts) => {
+            const list = (sts || []).map(t => ({
+                tag: (t.tag || '未标记').trim(), sig: t.signal,
+                dn: t.download, up: t.upload, lat: t.latency
+            }));
+            if (list.length) groups.push({ label, list });
+        };
+        pushRec('整改前', beforeRec.speedTests);
+        pushRec('整改后', afterRec.speedTests);
+
+        if (!groups.length) return '<tr><td colspan="6">两次巡检均未进行实时测速</td></tr>';
+
+        const rows = [];
+        groups.forEach(g => {
+            g.list.forEach((d, i) => {
+                const srcCell = i === 0
+                    ? `<td rowspan="${g.list.length}">${g.label}</td>`
+                    : '';
+                rows.push(`<tr>${srcCell}
+            <td>${escHtml(d.tag)}</td>
+            <td>${d.sig} dBm</td>
+            <td>${d.dn.toFixed(2)} MB/s</td>
+            <td>${d.up.toFixed(2)} MB/s</td>
+            <td>${d.lat} ms</td>
+        </tr>`);
+            });
+        });
+        return rows.join('');
+    })();
+
     // 检测点明细表
     const pointRows = rows.map(r => {
         const hasBefore = r.beforeVal !== null, hasAfter = r.afterVal !== null;
@@ -2335,13 +2866,24 @@ function buildPDFReportHTML() {
             ${metricRows}
         </table>
 
-        <div class="pr-h">四、检测点明细</div>
+        <div class="pr-h">五、实时测速对比</div>
+        <table class="pr-table">
+            <tr><th>测速指标</th><th>整改前</th><th>整改后</th></tr>
+            ${speedRowsHtml}
+        </table>
+        <div class="pr-table-caption" style="margin:10px 0 6px;font-size:12px;color:#475569;">· 单次实时测速明细（测速结果 · 对应信号 · 位置标记）</div>
+        <table class="pr-table pr-center">
+            <tr><th>数据来源</th><th>位置标记</th><th>当前信号</th><th>下载</th><th>上传</th><th>延迟</th></tr>
+            ${speedDetailHtml}
+        </table>
+
+        <div class="pr-h">六、检测点明细</div>
         <table class="pr-table">
             <tr><th>检测点</th><th>整改前</th><th>整改后</th><th>状态</th></tr>
             ${pointRows || '<tr><td colspan="4">两次测试均无异常点</td></tr>'}
         </table>
 
-        <div class="pr-h">六、整改建议</div>
+        <div class="pr-h">七、整改建议</div>
         <ol class="pr-tips">${tips.map(t => `<li>${t}</li>`).join('')}</ol>
 
         <div class="pr-foot">
