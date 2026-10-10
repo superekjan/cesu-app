@@ -3,616 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>网络测速结果</title>
+    <title>网络诊断报告</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        /* 深色主题：与项目整体设计变量保持一致 */
         :root {
-            --bg-primary: #131524;
-            --bg-secondary: #131524;
-            --bg-card: rgba(38, 41, 58, 0.65);
-            --bg-card-hover: rgba(46, 49, 69, 0.75);
-            --accent-blue: #5b8def;
-            --accent-blue-light: #7ca6f3;
-            --accent-cyan: #4ecdc4;
-            --accent-green: #5dbe8d;
-            --accent-orange: #f4a261;
-            --accent-purple: #9b8bf4;
-            --text-primary: #e8eaf0;
-            --text-secondary: #9aa3b2;
-            --text-tertiary: #6b7280;
-            --border-subtle: rgba(91, 141, 239, 0.15);
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --navy: #e8eaf0;
+            --navy-2: #9aa3b2;
+            --blue: #5b8def;
+            --blue-2: #7ca6f3;
+            --cyan: #4ecdc4;
+            --red: #ef4444;
+            --amber: #f4a261;
+            --green: #5dbe8d;
+            --ink: #e8eaf0;
+            --ink-2: #9aa3b2;
+            --muted: #6b7280;
+            --line: rgba(91, 141, 239, 0.15);
+            --bg: #131524;
+            --card: rgba(38, 41, 58, 0.65);
+            --card-hover: rgba(46, 49, 69, 0.75);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: var(--bg-primary);
-            min-height: 100vh;
-            color: var(--text-primary);
-            line-height: 1.5;
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .container {
+        .app {
             max-width: 480px;
             margin: 0 auto;
+            background: #fff;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            box-shadow: 0 0 40px rgba(15, 37, 68, .08);
+            overflow: hidden;
         }
 
-        /* 头部 */
-        .header {
-            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-subtle);
-            position: sticky;
-            top: 0;
-            z-index: 10;
+        /* ========== Hero ========== */
+        .hero {
+            position: relative;
+            background: linear-gradient(165deg, #08214d 0%, #103b7c 46%, #1d63c4 100%);
+            color: #fff;
+            padding: 20px 20px 0;
+            overflow: hidden;
         }
-
-        .header-top {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 84% 8%, rgba(41, 183, 232, .38), transparent 58%);
+            pointer-events: none;
         }
-
-        .back-btn {
-            width: 36px;
-            height: 36px;
+        .hero-top {
             display: flex;
             align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border-radius: 50%;
-            transition: background 0.2s ease;
+            justify-content: space-between;
+            position: relative;
+            z-index: 2;
         }
-
-        .back-btn:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .back-btn svg {
-            width: 24px;
-            height: 24px;
-            fill: var(--text-primary);
-        }
-
-        .header-title {
-            font-size: 17px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        /* 主内容区 */
-        .main-content {
-            flex: 1;
-            padding: 20px;
+        .hero-eyebrow {
             display: flex;
-            flex-direction: column;
-            gap: 16px;
-            border-top: 1px solid var(--border-subtle);
+            align-items: center;
+            gap: 7px;
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, .78);
+        }
+        .hero-eyebrow svg { width: 15px; height: 15px; fill: var(--cyan); }
+        .hero-badge {
+            font-size: 11px;
+            padding: 4px 12px;
+            border: 1px solid rgba(255, 255, 255, .3);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .1);
+            letter-spacing: .5px;
+        }
+        .hero-title {
+            position: relative;
+            z-index: 2;
+            font-size: 27px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            line-height: 1.28;
+            margin-top: 16px;
+        }
+        .hero-sub {
+            position: relative;
+            z-index: 2;
+            font-size: 12px;
+            color: rgba(255, 255, 255, .68);
+            margin-top: 9px;
+        }
+        .hero-stats {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-top: 18px;
+            background: rgba(255, 255, 255, .1);
+            border: 1px solid rgba(255, 255, 255, .18);
+            border-radius: 12px;
+            padding: 12px 4px;
+            backdrop-filter: blur(4px);
+        }
+        .hs { text-align: center; border-right: 1px solid rgba(255, 255, 255, .16); }
+        .hs:last-child { border-right: none; }
+        .hs b { display: block; font-size: 18px; font-weight: 800; line-height: 1.15; }
+        .hs b i { font-style: normal; font-size: 10px; font-weight: 500; color: rgba(255, 255, 255, .7); margin-left: 1px; }
+        .hs span { font-size: 10px; color: rgba(255, 255, 255, .68); }
+        .hero-img { position: relative; z-index: 2; width: 108%; margin: 6px 0 0 -4%; display: block; }
+        .hero-foot {
+            position: relative;
+            z-index: 2;
+            margin: 0 -20px;
+            background: linear-gradient(90deg, rgba(2, 18, 45, .55), rgba(2, 18, 45, .2));
+            text-align: center;
+            font-size: 13.5px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 13px 16px;
         }
 
-        .report-content .metrics-grid {
+        /* ========== 内容区 ========== */
+        .content { padding: 4px 18px 0; }
+
+        .sec { margin-top: 30px; }
+        .sec-head { text-align: center; margin-bottom: 20px; }
+        .sec-title {
+            font-size: 23px;
+            font-weight: 800;
+            color: var(--navy);
+            letter-spacing: .5px;
+            line-height: 1.3;
+        }
+        .sec-title::after {
+            content: '';
+            display: block;
+            width: 34px;
+            height: 3px;
+            border-radius: 2px;
+            background: var(--red);
+            margin: 10px auto 0;
+        }
+        .sec-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 10px;
+        }
+        .sec-sub b { color: var(--ink-2); font-weight: 600; }
+
+        .card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 6px 18px rgba(20, 60, 120, .05);
+        }
+        .card-title {
+            font-size: 14.5px;
+            font-weight: 800;
+            color: var(--navy);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
             gap: 8px;
         }
-
-        .report-content .metric-item {
-            padding: 0 10px 8px;
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 15px;
+            border-radius: 2px;
+            background: linear-gradient(180deg, var(--blue-2), var(--cyan));
         }
+        .card-desc { font-size: 11.5px; color: var(--ink-2); line-height: 1.85; }
 
-        /* 分类指标卡片 */
-        .metrics-section {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+        /* 结论条 */
+        .band {
+            margin-top: 14px;
+            border-radius: 9px;
+            padding: 13px 16px;
+            text-align: center;
+            font-size: 13px;
         }
-
-        .metrics-card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 16px;
-            border: 1px solid var(--border-subtle);
-            transition: all 0.2s ease;
+        .band-blue {
+            background: linear-gradient(90deg, #1a5fd0, #2f7bf0);
+            color: #fff;
+            font-weight: 700;
         }
-
-        .metrics-card:hover {
-            background: var(--bg-card-hover);
-            border-color: rgba(91, 141, 239, 0.25);
+        .band-gray {
+            background: #f2f7fd;
+            border: 1px solid var(--line);
+            color: var(--ink-2);
+            font-weight: 600;
+            font-size: 12.5px;
         }
+        .band-gray b { color: var(--red); }
 
-        .metrics-header {
+        /* 建议修复项 */
+        .fix-list { display: flex; flex-direction: column; gap: 11px; margin-top: 4px; }
+        .fix-item { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--ink-2); }
+        .fix-item svg { width: 18px; height: 18px; flex-shrink: 0; fill: var(--blue); }
+        .fix-item.warn svg { fill: var(--red); }
+
+        /* 顶部条 */
+        .topbar {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 14px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border-subtle);
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, .92);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--line);
+            position: sticky;
+            top: 0;
+            z-index: 20;
         }
-
-        .metrics-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, rgba(91, 141, 239, 0.2) 0%, rgba(78, 205, 196, 0.2) 100%);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .metrics-icon svg {
-            width: 18px;
-            height: 18px;
-            fill: url(#iconGradient);
-        }
-
-        .metrics-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        .metrics-grid.three-col {
-            grid-template-columns: repeat(3, 1fr);
-        }
-
-        .metric-item {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            overflow: hidden;
-            min-width: 0;
-        }
-
-        .metric-label {
-            font-size: 11px;
-            color: var(--text-tertiary);
-        }
-
-        .metric-value {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-primary);
-            display: flex;
-            align-items: baseline;
-            gap: 3px;
-        }
-
-        .metric-value .unit {
-            font-size: 11px;
-            color: var(--text-secondary);
-            font-weight: 400;
-        }
-
-        .metric-value.small {
-            font-size: 13px;
-        }
-
-        .metric-value.text-ellipsis {
-            display: block;
-            width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        /* AI诊断区域 */
-        .ai-diagnosis {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 24px;
-            border: 1px solid var(--border-subtle);
-        }
-
-        .ai-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .ai-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            color: #fff;
-            font-weight: 700;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
-
-        .ai-title-group {
-            flex: 1;
-        }
-
-        .ai-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 2px;
-        }
-
-        .ai-subtitle {
-            font-size: 12px;
-            color: var(--text-tertiary);
-        }
-
-        .ai-status {
-            font-size: 11px;
-            color: var(--accent-green);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 5px 10px;
-            background: rgba(16, 185, 129, 0.1);
-            border-radius: 20px;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .ai-status::before {
-            content: '';
-            width: 5px;
-            height: 5px;
-            background: var(--accent-green);
+        .topbar-back {
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
-        }
-
-        .diagnosis-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .diagnosis-item:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        .diagnosis-item:first-child {
-            padding-top: 0;
-        }
-
-        .diagnosis-icon {
-            width: 22px;
-            height: 22px;
-            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 11px;
-            flex-shrink: 0;
-            font-weight: 600;
-        }
-
-        .diagnosis-icon.good {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--accent-green);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .diagnosis-icon.warning {
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--accent-orange);
-            border: 1px solid rgba(245, 158, 11, 0.2);
-        }
-
-        .diagnosis-text {
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            padding-top: 2px;
-        }
-
-        /* 新AI诊断三行样式 */
-        .diagnosis-row {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 14px 0;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .diagnosis-row:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        .diagnosis-row:first-child {
-            padding-top: 0;
-        }
-
-        .diagnosis-label {
-            width: 70px;
-            font-size: 13px;
-            color: var(--text-tertiary);
-            font-weight: 500;
-            flex-shrink: 0;
-            padding-top: 2px;
-        }
-
-        .diagnosis-value {
-            font-size: 15px;
-            font-weight: 600;
-            padding: 4px 12px;
-            border-radius: 6px;
-        }
-
-        .diagnosis-value.excellent {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--accent-green);
-        }
-
-        .diagnosis-value.good {
-            background: rgba(91, 141, 239, 0.15);
-            color: var(--accent-blue);
-        }
-
-        .diagnosis-value.poor {
-            background: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
-        }
-
-        .diagnosis-desc {
-            flex: 1;
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        .report-section {
-            background: var(--bg-card);
-            border-radius: 12px;
-            border: 1px solid var(--border-subtle);
-            overflow: hidden;
-            margin-bottom: 16px;
-        }
-
-        .report-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 16px 20px;
             cursor: pointer;
+            background: #eff5fd;
         }
+        .topbar-back svg { width: 18px; height: 18px; fill: var(--navy); }
+        .topbar-title { font-size: 14px; font-weight: 700; color: var(--navy); }
 
-        .report-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
-
-        .report-icon svg {
-            width: 18px;
-            height: 18px;
-            fill: #fff;
-        }
-
-        .report-title-group {
-            flex: 1;
-        }
-
-        .report-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 2px;
-        }
-
-        .report-subtitle {
-            font-size: 12px;
-            color: var(--text-tertiary);
-        }
-
-        .report-arrow {
-            width: 20px;
-            height: 20px;
-            fill: var(--text-tertiary);
-            transition: transform 0.3s ease;
-        }
-
-        .report-section.expanded .report-arrow {
-            transform: rotate(180deg);
-        }
-
-        .report-content {
-            display: none;
-            padding: 0 16px 16px;
-        }
-
-        .report-section.expanded .report-content {
-            display: block;
-        }
-
-        .report-group {
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .report-group:last-child {
-            border-bottom: none;
-        }
-
-        .group-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 12px;
-        }
-
-        .group-icon {
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(91, 141, 239, 0.15);
-            border-radius: 6px;
-        }
-
-        .group-icon svg {
-            width: 16px;
-            height: 16px;
-            fill: var(--accent-blue);
-        }
-
-        /* 故障预约入口 */
-        .service-booking {
-            background: linear-gradient(135deg, rgba(244, 162, 97, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%);
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid rgba(244, 162, 97, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .service-booking:hover {
-            background: linear-gradient(135deg, rgba(244, 162, 97, 0.2) 0%, rgba(245, 158, 11, 0.15) 100%);
-            border-color: rgba(244, 162, 97, 0.4);
-            transform: translateY(-1px);
-        }
-
-        .service-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--accent-orange), #f59e0b);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(244, 162, 97, 0.3);
-        }
-
-        .service-icon svg {
-            width: 24px;
-            height: 24px;
-            fill: #fff;
-        }
-
-        .service-content {
-            flex: 1;
-        }
-
-        .service-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-
-        .service-desc {
-            font-size: 12px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-
-        .service-arrow {
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .service-arrow svg {
-            width: 20px;
-            height: 20px;
-            fill: var(--accent-orange);
-        }
-
-        /* 按钮区域 */
-        .button-section {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            padding: 20px;
-            background: var(--bg-secondary);
-        }
-
+        /* 按钮 */
+        .actions { display: flex; flex-direction: column; gap: 11px; padding: 26px 18px 32px; }
         .btn {
             width: 100%;
-            padding: 16px 24px;
+            padding: 15px 24px;
             border: none;
-            border-radius: 50px;
+            border-radius: 12px;
             font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            font-weight: 700;
             font-family: inherit;
-            letter-spacing: 0.3px;
+            letter-spacing: .5px;
+            cursor: pointer;
+            transition: transform .18s ease, box-shadow .18s ease;
         }
-
+        .btn:active { transform: scale(.985); }
         .btn-primary {
-            background: linear-gradient(270deg, #00c6ff 0%, #0072ff 100%);
+            background: linear-gradient(135deg, #1a5fd0, #2f7bf0);
             color: #fff;
-            box-shadow: 0 4px 14px rgba(0, 114, 255, 0.4);
+            box-shadow: 0 8px 20px rgba(26, 95, 208, .32);
         }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(0, 114, 255, 0.5);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--text-secondary);
-            border: 1px solid rgba(0, 114, 255, 0.5);
-        }
-
-        .btn-secondary:hover {
-            background: var(--bg-card);
-            color: var(--text-primary);
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-
-        /* 导出PDF按钮（独立配色，与主次按钮区分） */
         .btn-pdf {
-            background: linear-gradient(135deg, #6d28d9 0%, #7c6cf0 100%);
+            background: linear-gradient(135deg, #0f3676, #1a5fd0);
             color: #fff;
-            box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+            box-shadow: 0 8px 20px rgba(15, 54, 118, .28);
         }
-        .btn-pdf:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
-        }
-        .btn-pdf:active {
-            transform: translateY(0);
+        .btn-ghost {
+            background: #fff;
+            border: 1px solid var(--line);
+            color: var(--ink-2);
         }
 
         /* ========== 导出PDF报告（移出屏幕外，供html2canvas截取） ========== */
@@ -624,16 +277,10 @@
             background: #fff;
             z-index: -1;
         }
-        #printReport .pr-page {
-            width: 794px;
-        }
+        #printReport .pr-page { width: 794px; }
         @media print {
-            body {
-                background: #fff;
-            }
-            .container {
-                display: none !important;
-            }
+            body { background: #fff; }
+            .app { display: none !important; }
             #printReport {
                 position: static;
                 left: auto;
@@ -644,7 +291,7 @@
             }
         }
 
-        /* ========== 网络诊断报告 · A4 双页专业版式 ========== */
+        /* ========== 网络诊断报告 · A4 多页专业版式 ========== */
         .pr-sheet {
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'Microsoft YaHei', Helvetica, Arial, sans-serif;
             color: #1e293b;
@@ -922,27 +569,179 @@
         }
         .pr-foot .pr-page-no { font-family: 'SF Mono', Menlo, Consolas, monospace; }
 
-        /* 响应式 */
-        @page {
-            size: A4;
-            margin: 12mm;
+        @page { size: A4; margin: 12mm; }
+
+/* ========== 业务场景对比组件 ========== */
+        .scene {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 15px 16px;
+            box-shadow: var(--shadow-md);
         }
-        @media (max-width: 480px) {
-            .header {
-                padding: 12px 16px 20px 16px;
-            }
+        .scene + .scene { margin-top: 12px; }
+        .scene-head { display: flex; align-items: center; gap: 10px; margin-bottom: 13px; }
+        .scene-ico {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: rgba(91, 141, 239, 0.14);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .scene-ico svg { width: 19px; height: 19px; fill: none; stroke: var(--blue); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+        .scene-name { flex: 1; font-size: 13.5px; font-weight: 800; color: var(--navy); }
+        .chip { font-size: 11px; font-weight: 700; padding: 4px 11px; border-radius: 999px; border: 1px solid transparent; white-space: nowrap; }
+        .chip-ok { color: #5dbe8d; background: rgba(93, 190, 141, 0.12); border-color: rgba(93, 190, 141, 0.3); }
+        .chip-warn { color: #f4a261; background: rgba(244, 162, 97, 0.12); border-color: rgba(244, 162, 97, 0.3); }
+        .chip-bad { color: #ef4444; background: rgba(239, 68, 68, 0.12); border-color: rgba(239, 68, 68, 0.3); }
 
-            .main-content {
-                padding: 16px;
-            }
+        .cmp-line { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+        .cmp-line:last-child { margin-bottom: 0; }
+        .cmp-k { width: 52px; flex-shrink: 0; font-size: 11px; color: var(--muted); }
+        .cmp-track { flex: 1; height: 9px; border-radius: 5px; background: rgba(255, 255, 255, 0.06); overflow: hidden; }
+        .cmp-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, #4a7ce0, #5b8def); }
+        .cmp-line.std .cmp-fill { background: rgba(154, 163, 178, 0.55); }
+        .cmp-line.bad .cmp-fill { background: linear-gradient(90deg, #f87171, #ef4444); }
+        .cmp-v { width: 102px; text-align: right; font-size: 11px; font-weight: 700; color: var(--navy); flex-shrink: 0; }
+        .cmp-line.std .cmp-v { color: var(--muted); font-weight: 600; }
+        .scene-note { margin-top: 11px; font-size: 11.5px; color: var(--ink-2); line-height: 1.75; }
+        .scene-note b { color: var(--navy); }
 
-            .speed-number {
-                font-size: 48px;
-            }
+        .vs { display: flex; align-items: center; gap: 12px; }
+        .vs-col { flex: 1; text-align: center; }
+        .vs-l { font-size: 11px; color: var(--muted); margin-bottom: 7px; }
+        .vs-n { font-size: 30px; font-weight: 800; line-height: 1; color: var(--navy); font-family: 'SF Mono', Menlo, Consolas, monospace; }
+        .vs-n i { font-style: normal; font-size: 12px; color: var(--muted); font-weight: 500; margin-left: 2px; }
+        .vs-bar { height: 8px; border-radius: 4px; background: rgba(255, 255, 255, 0.06); margin-top: 11px; overflow: hidden; }
+        .vs-bar i { display: block; height: 100%; border-radius: 4px; background: linear-gradient(90deg, #f87171, #ef4444); }
+        .vs-col.good .vs-bar i { background: linear-gradient(90deg, #4a7ce0, #5b8def); }
+        .vs-mid { font-size: 11px; font-weight: 700; color: var(--muted); }
 
-            .button-section {
-                padding: 16px;
-            }
+        .reason { display: flex; gap: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; box-shadow: var(--shadow-md); }
+        .reason + .reason { margin-top: 11px; }
+        .reason-n {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            font-size: 12px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .reason-t { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 3px; }
+        .reason-d { font-size: 11.5px; color: var(--ink-2); line-height: 1.7; }
+
+        .after-row { display: flex; align-items: center; gap: 8px; padding: 12px 0; border-bottom: 1px dashed var(--line); }
+        .after-row:last-child { border-bottom: none; }
+        .after-k { width: 92px; flex-shrink: 0; font-size: 12px; font-weight: 700; color: var(--navy); }
+        .after-now { flex: 1; font-size: 11.5px; color: #ef4444; }
+        .after-arrow { font-size: 12px; color: var(--muted); }
+        .after-next { flex: 1; font-size: 11.5px; color: #5dbe8d; text-align: right; }
+
+        /* ========== 深色主题适配（仅屏幕，与项目整体风格一致） ========== */
+        @media screen {
+            body { background: var(--bg); }
+            .app { background: var(--bg); box-shadow: none; }
+
+            .topbar { background: rgba(30, 41, 59, 0.75); border-bottom-color: var(--line); }
+            .topbar-back { background: rgba(91, 141, 239, 0.15); }
+
+            .hero { background: linear-gradient(165deg, #0b1120 0%, #121b30 48%, #16294a 100%); }
+            .hero::after { background: radial-gradient(circle at 84% 8%, rgba(78, 205, 196, 0.2), transparent 58%); }
+            .hero-img { filter: brightness(0.8) saturate(0.95); }
+            .hero-badge { background: rgba(91, 141, 239, 0.18); border-color: rgba(91, 141, 239, 0.35); }
+            .hero-stats { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.12); }
+            .hero-foot { background: linear-gradient(90deg, rgba(11, 17, 32, 0.85), rgba(11, 17, 32, 0.35)); }
+
+            .card { background: var(--card); border-color: var(--line); box-shadow: var(--shadow-md); }
+            .scene, .reason { box-shadow: var(--shadow-md); }
+
+            .band-blue { background: linear-gradient(90deg, #3b6fd4, #5b8def); }
+            .band-gray { background: var(--card); border-color: var(--line); }
+
+            .btn-primary { background: linear-gradient(135deg, #4a7ce0, #5b8def); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); }
+            .btn-pdf { background: linear-gradient(135deg, #3a5f9e, #4a7ce0); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); }
+            .btn-ghost { background: transparent; border-color: rgba(91, 141, 239, 0.25); }
+        }
+
+        /* ============================================================
+           质感增强层 · 配图（仅在屏幕态生效，不影响 PDF 白底版式）
+           ============================================================ */
+        .card, .scene, .reason {
+            background:
+                linear-gradient(158deg, rgba(49, 53, 76, 0.74) 0%, rgba(29, 32, 47, 0.60) 100%);
+            border: 1px solid rgba(91, 141, 239, 0.16);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                0 14px 28px -16px rgba(0, 0, 0, 0.65);
+        }
+
+        /* 章节小序号 */
+        .sec-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'SF Mono', Menlo, Consolas, monospace;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            color: #5b8def;
+            opacity: .9;
+            margin-bottom: 8px;
+        }
+        .sec-eyebrow::before,
+        .sec-eyebrow::after {
+            content: '';
+            width: 16px;
+            height: 1px;
+            margin: 0 9px;
+        }
+        .sec-eyebrow::before {
+            background: linear-gradient(90deg, transparent, rgba(91, 141, 239, 0.6));
+        }
+        .sec-eyebrow::after {
+            background: linear-gradient(90deg, rgba(91, 141, 239, 0.6), transparent);
+        }
+
+        .sec-title::after {
+            width: 40px;
+            background: linear-gradient(90deg, #5b8def, #4ecdc4);
+        }
+
+        /* 场景缩略图 */
+        .thumb {
+            display: block;
+            width: 62px;
+            height: 62px;
+            border-radius: 14px;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1px solid rgba(91, 141, 239, 0.24);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.08),
+                0 10px 18px -10px rgba(0, 0, 0, 0.75);
+        }
+        .thumb-sm { width: 46px; height: 46px; border-radius: 12px; }
+        .scene-body { display: flex; align-items: center; gap: 13px; }
+        .scene-chart { flex: 1; min-width: 0; }
+        /* 缩略图已承担场景识别，隐藏头部小图标避免重复 */
+        .scene-head .scene-ico { display: none; }
+
+        /* 章节插画 */
+        .illus {
+            width: 100%;
+            display: block;
+            border-radius: 14px;
+            border: 1px solid rgba(91, 141, 239, 0.16);
+            box-shadow: 0 16px 32px -20px rgba(0, 0, 0, 0.85);
+            margin-bottom: 14px;
         }
     </style>
 </head>
@@ -950,198 +749,285 @@
     <script src="html2canvas.min.js"></script>
     <script src="jspdf.min.js"></script>
 
-    <div class="container">
-        <!-- 头部 -->
-        <header class="header">
-            <div class="header-top">
-                <div class="back-btn" onclick="history.back()">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
-                    </svg>
-                </div>
-                <div class="header-title">检测结果</div>
+    <div class="app">
+        <!-- 顶部栏 -->
+        <div class="topbar">
+            <div class="topbar-back" onclick="history.back()">
+                <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
             </div>
+            <div class="topbar-title">检测结果</div>
+        </div>
+
+<!-- Hero -->
+        <header class="hero">
+            <div class="hero-top">
+                <div class="hero-eyebrow">
+                    <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+                    网络体验对比报告
+                </div>
+                <div class="hero-badge">你家 WiFi</div>
+            </div>
+            <h1 class="hero-title">你家 WiFi 够用吗？<br>六大日常场景一测便知</h1>
+            <p class="hero-sub">覆盖刷视频、打游戏、视频通话等日常使用</p>
+            <div class="hero-stats">
+                <div class="hs"><b>60<i>分</i></b><span>综合体验</span></div>
+                <div class="hs"><b>4<i>项</i></b><span>达标场景</span></div>
+                <div class="hs"><b>2<i>项</i></b><span>偏弱场景</span></div>
+                <div class="hs"><b>23<i>秒</i></b><span>下载 1GB</span></div>
+            </div>
+            <img class="hero-img" src="assets/hero-network.jpg" alt="网络体验对比">
+            <div class="hero-foot">日常够用，但人多时容易卡</div>
         </header>
 
-        <!-- SVG渐变定义 -->
-        <svg width="0" height="0" style="position: absolute;">
-            <defs>
-                <linearGradient id="iconGradient" x1="0%" y1="100%" x2="0%" y2="0%">
-                    <stop offset="0%" style="stop-color:#5b8def;stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#4ecdc4;stop-opacity:1" />
-                </linearGradient>
-            </defs>
-        </svg>
+        <main class="content">
+            <!-- 一、综合对比 -->
+            <section class="sec">
+                <div class="sec-head">
+                    <div class="sec-eyebrow">01</div>
+                    <h2 class="sec-title">你家网络 vs 优质网络</h2>
+                    <div class="sec-sub">同样是刷视频、打游戏，差距一眼看懂</div>
+                </div>
+                <div class="card">
+                    <div class="vs">
+                        <div class="vs-col">
+                            <div class="vs-l">你家网络</div>
+                            <div class="vs-n">60<i>分</i></div>
+                            <div class="vs-bar"><i style="width:60%"></i></div>
+                        </div>
+                        <div class="vs-mid">对比</div>
+                        <div class="vs-col good">
+                            <div class="vs-l">优质网络</div>
+                            <div class="vs-n">85<i>分</i></div>
+                            <div class="vs-bar"><i style="width:85%"></i></div>
+                        </div>
+                    </div>
+                    <div class="band band-gray" style="margin-top:18px">
+                        你家网络<b>日常够用</b>，但和优质网络比，<b>打游戏、全家一起用</b>时会明显吃亏
+                    </div>
+                </div>
+            </section>
 
-        <!-- 主内容 -->
-        <main class="main-content">
-            <!-- AI诊断 -->
-            <div class="ai-diagnosis">
-                <div class="ai-header">
-                    <div class="ai-icon">AI</div>
-                    <div class="ai-title-group">
-                        <div class="ai-title">智能诊断结果</div>
-                        <div class="ai-subtitle">基于当前网络环境分析</div>
-                    </div>
+            <!-- 二、六大日常场景对比 -->
+            <section class="sec">
+                <div class="sec-head">
+                    <div class="sec-eyebrow">02</div>
+                    <h2 class="sec-title">六大日常场景对比</h2>
+                    <div class="sec-sub">平时做的事，网络到底够不够用</div>
                 </div>
-                <div class="ai-content">
-                    <div class="diagnosis-row">
-                        <div class="diagnosis-label">网络评价</div>
-                        <div class="diagnosis-value poor">差</div>
-                    </div>
-                    <div class="diagnosis-row">
-                        <div class="diagnosis-label">网络分析</div>
-                        <div class="diagnosis-desc">信号弱，干扰严重，连接数过多，导致延迟高、网速慢。</div>
-                    </div>
-                    <div class="diagnosis-row">
-                        <div class="diagnosis-label">整改建议</div>
-                        <div class="diagnosis-desc">建议将路由器更换为WiFi6型号，并将手机连接到5G频段，同时减少同时连接的设备数量，以显著提升网速和降低延迟。</div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- 检测报告 -->
-            <div class="report-section" id="reportSection">
-                <div class="report-header" onclick="toggleReport()">
-                    <div class="report-icon">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-                        </svg>
+                <div class="scene">
+                    <div class="scene-head">
+                        <div class="scene-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l6 3.5-6 3.5v-7z"/></svg></div>
+                        <div class="scene-name">刷视频 / 追剧</div>
+                        <div class="chip chip-ok">很流畅</div>
                     </div>
-                    <div class="report-title-group">
-                        <div class="report-title">检测报告</div>
-                        <div class="report-subtitle">详细检测数据记录</div>
+                    <div class="scene-body"><img class="thumb" src="assets/scene-video.jpg" alt=""><div class="scene-chart"><div class="cmp-line">
+                        <span class="cmp-k">你家网络</span>
+                        <div class="cmp-track"><div class="cmp-fill" style="width:100%"></div></div>
+                        <b class="cmp-v">45.2 MB/s</b>
                     </div>
-                    <svg class="report-arrow" viewBox="0 0 24 24">
-                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
-                    </svg>
+                    <div class="cmp-line std">
+                        <span class="cmp-k">流畅标准</span>
+                        <div class="cmp-track"><div class="cmp-fill" style="width:11%"></div></div></div></div>
+                        <b class="cmp-v">≥ 5 MB/s</b>
+                    </div>
+                    <div class="scene-note">看 4K 高清、连刷几个小时都基本不卡，一家人同时看也没问题。</div>
                 </div>
-                <div class="report-content">
-                    <div class="report-group">
-                        <div class="group-title">
-                            <span class="group-icon">
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                                </svg>
-                            </span>
-                            WiFi信息
-                        </div>
-                        <div class="metrics-grid">
-                            <div class="metric-item">
-                                <div class="metric-label">速率</div>
-                                <div class="metric-value">1200<span class="unit">Mbps</span></div>
-                            </div>
-                            <div class="metric-item">
-                                <div class="metric-label">频段</div>
-                                <div class="metric-value">5<span class="unit">GHz</span></div>
-                            </div>
-                            <div class="metric-item">
-                                <div class="metric-label">连接数</div>
-                                <div class="metric-value small">2</div>
-                            </div>
-                            <div class="metric-item">
-                                <div class="metric-label">WiFi名称</div>
-                                <div class="metric-value small">ChinaNet-5G</div>
-                            </div>
-                            <div class="metric-item">
-                                <div class="metric-label">信号</div>
-                                <div class="metric-value">-50<span class="unit">dBm</span></div>
-                            </div>
-                            <div class="metric-item">
-                                <div class="metric-label">干扰</div>
-                                <div class="metric-value small">较少</div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="report-group">
-                        <div class="group-title">
-                            <span class="group-icon">
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>
-                                </svg>
-                            </span>
-                            设备信息
-                        </div>
-                        <div class="metrics-grid">
-                            <div class="metric-item">
-                                <div class="metric-label">手机厂家</div>
-                                <div class="metric-value small">华为</div>
-                            </div>
-                            <div class="metric-item">
-                                <div class="metric-label">手机型号</div>
-                                <div class="metric-value small">P50 Pro</div>
-                            </div>
-                            <div class="metric-item">
-                                <div class="metric-label">网关厂家</div>
-                                <div class="metric-value small text-ellipsis" onclick="toggleEllipsis(this)" title="SHEN ZHEN NUO XIN CHENG TECHNOLOGY">SHEN ZHEN NUO XIN CHENG TECHNOLOGY</div>
-                            </div>
-                            <div class="metric-item">
-                                <div class="metric-label">手机WiFi6</div>
-                                <div class="metric-value small">支持</div>
-                            </div>
-                            <div class="metric-item">
-                                <div class="metric-label">网关WiFi6</div>
-                                <div class="metric-value small">支持</div>
-                            </div>
-                        </div>
+                <div class="scene">
+                    <div class="scene-head">
+                        <div class="scene-ico"><svg viewBox="0 0 24 24"><path d="M15 10.5V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2.5l4 3v-9l-4 3z"/></svg></div>
+                        <div class="scene-name">视频通话 / 上网课</div>
+                        <div class="chip chip-ok">够用</div>
                     </div>
+                    <div class="scene-body"><img class="thumb" src="assets/scene-call.jpg" alt=""><div class="scene-chart"><div class="cmp-line">
+                        <span class="cmp-k">你家网络</span>
+                        <div class="cmp-track"><div class="cmp-fill" style="width:100%"></div></div>
+                        <b class="cmp-v">23.8 MB/s</b>
+                    </div>
+                    <div class="cmp-line std">
+                        <span class="cmp-k">流畅标准</span>
+                        <div class="cmp-track"><div class="cmp-fill" style="width:8%"></div></div></div></div>
+                        <b class="cmp-v">≥ 2 MB/s</b>
+                    </div>
+                    <div class="scene-note">画面清晰、声音不卡，孩子上网课举手互动也够用（上传速度）。</div>
+                </div>
 
-                    <div class="report-group">
-                        <div class="group-title">
-                            <span class="group-icon">
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                                </svg>
-                            </span>
-                            内网质量
-                        </div>
-                        <div class="metrics-grid">
-                            <div class="metric-item">
-                                <div class="metric-label">上行</div>
-                                <div class="metric-value">4.68<span class="unit">MB/s</span></div>
-                            </div>
-                            <div class="metric-item">
-                                <div class="metric-label">下行</div>
-                                <div class="metric-value">4.68<span class="unit">MB/s</span></div>
-                            </div>
-                            <div class="metric-item">
-                                <div class="metric-label">内网时延</div>
-                                <div class="metric-value">4<span class="unit">ms</span></div>
-                            </div>
-                            <div class="metric-item">
-                                <div class="metric-label">外网时延</div>
-                                <div class="metric-value">10<span class="unit">ms</span></div>
-                            </div>
-                        </div>
+                <div class="scene">
+                    <div class="scene-head">
+                        <div class="scene-ico"><svg viewBox="0 0 24 24"><path d="M8 9h8a4 4 0 0 1 4 4 2.5 2.5 0 0 1-4.4 1.7L14.5 13h-5l-1.1 1.7A2.5 2.5 0 0 1 4 13a4 4 0 0 1 4-4z"/><path d="M8.5 11v2.4M7.3 12.2h2.4"/><path d="M15.5 11.6h.01"/></svg></div>
+                        <div class="scene-name">打游戏 / 看直播</div>
+                        <div class="chip chip-warn">高峰期易卡</div>
+                    </div>
+                    <div class="scene-body"><img class="thumb" src="assets/scene-game.jpg" alt=""><div class="scene-chart"><div class="cmp-line bad">
+                        <span class="cmp-k">你家网络</span>
+                        <div class="cmp-track"><div class="cmp-fill" style="width:69%"></div></div>
+                        <b class="cmp-v">稳定度 62 分</b>
+                    </div>
+                    <div class="cmp-line std">
+                        <span class="cmp-k">流畅标准</span>
+                        <div class="cmp-track"><div class="cmp-fill" style="width:100%"></div></div></div></div>
+                        <b class="cmp-v">≥ 90 分</b>
+                    </div>
+                    <div class="scene-note">平时能玩，但晚上人多时延迟会跳，游戏容易“瞬移”、直播会转圈。</div>
+                </div>
+
+                <div class="scene">
+                    <div class="scene-head">
+                        <div class="scene-ico"><svg viewBox="0 0 24 24"><path d="M12 4v11"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/></svg></div>
+                        <div class="scene-name">下载大文件 / 更新游戏</div>
+                        <div class="chip chip-ok">很快</div>
+                    </div>
+                    <div class="scene-body"><img class="thumb" src="assets/scene-download.jpg" alt=""><div class="scene-chart"><div class="cmp-line">
+                        <span class="cmp-k">你家网络</span>
+                        <div class="cmp-track"><div class="cmp-fill" style="width:100%"></div></div>
+                        <b class="cmp-v">45.2 MB/s</b>
+                    </div>
+                    <div class="cmp-line std">
+                        <span class="cmp-k">流畅标准</span>
+                        <div class="cmp-track"><div class="cmp-fill" style="width:22%"></div></div></div></div>
+                        <b class="cmp-v">≥ 10 MB/s</b>
+                    </div>
+                    <div class="scene-note">下载 1GB 的电影或游戏更新包，大约 <b>23 秒</b> 就能下完。</div>
+                </div>
+
+                <div class="scene">
+                    <div class="scene-head">
+                        <div class="scene-ico"><svg viewBox="0 0 24 24"><path d="M12 20V9"/><path d="M7.5 13.5L12 9l4.5 4.5"/><path d="M5 5h14"/></svg></div>
+                        <div class="scene-name">发视频 / 照片备份</div>
+                        <div class="chip chip-ok">不错</div>
+                    </div>
+                    <div class="scene-body"><img class="thumb" src="assets/scene-upload.jpg" alt=""><div class="scene-chart"><div class="cmp-line">
+                        <span class="cmp-k">你家网络</span>
+                        <div class="cmp-track"><div class="cmp-fill" style="width:100%"></div></div>
+                        <b class="cmp-v">23.8 MB/s</b>
+                    </div>
+                    <div class="cmp-line std">
+                        <span class="cmp-k">流畅标准</span>
+                        <div class="cmp-track"><div class="cmp-fill" style="width:21%"></div></div></div></div>
+                        <b class="cmp-v">≥ 5 MB/s</b>
+                    </div>
+                    <div class="scene-note">传 1GB 视频大约 <b>43 秒</b>，发朋友圈、备份照片都不慢（上传速度）。</div>
+                </div>
+
+                <div class="scene">
+                    <div class="scene-head">
+                        <div class="scene-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="12" height="9" rx="1.5"/><path d="M7 18h6"/><rect x="17" y="9" width="4" height="8" rx="1.2"/></svg></div>
+                        <div class="scene-name">全家多设备同时上网</div>
+                        <div class="chip chip-warn">容易卡</div>
+                    </div>
+                    <div class="scene-body"><img class="thumb" src="assets/scene-devices.jpg" alt=""><div class="scene-chart"><div class="cmp-line bad">
+                        <span class="cmp-k">你家网络</span>
+                        <div class="cmp-track"><div class="cmp-fill" style="width:60%"></div></div>
+                        <b class="cmp-v">约 3 台</b>
+                    </div>
+                    <div class="cmp-line std">
+                        <span class="cmp-k">流畅标准</span>
+                        <div class="cmp-track"><div class="cmp-fill" style="width:100%"></div></div></div></div>
+                        <b class="cmp-v">5 台以上</b>
+                    </div>
+                    <div class="scene-note">手机 + 电脑 + 电视同时用还行，再加几台设备就会互相“抢网”变慢。</div>
+                </div>
+            </section>
+
+            <!-- 三、为什么人多会卡 -->
+            <section class="sec">
+                <div class="sec-head">
+                    <div class="sec-eyebrow">03</div>
+                    <h2 class="sec-title">为什么人多的时候会卡？</h2>
+                    <div class="sec-sub">不是网速不够，是“路太挤”</div>
+                </div>
+                <img class="illus" src="assets/topology-network.jpg" alt="邻居路由器互相干扰示意"><div class="reason">
+                    <div class="reason-n">1</div>
+                    <div>
+                        <div class="reason-t">邻居的 WiFi 太多，信号互相“撞车”</div>
+                        <div class="reason-d">附近十几个 WiFi 挤在同样的频段上，就像多条小路汇进同一条道，谁都得排队。</div>
                     </div>
                 </div>
-            </div>
+                <div class="reason">
+                    <div class="reason-n">2</div>
+                    <div>
+                        <div class="reason-t">你家路由器走的正好是最挤的那条“道”</div>
+                        <div class="reason-d">当前用的信道，周边用的人最多、干扰最重，所以你家最容易被拖慢。</div>
+                    </div>
+                </div>
+                <div class="reason">
+                    <div class="reason-n">3</div>
+                    <div>
+                        <div class="reason-t">上传速度只有下载的一半</div>
+                        <div class="reason-d">发视频、开视频通话靠的是上传，一忙起来就更容易卡住。</div>
+                    </div>
+                </div>
+            </section>
 
-            <!-- 故障预约上门入口 -->
-            <div class="service-booking" onclick="goToServiceBooking()">
-                <div class="service-icon">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                    </svg>
+            <!-- 四、优化后能好多少 -->
+            <section class="sec">
+                <div class="sec-head">
+                    <div class="sec-eyebrow">04</div>
+                    <h2 class="sec-title">换个设置，能好多少？</h2>
+                    <div class="sec-sub">按下面建议调整后的预计效果</div>
                 </div>
-                <div class="service-content">
-                    <div class="service-title">服务预约上门</div>
-                    <div class="service-desc">网络问题无法解决？预约专业工程师上门服务</div>
+                <div class="card">
+                    <div class="after-row">
+                        <span class="after-k">打游戏卡顿</span>
+                        <span class="after-now">高峰期容易跳延迟</span>
+                        <span class="after-arrow">→</span>
+                        <span class="after-next">明显更稳定</span>
+                    </div>
+                    <div class="after-row">
+                        <span class="after-k">多设备同时用</span>
+                        <span class="after-now">约 3 台就变慢</span>
+                        <span class="after-arrow">→</span>
+                        <span class="after-next">5 台以上不卡</span>
+                    </div>
+                    <div class="after-row">
+                        <span class="after-k">网页打开</span>
+                        <span class="after-now">约 2.5 秒</span>
+                        <span class="after-arrow">→</span>
+                        <span class="after-next">1 秒内打开</span>
+                    </div>
+                    <div class="after-row">
+                        <span class="after-k">综合体验</span>
+                        <span class="after-now">60 分</span>
+                        <span class="after-arrow">→</span>
+                        <span class="after-next">85 分左右</span>
+                    </div>
                 </div>
-                <div class="service-arrow">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
-                    </svg>
+            </section>
+
+            <!-- 五、建议怎么做 -->
+            <section class="sec">
+                <div class="sec-head">
+                    <div class="sec-eyebrow">05</div>
+                    <h2 class="sec-title">建议怎么做</h2>
+                    <div class="sec-sub">照着做，全家上网都更顺畅</div>
                 </div>
-            </div>
+                <img class="illus" src="assets/router-device.jpg" alt="无线路由器"><div class="fix-list">
+                    <div class="fix-item">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        给路由器“换条不堵的路”：把信道从 161 换成 44 或 149
+                    </div>
+                    <div class="fix-item">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        路由器放在家里中间、开阔的位置，别塞进柜子里
+                    </div>
+                    <div class="fix-item">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        手机、电视等能连 5G 频段的设备，优先连 5G
+                    </div>
+                    <div class="fix-item warn">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm1 15h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg>
+                        路由器太老的话建议换 WiFi6 型号，全家一起用更稳
+                    </div>
+                </div>
+            </section>
         </main>
 
-        <!-- 按钮 -->
-        <div class="button-section">
+        <!-- 操作按钮 -->
+        <div class="actions">
             <button class="btn btn-primary" onclick="goToDetails()">查看测试详情</button>
             <button class="btn btn-pdf" id="exportBtn" onclick="exportReport()">导出PDF报告</button>
-            <button class="btn btn-secondary" onclick="retest()">重新检测</button>
+            <button class="btn btn-ghost" onclick="retest()">重新检测</button>
         </div>
     </div>
 
@@ -1151,26 +1037,6 @@
     </div>
 
     <script>
-        function toggleReport() {
-            document.getElementById('reportSection').classList.toggle('expanded');
-        }
-
-        function toggleEllipsis(el) {
-            el.classList.toggle('expanded');
-            if (el.classList.contains('expanded')) {
-                el.style.whiteSpace = 'normal';
-                el.style.wordBreak = 'break-all';
-            } else {
-                el.style.whiteSpace = 'nowrap';
-                el.style.wordBreak = 'normal';
-            }
-        }
-
-        // 跳转到故障预约页面
-        function goToServiceBooking() {
-            window.location.href = 'service-booking.html';
-        }
-
         // 查看测试详情
         function goToDetails() {
             window.location.href = 'speedtestresult2.html';

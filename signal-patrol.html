@@ -408,37 +408,41 @@
             background:rgba(34,197,94,0.15); color:var(--accent-green);
             border:1px solid rgba(34,197,94,0.3);
         }
-        .recheck-result {
-            background:rgba(34,197,94,0.08); border-radius:8px; padding:8px 10px;
-            display:flex; align-items:center; gap:10px; font-size:12px;
-            border:1px dashed rgba(34,197,94,0.3);
+        /* 结果视图 - 整改前后（信号+测速）对比 */
+        .abc-card {
+            display:grid; grid-template-columns:1fr 1fr; gap:8px;
         }
-        .recheck-result .label {
-            color:var(--accent-green); font-weight:600; flex-shrink:0;
+        .abc-col {
+            background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);
+            border-radius:10px; padding:8px 10px;
         }
-        .recheck-result .vals {
-            flex:1; display:flex; gap:12px; color:var(--text-primary);
+        .abc-col.after { background:rgba(34,197,94,0.06); border-color:rgba(34,197,94,0.22); }
+        .abc-hd {
+            display:flex; align-items:center; justify-content:space-between; gap:6px;
+            font-size:11px; font-weight:600; color:var(--text-secondary);
+            padding-bottom:6px; margin-bottom:4px;
+            border-bottom:1px solid rgba(255,255,255,0.06);
         }
-        .recheck-result .vals span b { font-weight:700; }
-        .recheck-result .delta {
-            font-size:11px; color:var(--accent-green); font-weight:700;
+        .abc-col.after .abc-hd { color:var(--accent-green); }
+        .abc-tag {
+            font-size:9px; font-weight:600; padding:1px 6px; border-radius:999px;
+            background:rgba(34,197,94,0.15); color:var(--accent-green);
         }
-        /* 结果视图 - 异常点测速结果 */
-        .abnormal-speed-result {
-            background:rgba(56,189,248,0.08); border-radius:8px; padding:8px 10px;
-            display:flex; align-items:center; gap:10px; font-size:12px;
-            border:1px dashed rgba(56,189,248,0.3); flex-wrap:wrap;
+        .abc-tag.warn { background:rgba(249,115,22,0.15); color:var(--accent-orange); }
+        .abc-tag.muted { background:rgba(255,255,255,0.06); color:var(--text-tertiary); }
+        .abc-row { display:flex; align-items:center; gap:6px; padding:3px 0; font-size:12px; }
+        .abc-row .k { flex:none; width:26px; font-size:11px; color:var(--text-secondary); }
+        .abc-row .v { font-weight:700; color:var(--text-primary); }
+        .abc-col:not(.after) .abc-row .v { font-weight:600; color:var(--text-secondary); }
+        .abc-row .v .u { font-size:9px; font-weight:400; color:var(--text-tertiary); margin-left:2px; }
+        .abc-row .none { color:var(--text-tertiary); }
+        .abc-d {
+            margin-left:auto; flex:none; font-size:10px; font-weight:700;
+            padding:1px 6px; border-radius:999px;
         }
-        .abnormal-speed-result .label {
-            color:var(--accent-cyan); font-weight:600; flex-shrink:0;
-            display:inline-flex; align-items:center; gap:4px;
-        }
-        .abnormal-speed-result .label svg { width:12px; height:12px; fill:var(--accent-cyan); }
-        .abnormal-speed-result .vals {
-            flex:1; display:flex; gap:12px; flex-wrap:wrap; color:var(--text-primary);
-        }
-        .abnormal-speed-result .vals span b { font-weight:700; }
-        .abnormal-speed-result .vals span.dn b { color:var(--accent-green); }
+        .abc-d.good { color:var(--accent-green); background:rgba(34,197,94,0.14); }
+        .abc-d.bad { color:var(--accent-red); background:rgba(239,68,68,0.14); }
+        .abc-note { grid-column:1 / -1; font-size:10px; color:var(--text-tertiary); margin-top:2px; }
 
         /* 整改采集弹窗 */
         .recheck-modal { max-width:340px; }
@@ -478,13 +482,50 @@
         }
         .recheck-summary-item .label { font-size:10px; color:var(--text-secondary); }
         .recheck-summary-item .value { font-size:15px; font-weight:700; margin-top:2px; }
+        .recheck-steps { display:flex; gap:8px; margin:0 0 10px; }
+        .recheck-step {
+            flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
+            padding:6px 8px; border-radius:8px; background:var(--bg-secondary);
+            font-size:11px; font-weight:600; color:var(--text-tertiary);
+            border:1px solid transparent;
+        }
+        .recheck-step i {
+            font-style:normal; width:16px; height:16px; border-radius:50%;
+            display:inline-flex; align-items:center; justify-content:center;
+            font-size:10px; background:rgba(255,255,255,0.08); color:var(--text-secondary);
+        }
+        .recheck-step.active { color:var(--accent-cyan); background:rgba(56,189,248,0.08); border-color:rgba(56,189,248,0.3); }
+        .recheck-step.active i { background:rgba(56,189,248,0.2); color:var(--accent-cyan); }
+        .recheck-step.done { color:var(--accent-green); }
+        .recheck-step.done i { background:rgba(34,197,94,0.2); color:var(--accent-green); }
+        .recheck-speed {
+            background:var(--bg-secondary); border-radius:12px; padding:14px; margin-bottom:14px;
+        }
+        .recheck-speed-head {
+            display:flex; align-items:center; justify-content:center; gap:6px;
+            font-size:11px; color:var(--text-secondary); margin-bottom:10px;
+        }
+        .recheck-speed-head .spd-dot {
+            width:8px; height:8px; border-radius:50%; background:var(--accent-red);
+            animation:pulse 1s infinite; flex:none;
+        }
+        .recheck-speed-head .spd-dot.idle { background:var(--text-tertiary); animation:none; }
+        .recheck-speed-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+        .recheck-speed-item { text-align:center; }
+        .recheck-speed-item .label { font-size:10px; color:var(--text-secondary); }
+        .recheck-speed-item .value { font-size:13px; font-weight:700; margin-top:2px; }
+        .recheck-speed-item .value.dn { color:var(--accent-green); }
+        .recheck-speed-item .value .u { font-size:9px; font-weight:400; color:var(--text-secondary); margin-left:1px; }
+        .recheck-speed .recheck-progress { margin-top:12px; }
 
         .result-actions { display:flex; gap:10px; margin-top:8px; margin-bottom: 80px; }
         .btn-primary {
             flex:1; background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));
             color:#fff; border:none; padding:14px; border-radius:12px;
             font-size:14px; font-weight:600; cursor:pointer;
+            display:inline-flex; align-items:center; justify-content:center; gap:6px;
         }
+        .btn-primary svg { width:16px; height:16px; fill:#fff; }
         .btn-primary:active { transform:scale(0.97); }
         .btn-secondary {
             flex:1; background:rgba(255,255,255,0.06); color:var(--text-primary);
@@ -535,35 +576,59 @@
         /* PDF导出报告（浅色信纸风，离屏渲染用） */
         #pdfReportWrap { position:fixed; left:-9999px; top:0; z-index:-1; }
         .pdf-report {
-            width:794px; padding:30px 42px; background:#fff; color:#1e293b;
+            width:794px; padding:48px 46px; background:#fff; color:#1e293b;
             font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Segoe UI',sans-serif;
         }
-        .pr-head { text-align:center; padding-bottom:12px; border-bottom:2px solid #0284c7; margin-bottom:14px; }
-        .pr-brand { font-size:11px; color:#0284c7; letter-spacing:4px; margin-bottom:6px; font-weight:700; }
-        .pr-title { font-size:22px; font-weight:800; color:#0f172a; letter-spacing:2px; }
-        .pr-no { font-size:11px; color:#94a3b8; margin-top:8px; letter-spacing:1px; }
-        .pr-salute { font-size:14px; font-weight:700; color:#0f172a; margin-bottom:8px; }
+        /* 报告头：品牌+标题居中，右上角扫码下载（字号/间距对齐 v3 备份版） */
+        .pr-head { position:relative; text-align:center; min-height:84px; padding-bottom:18px; border-bottom:2px solid #0284c7; margin-bottom:22px; }
+        .pr-brand { font-size:11px; color:#0284c7; letter-spacing:4px; margin-bottom:8px; font-weight:700; }
+        .pr-title { font-size:26px; font-weight:800; color:#0f172a; letter-spacing:2px; }
+        .pr-no { font-size:11px; color:#94a3b8; margin-top:10px; letter-spacing:1px; }
+        .pr-type {
+            display:inline-block; margin-top:10px; padding:3px 14px; border-radius:999px;
+            font-size:12px; font-weight:700; letter-spacing:2px;
+            border:1px solid #0284c7; color:#0284c7; background:#eff6ff;
+        }
+        .pr-type.done { border-color:#16a34a; color:#16a34a; background:#f0fdf4; }
+        .pr-qr { position:absolute; right:0; top:0; text-align:center; }
+        .pr-qr img { display:block; margin:0 auto 4px; }
+        .pr-qr-cap { font-size:10px; color:#94a3b8; letter-spacing:0.5px; white-space:nowrap; }
+
+        .pr-salute { font-size:14px; font-weight:700; color:#0f172a; margin-bottom:10px; }
         .pr-salute .phone { color:#0284c7; }
-        .pr-intro { font-size:12px; line-height:1.8; color:#475569; text-align:justify; text-indent:2em; margin-bottom:12px; }
-        .pr-h { font-size:15px; font-weight:700; color:#0f172a; margin:14px 0 8px; padding-left:9px; border-left:4px solid #0284c7; }
-        .pr-concl { margin-top:10px; border-radius:10px; padding:9px 13px; font-size:12px; line-height:1.6; }
-        .pr-concl.good { background:#f0fdf4; border:1px solid #bbf7d0; color:#15803d; }
-        .pr-concl.bad { background:#fff7ed; border:1px solid #fed7aa; color:#c2410c; }
-        .pr-table { width:100%; border-collapse:collapse; font-size:11.5px; }
+        .pr-intro { font-size:12px; line-height:2; color:#475569; text-align:justify; text-indent:2em; margin-bottom:18px; }
+        .pr-intro b { font-weight:700; }
+        .pr-intro .hl-bad { color:#dc2626; }
+        .pr-intro .hl-good { color:#16a34a; }
+        .pr-intro .hl-mid { color:#ea580c; }
+
+        /* 网络信息卡片：一行多项，竖线分隔 */
+        .pr-metacard { font-size:12px; color:#475569; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 16px; }
+        .pr-meta-row { display:flex; flex-wrap:wrap; align-items:center; line-height:2.1; }
+        .pr-meta-item .v { color:#0f172a; font-weight:700; }
+        .pr-meta-sep { margin:0 7px; }
+
+        .pr-h { font-size:15px; font-weight:700; color:#0f172a; margin:22px 0 12px; padding-left:9px; border-left:4px solid #0284c7; }
+        .pr-table { width:100%; border-collapse:collapse; font-size:12px; }
         .pr-table th { background:#eff6ff; color:#1e40af; font-weight:700; }
-        .pr-table th, .pr-table td { border:1px solid #e2e8f0; padding:5px 9px; text-align:center; }
+        .pr-table th, .pr-table td { border:1px solid #e2e8f0; padding:8px 10px; text-align:center; }
         .pr-table th:first-child, .pr-table td:first-child { text-align:left; }
         .pr-table.pr-center th, .pr-table.pr-center td { text-align:center; }
+        .pr-table tr.total td { font-weight:700; }
         .pr-table .ok { color:#16a34a; font-weight:700; }
         .pr-table .warn { color:#ea580c; font-weight:700; }
         .pr-table .bad { color:#dc2626; font-weight:700; }
         .pr-table .new { color:#7c3aed; font-weight:700; }
-        .pr-rect {
-            font-size:12px; color:#334155; line-height:1.8; white-space:pre-wrap;
-            background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid #0284c7;
-            border-radius:8px; padding:10px 14px;
-        }
-        .pr-foot { margin-top:16px; padding-top:10px; border-top:1px solid #e2e8f0; font-size:10px; color:#94a3b8; line-height:1.8; }
+        .pr-table .speed { color:#38bdf8; font-weight:700; }
+        .pr-note { margin-top:10px; font-size:12px; color:#475569; line-height:1.9; }
+        .pr-note .ok { color:#16a34a; font-weight:700; }
+        .pr-note .warn { color:#ea580c; font-weight:700; }
+        /* 巡检结论框：无异常点报告使用，与全文 10px 圆角 / 12px 字号规范一致 */
+        .pr-concl { border:1px solid #bbf7d0; background:#f0fdf4; border-radius:10px; padding:12px 14px; margin-top:14px; }
+        .pr-concl .pr-concl-h { font-size:12.5px; font-weight:700; color:#15803d; margin-bottom:6px; }
+        .pr-concl .pr-concl-t { font-size:12px; color:#475569; line-height:1.9; text-align:justify; }
+        .pr-concl .pr-concl-t b { color:#0f172a; }
+        .pr-foot { margin-top:30px; padding-top:14px; border-top:1px solid #e2e8f0; font-size:10.5px; color:#94a3b8; line-height:1.8; }
         @page { size:A4; margin:0; }
         @media print {
             body.print-report > *:not(#pdfReportWrap) { display:none !important; }
@@ -877,6 +942,28 @@
         }
         .modal-textarea:focus { outline:none; border-color:var(--border-active); }
         .modal-input::placeholder,.modal-textarea::placeholder { color:var(--text-tertiary); }
+        /* 导出报告类型选择 */
+        .accept-options { display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
+        .accept-option {
+            display:flex; align-items:flex-start; gap:10px;
+            background:rgba(255,255,255,0.04); border:1px solid var(--border-subtle);
+            border-radius:12px; padding:12px 14px; cursor:pointer;
+            transition:border-color 0.15s, background 0.15s;
+        }
+        .accept-option.active { border-color:var(--accent-cyan); background:rgba(56,189,248,0.08); }
+        .accept-radio {
+            flex:none; width:18px; height:18px; border-radius:50%; margin-top:1px;
+            border:2px solid var(--border-active);
+            display:flex; align-items:center; justify-content:center;
+        }
+        .accept-option.active .accept-radio { border-color:var(--accent-cyan); }
+        .accept-body { flex:1; min-width:0; }
+        .accept-option.active .accept-radio::after {
+            content:''; width:8px; height:8px; border-radius:50%; background:var(--accent-cyan);
+        }
+        .accept-name { font-size:14px; font-weight:700; color:var(--text-primary); }
+        .accept-option.active .accept-name { color:var(--accent-cyan); }
+        .accept-desc { font-size:11px; color:var(--text-secondary); line-height:1.6; margin-top:3px; }
 
         /* 户型选择 */
         .house-options {
@@ -1147,7 +1234,10 @@
             </div>
             <div class="result-actions">
                 <button class="btn-danger" onclick="confirmDeleteRecord()">删除报告</button>
-                <button class="btn-primary" onclick="navigate('view-home','WiFi信号巡检')">完成</button>
+                <button class="btn-primary" id="resultExportBtn" onclick="exportSingleRecordPDF(this)">
+                    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    导出报告
+                </button>
             </div>
         </div>
     </div>
@@ -1178,9 +1268,14 @@
                     <span id="recheckModalTitle">整改检查</span>
                 </span>
             </div>
+            <div class="recheck-steps">
+                <div class="recheck-step" id="recheckStepSignal"><i>1</i>信号采集</div>
+                <div class="recheck-step" id="recheckStepSpeed"><i>2</i>网络测速</div>
+            </div>
             <div class="modal-desc">
                 位置标签：<b id="recheckTagDisplay" style="color:var(--accent-cyan);">-</b><br>
-                整改前信号：<b id="recheckBeforeDisplay" style="color:var(--accent-red);">- dBm</b>
+                整改前信号：<b id="recheckBeforeDisplay" style="color:var(--accent-red);">- dBm</b><br>
+                整改前测速：<span id="recheckBeforeSpeed" style="color:var(--text-secondary);">未测速</span>
             </div>
             <div class="recheck-live">
                 <div class="live-label">
@@ -1204,9 +1299,60 @@
                     <div class="value" id="recheckAvgVal">-</div>
                 </div>
             </div>
+            <div class="recheck-speed" id="recheckSpeedBox" style="display:none;">
+                <div class="recheck-speed-head">
+                    <span class="spd-dot idle" id="recheckSpeedDot"></span>
+                    <span id="recheckSpeedLabel">点击「开始测速」复测网速</span>
+                </div>
+                <div class="recheck-speed-grid">
+                    <div class="recheck-speed-item"><div class="label">下载</div><div class="value dn" id="recheckSpeedDown">--</div></div>
+                    <div class="recheck-speed-item"><div class="label">上传</div><div class="value" id="recheckSpeedUp">--</div></div>
+                    <div class="recheck-speed-item"><div class="label">延迟</div><div class="value" id="recheckSpeedLat">--</div></div>
+                    <div class="recheck-speed-item"><div class="label">抖动</div><div class="value" id="recheckSpeedJit">--</div></div>
+                </div>
+                <div class="recheck-progress"><div class="recheck-progress-bar" id="recheckSpeedBar"></div></div>
+            </div>
             <div class="modal-actions">
                 <button class="modal-btn secondary" onclick="cancelRecheck()">取消</button>
                 <button class="modal-btn" id="recheckActionBtn" style="background:linear-gradient(135deg,var(--accent-orange),var(--accent-green));color:#fff;" onclick="recheckAction()">开始采集</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导出报告类型选择弹窗 -->
+    <div class="modal-mask" id="acceptTypeModal">
+        <div class="modal" style="max-width:340px;max-height:calc(100vh - 40px);overflow-y:auto;">
+            <div class="modal-title">
+                <span style="display:inline-flex;align-items:center;gap:6px;">
+                    <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:var(--accent-cyan);"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    导出报告
+                </span>
+            </div>
+            <div class="modal-desc">请选择本次报告类型并填写整改措施，将随PDF报告一同导出。</div>
+            <div class="accept-options" id="acceptOptions">
+                <div class="accept-option" data-type="预受理" onclick="selectAcceptType('预受理')">
+                    <div class="accept-radio"></div>
+                    <div class="accept-body">
+                        <div class="accept-name">预受理</div>
+                        <div class="accept-desc">装维准备的网络整改营销方案，供用户预览整改效果</div>
+                    </div>
+                </div>
+                <div class="accept-option" data-type="已受理" onclick="selectAcceptType('已受理')">
+                    <div class="accept-radio"></div>
+                    <div class="accept-body">
+                        <div class="accept-name">已受理</div>
+                        <div class="accept-desc">用户已认可整改营销方案，并已完成费用支付</div>
+                    </div>
+                </div>
+            </div>
+            <label class="field-label">整改用户信息</label>
+            <input type="text" class="modal-input" id="acceptUserInput" placeholder="请输入整改用户信息">
+            <label class="field-label req">整改措施</label>
+            <div class="modal-tags" id="acceptTags"></div>
+            <textarea class="modal-textarea" id="acceptRectifyInput" placeholder="例如：将客厅AP移至电视柜顶层，并在卧室新增1个Mesh子节点覆盖"></textarea>
+            <div class="modal-actions">
+                <button class="modal-btn secondary" onclick="closeAcceptTypeModal()">取消</button>
+                <button class="modal-btn primary" onclick="confirmAcceptExport()">导出报告</button>
             </div>
         </div>
     </div>
@@ -2253,7 +2399,35 @@ function showResult(r) {
         abList.innerHTML = r.abnormalPoints.map((p, i) => {
             const hasRecheck = !!p.recheck;
             const rc = p.recheck;
-            const delta = hasRecheck ? rc.avg - p.signal : 0;
+            const bs = p.speed || null;                     // 整改前测速
+            const as = (rc && rc.speed) ? rc.speed : null;  // 整改检查后测速
+            const afterOk = hasRecheck && rc.avg >= th;
+            const num = (v, unit, dec) => v == null ? '<span class="none">—</span>'
+                : `${dec != null ? Number(v).toFixed(dec) : v}<span class="u">${unit}</span>`;
+            const chip = (before, after, higherBetter) => {
+                if (before == null || after == null) return '';
+                const d = Math.round((after - before) * 100) / 100;
+                const good = higherBetter ? d >= 0 : d <= 0;
+                return `<span class="abc-d ${good ? 'good' : 'bad'}">${d > 0 ? '+' : ''}${d}</span>`;
+            };
+            const cmpCard = hasRecheck ? `
+                <div class="abc-card">
+                    <div class="abc-col">
+                        <div class="abc-hd">整改前${bs ? '' : '<span class="abc-tag muted">未测速</span>'}</div>
+                        <div class="abc-row"><span class="k">信号</span><span class="v">${num(p.signal, 'dBm')}</span></div>
+                        <div class="abc-row"><span class="k">下载</span><span class="v">${num(bs && bs.download, 'MB/s', 2)}</span></div>
+                        <div class="abc-row"><span class="k">上传</span><span class="v">${num(bs && bs.upload, 'MB/s', 2)}</span></div>
+                        <div class="abc-row"><span class="k">延迟</span><span class="v">${num(bs && bs.latency, 'ms')}</span></div>
+                    </div>
+                    <div class="abc-col after">
+                        <div class="abc-hd">整改检查后<span class="abc-tag ${afterOk ? '' : 'warn'}">${afterOk ? '已达标' : '仍偏弱'}</span></div>
+                        <div class="abc-row"><span class="k">信号</span><span class="v">${num(rc.avg, 'dBm')}</span>${chip(p.signal, rc.avg, true)}</div>
+                        <div class="abc-row"><span class="k">下载</span><span class="v">${num(as && as.download, 'MB/s', 2)}</span>${chip(bs && bs.download, as && as.download, true)}</div>
+                        <div class="abc-row"><span class="k">上传</span><span class="v">${num(as && as.upload, 'MB/s', 2)}</span>${chip(bs && bs.upload, as && as.upload, true)}</div>
+                        <div class="abc-row"><span class="k">延迟</span><span class="v">${num(as && as.latency, 'ms')}</span>${chip(bs && bs.latency, as && as.latency, false)}</div>
+                    </div>
+                    <div class="abc-note">整改后采样 ${rc.samples.length} 次 · 区间 ${rc.min} ~ ${rc.max} dBm</div>
+                </div>` : '';
             return `
             <div class="abnormal-result-item ${hasRecheck?'has-recheck':''}">
                 <div class="abnormal-result-row">
@@ -2261,28 +2435,7 @@ function showResult(r) {
                     <span class="tag-signal">${p.signal} dBm<span class="below-threshold-tag">&lt; ${th}</span></span>
                     <button class="recheck-btn ${hasRecheck?'done':''}" onclick="openRecheckModal(${i})">${hasRecheck?'重新检查':'整改检查'}</button>
                 </div>
-                ${hasRecheck ? `
-                <div class="recheck-result">
-                    <span class="label">整改后</span>
-                    <div class="vals">
-                        <span>最小 <b class="bad">${rc.min}</b></span>
-                        <span>最大 <b class="good">${rc.max}</b></span>
-                        <span>平均 <b>${rc.avg}</b> dBm</span>
-                    </div>
-                    <span class="delta">${delta>=0?'+':''}${delta} dBm</span>
-                </div>` : ''}
-                ${p.speed ? `
-                <div class="abnormal-speed-result">
-                    <span class="label">
-                        <svg viewBox="0 0 24 24"><path d="M13 10.05V3.54c0-.97-1.17-1.46-1.86-.78L3.8 11.02c-.4.38-.4 1 .02 1.38L9 16.02v4.44c0 .97 1.17 1.46 1.86.78l7.34-8.26c.4-.38.4-1-.02-1.38L13 10.05z"/></svg>
-                        异常点测速
-                    </span>
-                    <div class="vals">
-                        <span class="dn">下载 <b>${p.speed.download.toFixed(2)}</b> MB/s</span>
-                        <span>上传 <b>${p.speed.upload.toFixed(2)}</b> MB/s</span>
-                        <span>延迟 <b>${p.speed.latency}</b> ms</span>
-                    </div>
-                </div>` : ''}
+                ${cmpCard}
             </div>`;
         }).join('');
     }
@@ -2389,9 +2542,10 @@ function doDeleteRecord() {
 // ============== 整改检查（单点采集） ==============
 let recheckState = {
     pointIndex: -1,
-    phase: 'idle',  // idle | collecting | done
+    phase: 'idle',  // idle | collecting | signal_done | speed_running | done
     samples: [],
     timer: null,
+    speedTimer: null,
     startTime: 0,
     pendingSave: null,
     compareCtx: null  // 从对比报告发起复测时的上下文 {beforeRec, afterRec, groupIndices}
@@ -2406,46 +2560,71 @@ function openRecheckModal(pointIndex) {
     recheckState.samples = [];
     recheckState.pendingSave = null;
     recheckState.compareCtx = null;
+    if (recheckState.speedTimer) { clearInterval(recheckState.speedTimer); recheckState.speedTimer = null; }
     const p = currentRecord.abnormalPoints[pointIndex];
     document.getElementById('recheckModalTitle').textContent = '整改检查';
     document.getElementById('recheckTagDisplay').textContent = p.tag;
     document.getElementById('recheckBeforeDisplay').textContent = p.signal + ' dBm';
+    document.getElementById('recheckBeforeSpeed').textContent = p.speed
+        ? `下载 ${p.speed.download.toFixed(2)} MB/s · 上传 ${p.speed.upload.toFixed(2)} MB/s · 延迟 ${p.speed.latency} ms`
+        : '未测速';
+    setRecheckStep(1);
     document.getElementById('recheckLiveVal').innerHTML = `--<span class="live-unit"> dBm</span>`;
     document.getElementById('recheckLiveLabel').textContent = '点击下方按钮开始采集';
     document.getElementById('recheckLiveDot').classList.add('idle');
     document.getElementById('recheckProgressBar').style.width = '0%';
     document.getElementById('recheckSummary').style.display = 'none';
+    // 第 2 步（测速）复位
+    document.getElementById('recheckSpeedBox').style.display = 'none';
+    document.getElementById('recheckSpeedBar').style.width = '0%';
+    document.getElementById('recheckSpeedLabel').textContent = '点击「开始测速」复测网速';
+    document.getElementById('recheckSpeedDot').classList.add('idle');
+    ['Down','Up','Lat','Jit'].forEach(k => { document.getElementById('recheckSpeed'+k).textContent = '--'; });
     updateRecheckBtn();
     document.getElementById('recheckModal').classList.add('show');
 }
 
+// 顶部步骤指示：1 信号采集 / 2 网络测速
+function setRecheckStep(step) {
+    const s1 = document.getElementById('recheckStepSignal');
+    const s2 = document.getElementById('recheckStepSpeed');
+    s1.className = 'recheck-step' + (step === 1 ? ' active' : step > 1 ? ' done' : '');
+    s2.className = 'recheck-step' + (step === 2 ? ' active' : '');
+}
+
 function updateRecheckBtn() {
     const btn = document.getElementById('recheckActionBtn');
-    if (recheckState.phase === 'idle') {
-        btn.textContent = '开始采集';
+    const ph = recheckState.phase;
+    if (ph === 'idle') {
+        btn.textContent = '开始采集'; btn.disabled = false; btn.style.opacity = '1';
         btn.style.background = 'linear-gradient(135deg,var(--accent-orange),var(--accent-green))';
-    } else if (recheckState.phase === 'collecting') {
-        btn.textContent = '结束采集';
+    } else if (ph === 'collecting') {
+        btn.textContent = '结束采集'; btn.disabled = false; btn.style.opacity = '1';
         btn.style.background = 'linear-gradient(135deg,#7c2d12,var(--accent-red))';
-    } else if (recheckState.phase === 'done') {
-        btn.textContent = '保存结果';
+    } else if (ph === 'signal_done') {
+        btn.textContent = '开始测速'; btn.disabled = false; btn.style.opacity = '1';
+        btn.style.background = 'linear-gradient(135deg,var(--accent-blue),var(--accent-cyan))';
+    } else if (ph === 'speed_running') {
+        btn.textContent = '测速中…'; btn.disabled = true; btn.style.opacity = '0.6';
+        btn.style.background = 'linear-gradient(135deg,var(--accent-blue),var(--accent-cyan))';
+    } else if (ph === 'done') {
+        btn.textContent = '保存结果'; btn.disabled = false; btn.style.opacity = '1';
         btn.style.background = 'linear-gradient(135deg,var(--accent-blue),var(--accent-cyan))';
     }
 }
 
 function cancelRecheck() {
     stopRecheckCollecting(false);
+    if (recheckState.speedTimer) { clearInterval(recheckState.speedTimer); recheckState.speedTimer = null; }
     document.getElementById('recheckModal').classList.remove('show');
 }
 
 function recheckAction() {
-    if (recheckState.phase === 'idle') {
-        startRecheckCollecting();
-    } else if (recheckState.phase === 'collecting') {
-        stopRecheckCollecting(true);
-    } else if (recheckState.phase === 'done') {
-        saveRecheckResult();
-    }
+    const ph = recheckState.phase;
+    if (ph === 'idle') startRecheckCollecting();
+    else if (ph === 'collecting') stopRecheckCollecting(true);
+    else if (ph === 'signal_done') startRecheckSpeed();
+    else if (ph === 'done') saveRecheckResult();
 }
 
 function startRecheckCollecting() {
@@ -2485,6 +2664,7 @@ function stopRecheckCollecting(finished) {
 
     if (!finished || recheckState.samples.length === 0) {
         recheckState.phase = 'idle';
+        setRecheckStep(1);
         if (finished && recheckState.samples.length === 0) {
             showToast('未采集到样本');
             document.getElementById('recheckLiveLabel').textContent = '未采集到数据，请重试';
@@ -2507,8 +2687,76 @@ function stopRecheckCollecting(finished) {
     document.getElementById('recheckMaxVal').textContent = max;
     document.getElementById('recheckAvgVal').textContent = avg;
     document.getElementById('recheckSummary').style.display = 'grid';
-    recheckState.phase = 'done';
+    recheckState.phase = 'signal_done';
     recheckState.pendingSave = { min, max, avg, samples: [...samples], time: Date.now() };
+    // 进入第 2 步：网络测速
+    setRecheckStep(2);
+    document.getElementById('recheckSpeedBox').style.display = '';
+    document.getElementById('recheckSpeedLabel').textContent = '点击「开始测速」复测网速';
+    updateRecheckBtn();
+}
+
+// 第 2 步：整改后网络测速（以整改后平均信号推算速率）
+function startRecheckSpeed() {
+    const sig = recheckState.pendingSave;
+    if (!sig) return;
+    recheckState.phase = 'speed_running';
+    updateRecheckBtn();
+    document.getElementById('recheckSpeedBox').style.display = '';
+    document.getElementById('recheckSpeedDot').classList.remove('idle');
+    document.getElementById('recheckSpeedLabel').textContent = '测速中…';
+    document.getElementById('recheckSpeedBar').style.width = '0%';
+    const u = s => `<span class="u">${s}</span>`;
+    ['Down','Up','Lat','Jit'].forEach(k => { document.getElementById('recheckSpeed'+k).textContent = '--'; });
+
+    const avgSig = sig.avg;
+    const weak = Math.min(80, (-avgSig - 30));
+    const f = Math.max(0.12, 1 - weak / 80);
+    const latency = Math.round(6 + (-avgSig - 30) * 0.5 + Math.random() * 8);
+    const jitter = Math.round(2 + (-avgSig - 30) * 0.25 + Math.random() * 5);
+    const download = Math.round((45 + Math.random() * 30) * f * 100) / 100;
+    const upload = Math.round(download * (0.35 + Math.random() * 0.25) * 100) / 100;
+
+    const phases = [
+        { label: '延迟测试中', dur: 700, id: 'recheckSpeedLat', val: latency, dec: 0, unit: 'ms' },
+        { label: '下载测速中', dur: 1500, id: 'recheckSpeedDown', val: download, dec: 2, unit: 'MB/s' },
+        { label: '上传测速中', dur: 1100, id: 'recheckSpeedUp', val: upload, dec: 2, unit: 'MB/s' }
+    ];
+    const total = phases.reduce((a, ph) => a + ph.dur, 0);
+    let idx = 0, done = 0;
+    const runPhase = () => {
+        if (recheckState.phase !== 'speed_running') return;
+        if (idx >= phases.length) { finishRecheckSpeed({ download, upload, latency, jitter }); return; }
+        const ph = phases[idx];
+        document.getElementById('recheckSpeedLabel').textContent = ph.label;
+        const t0 = Date.now();
+        recheckState.speedTimer = setInterval(() => {
+            const pr = Math.min(1, (Date.now() - t0) / ph.dur);
+            document.getElementById(ph.id).innerHTML = (ph.val * pr).toFixed(ph.dec) + u(ph.unit);
+            document.getElementById('recheckSpeedBar').style.width = Math.min(100, ((done + pr * ph.dur) / total) * 100) + '%';
+        }, 100);
+        setTimeout(() => {
+            clearInterval(recheckState.speedTimer);
+            recheckState.speedTimer = null;
+            if (recheckState.phase !== 'speed_running') return;
+            document.getElementById(ph.id).innerHTML = ph.val.toFixed(ph.dec) + u(ph.unit);
+            done += ph.dur; idx++; runPhase();
+        }, ph.dur);
+    };
+    runPhase();
+}
+
+function finishRecheckSpeed(r) {
+    recheckState.phase = 'done';
+    recheckState.pendingSave.speed = { download: r.download, upload: r.upload, latency: r.latency, jitter: r.jitter, time: Date.now() };
+    const u = s => `<span class="u">${s}</span>`;
+    document.getElementById('recheckSpeedDot').classList.add('idle');
+    document.getElementById('recheckSpeedLabel').textContent = '测速完成';
+    document.getElementById('recheckSpeedBar').style.width = '100%';
+    document.getElementById('recheckSpeedDown').innerHTML = r.download.toFixed(2) + u('MB/s');
+    document.getElementById('recheckSpeedUp').innerHTML = r.upload.toFixed(2) + u('MB/s');
+    document.getElementById('recheckSpeedLat').innerHTML = r.latency + u('ms');
+    document.getElementById('recheckSpeedJit').innerHTML = r.jitter + u('ms');
     updateRecheckBtn();
 }
 
@@ -2848,6 +3096,30 @@ function fmtFullTime(t) {
     return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
+// 紧凑时间（月-日 时:分），用于表格内展示巡检时段
+function hmTime(t) {
+    const d = new Date(t);
+    const p = n => String(n).padStart(2,'0');
+    return `${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+// App安装包地址（与 app-download 下载页保持一致）
+const APP_DOWNLOAD_URL = 'http://fjsp.chinaqoe.net:8000/ycgj_v1.2.0.apk';
+
+// 报告右上角「扫码下载」二维码（复用下载页的二维码服务）
+function pdfQrBlock(px) {
+    const src = `https://api.qrserver.com/v1/create-qr-code/?size=${px * 2}x${px * 2}&margin=0&data=${encodeURIComponent(APP_DOWNLOAD_URL)}`;
+    return `<img src="${src}" width="${px}" height="${px}" alt="扫码下载" crossorigin="anonymous">`;
+}
+
+// 报告信息卡片：多行「标签：值」，行内以竖线分隔
+function pdfMetaCard(rows) {
+    const line = items => items
+        .map(([k, v]) => `<span class="pr-meta-item"><span class="k">${k}：</span><span class="v">${escHtml(String(v))}</span></span>`)
+        .join('<span class="pr-meta-sep">｜</span>');
+    return `<div class="pr-metacard">${rows.map(r => `<div class="pr-meta-row">${line(r)}</div>`).join('')}</div>`;
+}
+
 // 构建信纸风格的PDF报告HTML（浅色A4，与App深色界面区分）
 function buildPDFReportHTML() {
     const { beforeRec, afterRec, rows } = comparePair;
@@ -2855,42 +3127,77 @@ function buildPDFReportHTML() {
     const bw = beforeRec.wifiInfo || {}, aw = afterRec.wifiInfo || {};
     const improve = a.avg - b.avg;
     const rateImp = (a.qualifiedRate||0) - (b.qualifiedRate||0);
-    const abnRed = b.abnormalCount - a.abnormalCount;
     const th = rows.length ? rows[0].th : threshold;
-    const totalSamples = (b.count||0) + (a.count||0);
     const apChanged = !!(bw.bssid && aw.bssid && bw.bssid !== aw.bssid);
     const d = new Date();
     const p = n => String(n).padStart(2,'0');
     const rptNo = `SP-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${Math.floor(Math.random()*0xffff).toString(16).toUpperCase().padStart(4,'0')}`;
 
-    // 综合结论
-    let concl, conclGood;
-    if (improve >= 5) { concl = '整改后整体网络质量显著改善，平均信号、覆盖率均有明显提升。'; conclGood = true; }
-    else if (improve > 0) { concl = '整改后整体网络质量有所改善，建议持续观察并定期复检。'; conclGood = true; }
-    else if (improve === 0) { concl = '整改前后整体信号水平保持稳定，建议针对薄弱区域进一步优化。'; conclGood = false; }
-    else { concl = '整改后整体信号有所下降，建议排查AP工作状态及环境干扰后重新检测。'; conclGood = false; }
+    const ssid = aw.ssid || bw.ssid || '-';
+    const rateBefore = b.qualifiedRate || 0, rateAfter = a.qualifiedRate || 0;
+    const rectifyText = (afterRec.rectification || '').trim();
 
-    // 统计各状态数量
-    let nBad = 0, nPending = 0;
-    rows.forEach(r => {
-        if (r.beforeVal === null) {
-            nPending++;
-        } else if (r.afterVal === null) {
-            nPending++;
-        } else if (r.afterVal < r.th) {
-            nBad++;
-        }
-    });
+    // 首段导语：把整改前/后的关键指标内联高亮，替代原先独立的「总体情况表 + 结论块 + 整改措施块」
+    const impPhrase = improve >= 0
+        ? `平均信号提升 <b class="hl-good">+${improve} dBm</b>`
+        : `平均信号下降 <b class="hl-bad">${Math.abs(improve)} dBm</b>`;
+    const ratePhrase = rateImp >= 0
+        ? `信号合格覆盖率提升 <b class="hl-good">+${rateImp}%</b> 至 <b class="hl-good">${rateAfter}%</b>`
+        : `信号合格覆盖率下降 <b class="hl-bad">${Math.abs(rateImp)}%</b> 至 <b class="hl-bad">${rateAfter}%</b>`;
+    const rectPhrase = rectifyText
+        ? `经落实「<b class="hl-mid">${escHtml(rectifyText)}</b>」整改措施后，`
+        : '经整改后，';
+    const tailWord = improve > 0
+        ? '整体达标，建议持续观察并定期复检'
+        : improve === 0
+            ? '整体信号水平持平，建议针对薄弱区域继续优化'
+            : '整体信号有所回落，建议排查AP工作状态后重新检测';
+    const intro = `您好！本次家庭网络「${ssid}」巡检已完成。整改前全屋信号覆盖率 <b class="hl-bad">${rateBefore}%</b>，共发现 <b class="hl-bad">${b.abnormalCount}</b> 个异常点位。${rectPhrase}${impPhrase}，${ratePhrase}，${tailWord}。具体详情如下：`;
 
-    // 指标对比表
-    const metricRows = [
-        ['测试时间', fmtFullTime(beforeRec.startTime), fmtFullTime(afterRec.startTime)],
-        ['平均信号', b.avg + ' dBm', a.avg + ' dBm'],
-        ['最高信号', b.max + ' dBm', a.max + ' dBm'],
-        ['最低信号', b.min + ' dBm', a.min + ' dBm'],
-        ['异常点数', b.abnormalCount + ' 个', a.abnormalCount + ' 个'],
-        ['合格覆盖率', (b.qualifiedRate||0) + ' %', (a.qualifiedRate||0) + ' %']
-    ].map(m => `<tr><td>${m[0]}</td><td>${m[1]}</td><td>${m[2]}</td></tr>`).join('');
+    // 网络信息卡片：一行多项，竖线分隔
+    const metaCard = pdfMetaCard([
+        [
+            ['户型', houseTypeText()],
+            ['网络名称', ssid],
+            ['频段', aw.band || bw.band || '-'],
+            ['信道', aw.channel || bw.channel || '-']
+        ],
+        [
+            ['AP地址（MAC）', (aw.bssid || bw.bssid || '-') + (apChanged ? `（原 ${bw.bssid}）` : '')],
+            ['信号阈值', th + ' dBm'],
+            ['加密方式', aw.security || bw.security || '-']
+        ]
+    ]);
+
+    // 核心指标对比：整改前 / 整改后 / 整体成效（末行直接给出各项变化量）
+    const deltaCell = (now, prev, lowerBetter, unit) => {
+        const dv = +(now - prev).toFixed(2);
+        if (dv === 0) return `<span class="warn">±0</span> ${unit}`;
+        const better = lowerBetter ? dv < 0 : dv > 0;
+        return `<span class="${better ? 'ok' : 'bad'}">${dv > 0 ? '+' : ''}${dv}</span> ${unit}`;
+    };
+    const metricsHtml = `
+            <tr>
+                <td>整改前</td>
+                <td>${fmtFullTime(beforeRec.startTime)}</td>
+                <td>${b.avg} dBm</td><td>${b.max} dBm</td><td>${b.min} dBm</td>
+                <td>${b.abnormalCount} 个</td><td>${rateBefore} %</td>
+            </tr>
+            <tr>
+                <td>整改后</td>
+                <td>${fmtFullTime(afterRec.startTime)}</td>
+                <td>${a.avg} dBm</td><td>${a.max} dBm</td><td>${a.min} dBm</td>
+                <td>${a.abnormalCount} 个</td><td>${rateAfter} %</td>
+            </tr>
+            <tr class="total">
+                <td>整体成效</td>
+                <td>—</td>
+                <td>${deltaCell(a.avg, b.avg, false, 'dBm')}</td>
+                <td>${deltaCell(a.max, b.max, false, 'dBm')}</td>
+                <td>${deltaCell(a.min, b.min, false, 'dBm')}</td>
+                <td>${deltaCell(a.abnormalCount, b.abnormalCount, true, '个')}</td>
+                <td>${deltaCell(rateAfter, rateBefore, false, '%')}</td>
+            </tr>`;
 
     // 测速明细：列出整改前/后的每条实时测速（测速结果 · 对应信号 · 位置标记）
     // 数据来源按「整改前 / 整改后」合并单元格（rowspan），不再区分第几次
@@ -2924,21 +3231,20 @@ function buildPDFReportHTML() {
             });
         });
 
-        // 底部「网络提升」行：整改前后平均下载 / 上传 / 延迟的差值
-        const ba = speedAgg(beforeRec), aa = speedAgg(afterRec);
-        if (ba && aa) {
-            const diff = (a, b) => (a - b).toFixed(2);
-            rows.push(`<tr>
-            <td style="font-weight:700;color:#1e40af;">网络提升</td>
-            <td>-</td>
-            <td>-</td>
-            <td style="color:${aa.down >= ba.down ? '#16a34a' : '#ea580c'};font-weight:700;">${aa.down >= ba.down ? '+' : ''}${diff(aa.down, ba.down)} MB/s</td>
-            <td style="color:${aa.up >= ba.up ? '#16a34a' : '#ea580c'};font-weight:700;">${aa.up >= ba.up ? '+' : ''}${diff(aa.up, ba.up)} MB/s</td>
-            <td style="color:${aa.lat <= ba.lat ? '#16a34a' : '#ea580c'};font-weight:700;">${aa.lat <= ba.lat ? '-' : '+'}${Math.abs(aa.lat - ba.lat)} ms</td>
-        </tr>`);
-        }
         return rows.join('');
     })();
+
+    // 测速平均值变化：改为表格下方一行紧凑备注，替代原先占一整行的「网络提升」
+    const ba = speedAgg(beforeRec), aa = speedAgg(afterRec);
+    let speedNote = '';
+    if (ba && aa) {
+        const dm = (x, y, unit) => {
+            const dv = +(x - y).toFixed(2);
+            return `<b class="${dv >= 0 ? 'ok' : 'warn'}">${dv > 0 ? '+' : ''}${dv}</b> ${unit}`;
+        };
+        const latD = aa.lat - ba.lat;
+        speedNote = `<div class="pr-note">整改后平均速率变化：下载 ${dm(aa.down, ba.down, 'MB/s')}，上传 ${dm(aa.up, ba.up, 'MB/s')}，延迟 <b class="${latD <= 0 ? 'ok' : 'warn'}">${latD > 0 ? '+' : ''}${latD}</b> ms</div>`;
+    }
 
     // 检测点明细表
     const pointRows = rows.map(r => {
@@ -2966,53 +3272,35 @@ function buildPDFReportHTML() {
     return `
     <div class="pdf-report">
         <div class="pr-head">
-            <div class="pr-brand">WiFi信号巡检服务</div>
+            <div class="pr-brand">WiFi 信号巡检服务</div>
             <div class="pr-title">家庭网络整改成效报告</div>
             <div class="pr-no">报告编号：${rptNo} ｜ 生成日期：${fmtFullTime()}</div>
+            <div class="pr-qr">${pdfQrBlock(76)}<div class="pr-qr-cap">扫码下载易测管家</div></div>
         </div>
         <div class="pr-salute">${salute}：</div>
-        <div class="pr-intro">您好！感谢您使用WiFi信号巡检服务。本次针对家庭网络「${aw.ssid || '-'}」的整改复检已完成，前后两轮巡检共采集 ${totalSamples} 个信号样本，信号达标阈值为 ${th} dBm。现将整改前后的对比结果呈报如下，供您参考。</div>
+        <div class="pr-intro">${intro}</div>
+        ${metaCard}
 
-        <div class="pr-h">一、整改总体情况</div>
-        <table class="pr-table" style="margin-top:0;">
-                    <tr><th style="width:34%;">项目</th><th>内容</th></tr>
-                    <tr><td>户型</td><td>${houseTypeText()}</td></tr>
-                    <tr><td>网络名称 / 频段</td><td>${aw.ssid || '-'} ｜ ${aw.band || '-'} ｜ ${aw.channel ? '信道 ' + aw.channel : ''}</td></tr>
-                    <tr><td>AP地址（MAC）</td><td>${aw.bssid || '-'}${apChanged?`（原 ${bw.bssid}）`:''}${apChanged?' ｜ <span>整改后已更换AP</span>':''}</td></tr>
-                    <tr><td>加密方式</td><td>${aw.security || '-'}</td></tr>
-                    <tr><td>信号阈值</td><td>${th} dBm</td></tr>
-                    <tr><td>平均信号提升</td><td class="${improve>=0?'ok':'bad'}">${improve>=0?'+':''}${improve} dBm</td></tr>
-                    <tr><td>合格覆盖率提升</td><td class="${rateImp>=0?'ok':'bad'}">${rateImp>=0?'+':''}${rateImp}%</td></tr>
-                    <tr><td>异常点减少</td><td class="${abnRed>=0?'ok':'bad'}">${abnRed>=0?'-':'+'}${Math.abs(abnRed)} 个</td></tr>
-                </table>
-        <div class="pr-concl ${conclGood?'good':'bad'}">综合结论：${concl}${nBad?`仍有 ${nBad} 处检测点未达标。`:''}${nPending?`另有 ${nPending} 处待复测。`:''}</div>
-        <div style="margin-top:12px;">
-            <b style="font-size:13px;color:#0f172a;">整改措施</b>
-            <div class="pr-rect">${escHtml((afterRec.rectification || '').trim())}</div>
-        </div>
-
-        <div class="pr-h">二、核心指标对比</div>
-        <table class="pr-table">
-            <tr><th>指标</th><th>整改前</th><th>整改后</th></tr>
-            ${metricRows}
+        <div class="pr-h">一、核心指标对比</div>
+        <table class="pr-table pr-center">
+            <tr><th>数据来源</th><th>测试时间</th><th>平均信号</th><th>最高信号</th><th>最低信号</th><th>异常点数</th><th>合格覆盖率</th></tr>
+            ${metricsHtml}
         </table>
 
-        <div class="pr-h">三、实时测速对比</div>
+        <div class="pr-h">二、实时测速明细</div>
         <table class="pr-table pr-center">
             <tr><th>数据来源</th><th>位置标记</th><th>当前信号</th><th>下载</th><th>上传</th><th>延迟</th></tr>
             ${speedDetailHtml}
         </table>
+        ${speedNote}
 
-        <div class="pr-h">四、检测点明细</div>
+        <div class="pr-h">三、异常信号点对比</div>
         <table class="pr-table">
             <tr><th>检测点</th><th>整改前</th><th>整改后</th><th>状态</th></tr>
             ${pointRows || '<tr><td colspan="4">两次测试均无异常点</td></tr>'}
         </table>
 
-        <div class="pr-foot">
-            报告生成时间：${fmtFullTime()} ｜ 报告编号：${rptNo}<br>
-            本报告由WiFi信号巡检APP基于巡检采样数据自动生成，数据仅反映检测时段内的信号状况，可作为组网优化的参考依据。如有疑问，请联系您的网络服务专员。
-        </div>
+        <div class="pr-foot">本报告由WiFi信号巡检APP基于巡检采样数据自动生成，数据仅反映检测时段内的信号状况，可作为组网优化的参考依据。如有疑问，请联系您的网络服务专员。</div>
     </div>`;
 }
 
@@ -3036,14 +3324,22 @@ function escHtml(s) {
 const RECTIFY_TAGS = ['更换AP设备','增设Mesh子节点','调整AP位置','调整天线朝向','更换信道','升级固件','更换网线','移除干扰源'];
 let pendingExportBtn = null;
 
+function rectifyTagsHTML(targetId) {
+    return RECTIFY_TAGS.map(t => `<div class="modal-tag" onclick="pickRectifyTag('${t}','${targetId}')">${t}</div>`).join('');
+}
+
 function renderRectifyTags() {
-    document.getElementById('rectifyTags').innerHTML =
-        RECTIFY_TAGS.map(t => `<div class="modal-tag" onclick="pickRectifyTag('${t}')">${t}</div>`).join('');
+    document.getElementById('rectifyTags').innerHTML = rectifyTagsHTML('rectifyInput');
+}
+
+function renderAcceptRectifyTags() {
+    const box = document.getElementById('acceptTags');
+    if (box) box.innerHTML = rectifyTagsHTML('acceptRectifyInput');
 }
 
 // 快捷标签点击后追加到输入框（分号分隔，避免重复）
-function pickRectifyTag(t) {
-    const input = document.getElementById('rectifyInput');
+function pickRectifyTag(t, targetId) {
+    const input = document.getElementById(targetId || 'rectifyInput');
     const cur = input.value.trim();
     if (cur.includes(t)) return;
     input.value = cur ? cur.replace(/[；;，,\s]+$/, '') + '；' + t : t;
@@ -3107,6 +3403,221 @@ async function doExportPDF(btn) {
         pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', x, 0, scaledW, scaledH);
         const d = new Date(), p = n => String(n).padStart(2,'0');
         pdf.save(`WiFi信号巡检整改报告_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}.pdf`);
+        showToast('PDF报告已导出');
+    } catch (e) {
+        // CDN不可用：切换为打印模式（打印对话框中选择“存储为PDF”）
+        showToast('组件加载失败，已切换为打印模式');
+        document.body.classList.add('print-report');
+        const cleanup = () => document.body.classList.remove('print-report');
+        window.addEventListener('afterprint', cleanup, { once: true });
+        setTimeout(() => window.print(), 300);
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = oldHtml; }
+    }
+}
+
+// ============== 单条巡检记录 PDF 导出 ==============
+// 从历史记录或刚完成测试的结果页导出该记录，模板风格与对比报告一致（信纸A4）
+
+// 综合结论：基于覆盖/异常/漫游 3 个维度给出单次巡检结论
+function singleConcl(s, th) {
+    const rate = s.qualifiedRate || 0;
+    let code = 'bad'; let text = '';
+    if (rate >= 90 && s.abnormalCount === 0) {
+        code = 'good';
+        text = '全屋信号覆盖良好，追剧、视频通话、上网都很顺畅，暂时不需要整改。';
+    } else if (rate >= 70) {
+        code = 'warn';
+        text = '部分区域信号覆盖不足，可能影响视频通话与在线体验。';
+    } else {
+        code = 'bad';
+        text = '多个区域信号明显偏弱，视频通话、上网课、追剧容易卡顿。';
+    }
+    return { code, text };
+}
+
+// 无异常点判定：未标记异常点且统计异常数为 0
+function isRecordHealthy(rec) {
+    const s = rec.stats || {};
+    return (rec.abnormalPoints || []).length === 0 && !(s.abnormalCount > 0);
+}
+
+// 构建单条巡检记录的报告HTML（复用对比报告的信纸样式）
+function buildSinglePDFReportHTML(rec, acceptType, rectifyText) {
+    const s = rec.stats;
+    const w = rec.wifiInfo || {};
+    const th = rec.threshold != null ? rec.threshold : threshold;
+    const concl = singleConcl(s, th);
+    // 无异常点：不标注受理类型、不出具整改措施，改为输出达标结论
+    const healthy = isRecordHealthy(rec);
+    const accept = healthy ? '' : (acceptType === '已受理' ? '已受理' : '预受理');
+    const rectify = healthy ? '' : (rectifyText || rec.rectification || '').trim();
+    // 整改措施语：预受理为待实施方案，已受理为已落实措施
+    const rectPhrase = !rectify ? '' : (accept === '已受理'
+        ? `经落实「<b class="hl-mid">${escHtml(rectify)}</b>」整改措施，整改效果如下：`
+        : `拟实施整改措施「<b class="hl-mid">${escHtml(rectify)}</b>」，整改效果预览如下：`);
+
+    // 异常点与测速明细：对比「整改前 → 整改后」的信号与下载速率，其余指标不展示
+    const abn = rec.abnormalPoints || [];
+    const sts = rec.speedTests || [];
+    const dSig = v => v == null ? '—' : v + ' dBm';
+    const dSpd = v => v == null ? '—' : Number(v).toFixed(2) + ' MB/s';
+    // 整改后数值着色：对比整改前变好为绿、变差为橙，无对比或缺失时保持默认黑色
+    const cmpCls = (before, after) => (before == null || after == null) ? '' : (after > before ? 'ok' : (after < before ? 'warn' : ''));
+    const detailRows = abn.map(pp => {
+        const rc = pp.recheck;
+        const afterSig = rc ? rc.avg : null;
+        const afterSpd = rc && rc.speed ? rc.speed.download : null;
+        const beforeSpd = pp.speed ? pp.speed.download : null;
+        return `<tr>
+            <td>${escHtml(pp.tag)}</td>
+            <td class="bad">异常点</td>
+            <td>${dSig(pp.signal)}</td>
+            <td>${dSpd(beforeSpd)}</td>
+            <td class="${cmpCls(pp.signal, afterSig)}">${dSig(afterSig)}</td>
+            <td class="${cmpCls(beforeSpd, afterSpd)}">${dSpd(afterSpd)}</td>
+        </tr>`;
+    }).concat(sts.filter(t => !t.abnormal).map(t => `<tr>
+            <td>${escHtml((t.tag || '未标记').trim())}</td>
+            <td class="speed">测速点</td>
+            <td>${dSig(t.signal)}</td>
+            <td>${dSpd(t.download)}</td>
+            <td>—</td>
+            <td>—</td>
+        </tr>`)).join('');
+
+    // 无异常点报告：以「测速点位明细 + 达标结论框」替代整改前后对比表
+    const healthyRows = sts.filter(t => !t.abnormal).map(t => `<tr>
+            <td>${escHtml((t.tag || '未标记').trim())}</td>
+            <td>${dSig(t.signal)}</td>
+            <td>${dSpd(t.download)}</td>
+        </tr>`).join('');
+    const cnt = s.count != null ? s.count : '—';
+    const avgTxt = s.avg != null ? s.avg + ' dBm' : '—';
+    const minTxt = s.min != null ? s.min + ' dBm' : '—';
+    const rateTxt = (s.qualifiedRate != null ? s.qualifiedRate : 100) + '%';
+    const detailSection = healthy
+        ? `
+        <div class="pr-h">${healthyRows ? '巡检结果明细' : '巡检结论'}</div>
+        ${healthyRows ? `<table class="pr-table pr-center">
+            <tr><th>检测点</th><th>信号</th><th>下载速率</th></tr>
+            ${healthyRows}
+        </table>` : ''}
+        <div class="pr-concl">
+            <div class="pr-concl-h">✓ 巡检结论：全屋信号覆盖达标</div>
+            <div class="pr-concl-t">本次巡检共采集 <b>${cnt}</b> 个信号样本，平均信号 <b>${avgTxt}</b>，最低信号 <b>${minTxt}</b>，全屋信号合格覆盖率 <b>${rateTxt}</b>，未发现信号异常点。各区域网络体验良好，暂无需整改，建议保持当前设备布局并定期复检。</div>
+        </div>`
+        : `
+        <div class="pr-h">巡检结果明细</div>
+        <table class="pr-table pr-center">
+            <tr>
+                <th rowspan="2">检测点</th>
+                <th rowspan="2">类型</th>
+                <th colspan="2">整改前</th>
+                <th colspan="2">整改后</th>
+            </tr>
+            <tr><th>信号</th><th>下载</th><th>信号</th><th>下载</th></tr>
+            ${detailRows || '<tr><td colspan="6">本次巡检未发现异常点，也未进行实时测速</td></tr>'}
+        </table>`;
+
+    return `
+    <div class="pdf-report">
+        <div class="pr-head">
+            <div class="pr-title">家庭网络巡检报告</div>
+            <div class="pr-no">生成日期：${fmtFullTime()}</div>
+            ${accept ? `<div class="pr-type ${accept === '已受理' ? 'done' : ''}">${accept}报告</div>` : ''}
+            <div class="pr-qr">${pdfQrBlock(52)}<div class="pr-qr-cap">扫码下载易测管家</div></div>
+        </div>
+        <div class="pr-salute">尊敬的用户：</div>
+        <div class="pr-intro">您好！本次家庭网络「${w.ssid || '-'}」巡检已完成，共采集 <b class="hl-good">${s.count}</b> 个信号样本，发现 <b class="${s.abnormalCount > 0 ? 'hl-bad' : 'hl-good'}">${s.abnormalCount}</b> 个信号偏弱点。${concl.text}${rectPhrase ? ' ' + rectPhrase : ''}</div>
+        ${pdfMetaCard([
+            [
+                ['户型', houseTypeText()],
+                ['网络名称', w.ssid || '-'],
+                ['频段', w.band || '-'],
+                ['信道', w.channel || '-']
+            ],
+            [
+                ['AP地址（MAC）', w.bssid || '-'],
+                ['信号阈值', th + ' dBm']
+            ]
+        ])}
+
+        ${detailSection}
+
+        <div class="pr-foot">本报告由WiFi信号巡检APP基于巡检采样数据自动生成，数据仅反映检测时段内的信号状况，可作为组网优化的参考依据。如有疑问，请联系您的网络服务专员。</div>
+    </div>`;
+}
+
+// ============== 导出报告：受理类型选择 ==============
+let pendingSingleExportBtn = null;
+let pendingExportType = '预受理';
+
+function exportSingleRecordPDF(btn) {
+    if (!currentRecord) { showToast('暂无可导出的巡检记录'); return; }
+    pendingSingleExportBtn = btn;
+    // 无异常点：不涉及受理类型与整改措施，直接导出达标报告
+    if (isRecordHealthy(currentRecord)) {
+        doExportSinglePDF(currentRecord, btn, '', '');
+        return;
+    }
+    selectAcceptType('预受理');   // 默认预受理
+    // 预填上次填写的整改措施与用户信息，便于再次导出时复用
+    document.getElementById('acceptRectifyInput').value = currentRecord.rectification || '';
+    document.getElementById('acceptUserInput').value = currentRecord.userInfo || '';
+    renderAcceptRectifyTags();
+    document.getElementById('acceptTypeModal').classList.add('show');
+}
+
+function selectAcceptType(type) {
+    pendingExportType = type;
+    document.querySelectorAll('#acceptOptions .accept-option').forEach(el => {
+        el.classList.toggle('active', el.dataset.type === type);
+    });
+}
+
+function closeAcceptTypeModal() {
+    document.getElementById('acceptTypeModal').classList.remove('show');
+}
+
+function confirmAcceptExport() {
+    if (!currentRecord) return;
+    const text = document.getElementById('acceptRectifyInput').value.trim();
+    if (!text) { showToast('请填写整改措施内容'); document.getElementById('acceptRectifyInput').focus(); return; }
+    const userInfo = document.getElementById('acceptUserInput').value.trim();
+    // 保存到巡检记录：再次导出时预填，报告可追溯
+    currentRecord.rectification = text;
+    currentRecord.userInfo = userInfo;
+    const idx = records.findIndex(r => r.id === currentRecord.id);
+    if (idx >= 0) { records[idx] = currentRecord; localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
+    closeAcceptTypeModal();
+    doExportSinglePDF(currentRecord, pendingSingleExportBtn, pendingExportType, text);
+}
+
+// 实际执行单条记录PDF导出（实现与对比报告一致）
+async function doExportSinglePDF(rec, btn, acceptType, rectifyText) {
+    const oldHtml = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.textContent = '报告生成中…'; }
+    const wrap = document.getElementById('pdfReportWrap');
+    wrap.innerHTML = buildSinglePDFReportHTML(rec, acceptType, rectifyText);
+    try {
+        if (!window.html2canvas) await loadScriptOnce('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
+        if (!window.jspdf) await loadScriptOnce('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js');
+        await new Promise(r => setTimeout(r, 50)); // 等待离屏布局完成
+        const canvas = await html2canvas(wrap.firstElementChild, {
+            scale: 2, backgroundColor: '#ffffff', useCORS: true
+        });
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pageW = 210, pageH = 297;
+        // 强制单页：整图等比缩放，高度铺满一页内容区；宽度等比且水平居中，不切成多页
+        const scale = Math.min(pageH * canvas.width / (canvas.height * pageW), 1);
+        const scaledW = canvas.width * scale * (pageW / canvas.width); // mm
+        const scaledH = canvas.height * scale * (pageW / canvas.width); // mm
+        const x = Math.max((pageW - scaledW) / 2, 0);
+        pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', x, 0, scaledW, scaledH);
+        const d = new Date(), p = n => String(n).padStart(2,'0');
+        pdf.save(`WiFi信号巡检报告_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}.pdf`);
         showToast('PDF报告已导出');
     } catch (e) {
         // CDN不可用：切换为打印模式（打印对话框中选择“存储为PDF”）
