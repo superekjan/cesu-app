@@ -65,6 +65,10 @@
             justify-content: center;
             cursor: pointer;
             border-radius: 50%;
+            border: 0;
+            padding: 0;
+            background: transparent;
+            color: inherit;
             transition: background 0.2s ease;
         }
 
@@ -495,6 +499,756 @@
         .search-result-tip.visible {
             display: block;
         }
+
+        /* 面向普通用户的路由器质量报告 */
+        .report-item.expanded .report-detail {
+            max-height: 1200px;
+        }
+
+        .report-header {
+            width: 100%;
+            border: 0;
+            color: inherit;
+            text-align: left;
+            font: inherit;
+            background: transparent;
+        }
+
+        .report-header:focus-visible,
+        .back-btn:focus-visible,
+        .action-button:focus-visible,
+        .upload-trigger:focus-visible {
+            outline: 2px solid #f5ca6b;
+            outline-offset: 3px;
+        }
+
+        .report-summary {
+            padding: 14px;
+            background: linear-gradient(145deg, #0b2752 0%, #145ba7 100%);
+            border-radius: 13px;
+            color: #f5f9ff;
+        }
+
+        .summary-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-bottom: 13px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+        }
+
+        .summary-eyebrow {
+            color: #b9d9ff;
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .summary-title {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        .summary-subtitle {
+            margin-top: 4px;
+            color: #d4e6fb;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .score-ring {
+            width: 66px;
+            height: 66px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 4px solid #f4c868;
+            box-shadow: inset 0 0 0 4px rgba(255,255,255,.1);
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .score-ring strong {
+            font-size: 22px;
+            line-height: 1;
+        }
+
+        .score-ring span {
+            margin-top: 3px;
+            color: #d6e7fb;
+            font-size: 9px;
+        }
+
+        .experience-list {
+            display: grid;
+            gap: 8px;
+            padding: 12px 0;
+        }
+
+        .experience-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 42px;
+            padding: 8px 10px;
+            border-radius: 9px;
+            background: rgba(255,255,255,.09);
+        }
+
+        .experience-icon {
+            width: 26px;
+            height: 26px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border-radius: 8px;
+            background: rgba(255,255,255,.13);
+            color: #f5cf78;
+            font-size: 15px;
+        }
+
+        .experience-copy {
+            flex: 1;
+            color: #e8f2ff;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .experience-copy strong {
+            display: block;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .experience-tag {
+            padding: 4px 7px;
+            border-radius: 12px;
+            color: #ffdf93;
+            background: rgba(244, 200, 104, .15);
+            font-size: 10px;
+            white-space: nowrap;
+        }
+
+        .advice-box {
+            padding: 11px 12px;
+            border: 1px solid rgba(245, 201, 108, .36);
+            border-radius: 9px;
+            background: rgba(5, 21, 47, .38);
+        }
+
+        .advice-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 5px;
+            color: #ffdc8b;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .advice-copy {
+            color: #e5efff;
+            font-size: 11px;
+            line-height: 1.65;
+        }
+
+        .router-diagnosis {
+            padding: 14px;
+            border-radius: 13px;
+            background: linear-gradient(145deg, #0b2752 0%, #145ba7 100%);
+            color: #f5f9ff;
+        }
+
+        .router-hero {
+            display: grid;
+            grid-template-columns: 48px minmax(0, 1fr) 62px;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .router-device-art {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            color: #f8d37f;
+            background: rgba(255,255,255,.12);
+        }
+
+        .router-device-art svg { width: 34px; height: 34px; fill: currentColor; }
+
+        .diagnosis-score {
+            width: 62px;
+            height: 62px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid #f4c868;
+            border-radius: 50%;
+            color: #fff;
+        }
+
+        .diagnosis-score strong { font-size: 20px; line-height: 1; }
+        .diagnosis-score span { margin-top: 3px; color: #d6e7fb; font-size: 8px; }
+
+        .diagnosis-cause {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 6px;
+            color: #ffe3a0;
+            font-size: 10px;
+        }
+
+        .diagnosis-cause::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .network-status {
+            margin-bottom: 10px;
+            padding: 14px;
+            border: 1px solid rgba(56,189,248,.22);
+            border-radius: 13px;
+            background: linear-gradient(150deg, rgba(18,55,105,.94), rgba(9,28,62,.96));
+            color: #f5f9ff;
+        }
+
+        .network-status-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .network-eyebrow { color: #b9d9ff; font-size: 10px; }
+        .network-verdict { margin-top: 3px; color: #fff; font-size: 18px; font-weight: 700; }
+
+        .network-score {
+            min-width: 68px;
+            padding: 7px 10px;
+            border-radius: 12px;
+            background: rgba(255,255,255,.1);
+            text-align: center;
+        }
+
+        .network-score strong { color: #ffdb85; font-size: 19px; }
+        .network-score span { margin-left: 2px; color: #d5e6fc; font-size: 9px; }
+
+        .network-meters {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 13px;
+        }
+
+        .network-meter { min-width: 0; }
+
+        .network-meter-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4px;
+            color: #d7e8fc;
+            font-size: 9px;
+        }
+
+        .network-meter-head strong { color: #fff; font-size: 9px; white-space: nowrap; }
+
+        .network-track {
+            height: 6px;
+            margin-top: 6px;
+            overflow: hidden;
+            border-radius: 5px;
+            background: rgba(255,255,255,.16);
+        }
+
+        .network-fill {
+            height: 100%;
+            border-radius: inherit;
+            background: #51d6a0;
+        }
+
+        .network-fill.medium { background: #f4c868; }
+        .network-fill.low { background: #f47777; }
+
+        .network-status-foot {
+            margin-top: 9px;
+            color: #aec9e9;
+            font-size: 10px;
+        }
+
+        .diagnosis-kicker {
+            color: #b9d9ff;
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .diagnosis-title-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .diagnosis-title {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .diagnosis-copy {
+            margin-top: 5px;
+            color: #d4e6fb;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+
+        .router-facts {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 7px;
+            margin-top: 13px;
+        }
+
+        .router-fact {
+            min-width: 0;
+            padding: 9px 8px;
+            border-radius: 9px;
+            background: rgba(255,255,255,.09);
+        }
+
+        .router-fact span {
+            display: block;
+            color: #b9d4f2;
+            font-size: 10px;
+        }
+
+        .router-fact strong {
+            display: block;
+            margin-top: 4px;
+            color: #fff;
+            font-size: 12px;
+            line-height: 1.35;
+            overflow-wrap: anywhere;
+        }
+
+        .comparison-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 11px;
+        }
+
+        .comparison-heading strong { color: #fff; font-size: 12px; }
+        .comparison-heading span { color: #b9d4f2; font-size: 9px; }
+
+        .router-age-panel {
+            margin-top: 11px;
+            padding: 11px 12px;
+            border: 1px solid rgba(255,255,255,.17);
+            border-radius: 10px;
+            background: rgba(5,21,47,.38);
+        }
+
+        .router-age-panel .comparison-heading { margin-bottom: 8px; }
+        .router-age-panel .age-stage { min-height: 78px; }
+        .router-age-panel .age-stage-label { min-height: 26px; }
+        .age-reference-note { margin-top: 8px; color: #b9d4f2; font-size: 9px; line-height: 1.5; }
+        .device-result .age-reference-note { color: #73859b; }
+
+        .age-stages { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 10px; }
+        .age-stage { padding: 8px 7px; border-radius: 8px; background: rgba(255,255,255,.08); text-align: center; }
+        .age-stage.good { border: 1px solid rgba(45,190,124,.65); }
+        .age-stage.warning { border: 1px solid rgba(240,190,43,.7); }
+        .age-stage.risk { border: 1px solid rgba(239,91,91,.7); }
+        .age-stage.active { background: rgba(255,255,255,.16); box-shadow: inset 0 0 0 1px rgba(255,255,255,.15); }
+        .age-stage-state { display: inline-block; margin-top: 5px; padding: 3px 7px; border-radius: 10px; color: #fff; background: #24a96a; font-size: 9px; }
+        .age-stage.warning .age-stage-state { background: #dcae11; color: #26313d; }
+        .age-stage.risk .age-stage-state { background: #df494e; }
+        .analysis-card .age-stage { background: #fff; }
+        .analysis-card .age-stage strong { color: #244666; }
+        .analysis-card .age-stage-label { color: #6b7e94; }
+        .age-stage-label { display: block; margin-top: 7px; color: #dceaff; font-size: 9px; }
+
+        .age-stage strong { display: block; color: #ffdf93; font-size: 10px; }
+        .age-stage span { display: block; margin-top: 4px; color: #dceaff; font-size: 9px; line-height: 1.45; }
+        .age-stage-bar { height: 4px; margin-top: 8px; overflow: hidden; border-radius: 4px; background: rgba(255,255,255,.15); }
+        .age-stage-bar i { display: block; height: 100%; border-radius: inherit; background: #f4c868; }
+
+        .photo-prompt {
+            margin-top: 10px;
+            padding: 12px;
+            border-radius: 10px;
+            background: #edf5ff;
+            color: #183553;
+        }
+
+        .photo-prompt-title {
+            margin-bottom: 4px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .photo-prompt-copy {
+            color: #61738b;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .action-button {
+            min-height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            border: 0;
+            border-radius: 9px;
+            padding: 0 14px;
+            background: #1672cf;
+            color: #fff;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .18s ease, transform .18s ease;
+        }
+
+        .action-button:active { transform: scale(.98); }
+        .action-button:hover { background: #0e60b5; }
+
+        .photo-prompt .action-button {
+            width: 100%;
+            margin-top: 10px;
+            color: #fff;
+            background: #135ba7;
+        }
+
+        .photo-prompt .action-button:hover { background: #0c4a90; }
+        .photo-prompt .photo-prompt-copy { max-width: 32ch; }
+        .photo-prompt .action-button svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+        .router-page {
+            padding: 16px 16px 30px;
+        }
+
+        .router-intro {
+            margin: 2px 0 14px;
+        }
+
+        .router-intro h2 {
+            color: #f4f8ff;
+            font-size: 20px;
+            line-height: 1.35;
+        }
+
+        .router-intro p {
+            margin-top: 5px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .upload-card {
+            padding: 14px;
+            border: 1px solid rgba(105, 179, 255, .28);
+            border-radius: 14px;
+            background: linear-gradient(140deg, rgba(19, 66, 124, .88), rgba(11, 34, 72, .92));
+        }
+
+        .upload-trigger {
+            width: 100%;
+            min-height: 124px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            border: 1px dashed rgba(172, 211, 255, .55);
+            border-radius: 11px;
+            background: rgba(255,255,255,.04);
+            color: #eff7ff;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .upload-mark {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            color: #f5cf78;
+            background: rgba(245, 207, 120, .14);
+            font-size: 22px;
+        }
+
+        .upload-mark svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+        .upload-trigger strong { font-size: 14px; }
+        .upload-trigger span:last-child { color: #b8cee9; font-size: 11px; }
+
+        .upload-help {
+            margin: 9px 2px 0;
+            color: #bdd1eb;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .photo-preview-wrap {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            margin-top: 11px;
+            padding: 9px;
+            border-radius: 10px;
+            background: rgba(2, 15, 36, .38);
+        }
+
+        .photo-preview-wrap.visible { display: flex; }
+
+        .photo-preview {
+            width: 74px;
+            height: 74px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #081a34;
+        }
+
+        .photo-preview-meta { flex: 1; min-width: 0; }
+        .photo-preview-meta strong { display: block; color: #fff; font-size: 12px; }
+        .photo-preview-meta span { display: block; margin-top: 4px; color: #c3d5ed; font-size: 11px; line-height: 1.5; }
+        .photo-change {
+            border: 0;
+            padding: 7px 9px;
+            border-radius: 7px;
+            color: #d8eaff;
+            background: rgba(255,255,255,.1);
+            font: inherit;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .analysis-card {
+            margin-top: 13px;
+            padding: 15px;
+            border-radius: 14px;
+            background: #f3f7fc;
+            color: #173454;
+        }
+
+        .analysis-card h3 {
+            color: #143559;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        .analysis-caption {
+            margin-top: 4px;
+            color: #71829a;
+            font-size: 11px;
+            line-height: 1.55;
+        }
+
+        .analysis-state {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 9px;
+            padding: 5px 8px;
+            border-radius: 14px;
+            color: #34618c;
+            background: #e2eefb;
+            font-size: 10px;
+        }
+
+        .analysis-state.ready {
+            color: #226344;
+            background: #e0f4e9;
+        }
+
+        .analysis-state.error {
+            color: #8d402e;
+            background: #fae9e3;
+        }
+
+        .analysis-state.processing::before {
+            content: "";
+            width: 10px;
+            height: 10px;
+            border: 1.5px solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: analysis-spin .75s linear infinite;
+        }
+
+        @keyframes analysis-spin { to { transform: rotate(360deg); } }
+
+        .device-result {
+            display: none;
+            margin-top: 11px;
+            padding: 12px;
+            border: 1px solid #d4e1ef;
+            border-radius: 10px;
+            background: #fff;
+        }
+
+        .device-result.visible { display: block; }
+
+        .device-result h4 {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: #173e68;
+            font-size: 13px;
+        }
+
+        .demo-label {
+            padding: 3px 6px;
+            border-radius: 8px;
+            color: #7a5d18;
+            background: #fff2cf;
+            font-size: 9px;
+            font-weight: 500;
+        }
+
+        .device-result p {
+            margin-top: 7px;
+            color: #53677f;
+            font-size: 11px;
+            line-height: 1.65;
+        }
+
+        .device-result strong { color: #193a5d; }
+
+        .analysis-card .age-stage.active { background: #edf5ff; }
+
+        .ai-summary {
+            display: flex;
+            align-items: flex-start;
+            gap: 11px;
+            margin-top: 13px;
+            padding: 13px;
+            border: 1px solid #dce8f5;
+            border-radius: 11px;
+            background: #fff;
+        }
+
+        .ai-summary-icon,
+        .ai-section-icon {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+            border-radius: 12px;
+            color: #1d66a7;
+            background: #e9f3ff;
+        }
+
+        .ai-summary-icon svg,
+        .ai-section-icon svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .ai-summary-copy { min-width: 0; flex: 1; }
+        .ai-summary-copy strong { display: block; color: #1c3d5f; font-size: 14px; line-height: 1.4; }
+        .ai-summary-copy span { display: block; margin-top: 4px; color: #667a91; font-size: 11px; line-height: 1.55; }
+        .ai-summary .age-stages { margin-top: 12px; }
+
+        .ai-section-heading {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin: 18px 0 9px;
+        }
+
+        .ai-section-heading .ai-section-icon { width: 31px; height: 31px; border-radius: 10px; }
+        .ai-section-heading .ai-section-icon svg { width: 17px; height: 17px; }
+        .ai-section-heading strong { color: #1c3d5f; font-size: 14px; }
+        .ai-section-heading span { margin-left: auto; color: #8493a5; font-size: 10px; }
+
+        .ai-app-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .ai-app-card {
+            min-width: 0;
+            min-height: 88px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 5px;
+            border: 1px solid #e1e9f2;
+            border-radius: 11px;
+            background: #fff;
+            text-align: center;
+        }
+
+        .ai-app-card svg { width: 22px; height: 22px; fill: none; stroke: #3577b3; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .ai-app-card strong { color: #38536d; font-size: 11px; font-weight: 600; }
+        .ai-app-state { padding: 3px 7px; border-radius: 10px; color: #24714d; background: #e6f5ed; font-size: 9px; }
+        .ai-app-state.medium { color: #916a16; background: #fff3d5; }
+        .ai-app-state.low { color: #a54c4c; background: #fdeaea; }
+
+        .ai-advice-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px;
+            border: 1px solid #f0dfb4;
+            border-radius: 11px;
+            background: #fffaf0;
+        }
+
+        .ai-advice-card .ai-section-icon { width: 32px; height: 32px; color: #a77a1c; background: #fff0c9; }
+        .ai-advice-card strong { color: #624d22; font-size: 12px; }
+        .ai-advice-card p { margin-top: 4px; color: #776747; font-size: 11px; line-height: 1.6; }
+
+        .ai-metric-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+        .ai-metric {
+            min-width: 0;
+            padding: 11px;
+            border: 1px solid #e3ebf4;
+            border-radius: 10px;
+            background: #fff;
+        }
+
+        .ai-metric-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+        .ai-metric-top span { color: #74869b; font-size: 10px; }
+        .ai-metric-top svg { width: 16px; height: 16px; fill: none; stroke: #7fa4c8; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+        .ai-metric strong { display: block; margin-top: 6px; color: #203f5f; font-size: 15px; line-height: 1.25; overflow-wrap: anywhere; }
+        .ai-metric small { display: block; margin-top: 3px; color: #8695a7; font-size: 9px; line-height: 1.4; }
+        .ai-metric-wide { grid-column: 1 / -1; }
+
+        .ai-disclaimer { margin-top: 12px; color: #8291a3; font-size: 10px; line-height: 1.5; }
+
+        .prototype-note {
+            margin: 12px 2px 0;
+            color: #8798ad;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        [hidden] { display: none !important; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+        }
     </style>
 </head>
 <body>
@@ -502,23 +1256,23 @@
         <!-- 头部 -->
         <header class="header">
             <div class="header-top">
-                <div class="back-btn" onclick="history.back()">
+                <button class="back-btn" id="backButton" type="button" onclick="handleBack()" aria-label="返回">
                     <svg viewBox="0 0 24 24">
                         <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
                     </svg>
-                </div>
-                <div class="header-title">用户报告</div>
+                </button>
+                <div class="header-title" id="headerTitle">用户报告</div>
                 <div class="header-count" id="headerCount">共 12 份</div>
             </div>
         </header>
 
         <!-- 搜索区 -->
-        <div class="search-section">
+        <div class="search-section" id="searchSection">
             <div class="search-box">
                 <svg class="search-icon" viewBox="0 0 24 24">
                     <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
                 </svg>
-                <input class="search-input" id="searchInput" type="text" placeholder="输入手机号或地址搜索" maxlength="11">
+                <input class="search-input" id="searchInput" type="text" placeholder="输入手机号或地址搜索">
                 <div class="search-clear" id="searchClear" onclick="clearSearch()" style="display:none;">
                     <svg viewBox="0 0 24 24">
                         <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -533,6 +1287,56 @@
 
             <div id="reportContainer"></div>
         </main>
+
+        <main class="router-page" id="routerDetailPage" hidden>
+            <section class="upload-card" aria-label="上传路由器照片">
+                <input id="routerPhotoInput" type="file" accept="image/*" capture="environment" hidden>
+                <button class="upload-trigger" id="uploadTrigger" type="button" onclick="document.getElementById('routerPhotoInput').click()">
+                    <span class="upload-mark" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M4 7.5h3l1.4-2h7.2l1.4 2h3a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 20 19.5H4A1.5 1.5 0 0 1 2.5 18V9A1.5 1.5 0 0 1 4 7.5Z"/><circle cx="12" cy="13" r="3.5"/></svg>
+                    </span>
+                    <strong>上传路由器照片</strong>
+                    <span>拍清正面和底部标签，识别更准确</span>
+                </button>
+                <p class="upload-help">照片仅用于识别设备型号与使用年限</p>
+                <div class="photo-preview-wrap" id="photoPreviewWrap">
+                    <img class="photo-preview" id="photoPreview" alt="已选择的路由器照片预览">
+                    <div class="photo-preview-meta">
+                        <strong>照片已添加</strong>
+                        <span id="photoStatus">准备开始分析</span>
+                    </div>
+                    <button class="photo-change" type="button" onclick="document.getElementById('routerPhotoInput').click()">更换</button>
+                </div>
+            </section>
+
+            <section class="analysis-card" aria-labelledby="analysisTitle">
+                <h3 id="analysisTitle">路由器诊断</h3>
+                <p class="analysis-caption" id="analysisCaption">先根据本次网络数据分析，上传照片后可进一步识别设备</p>
+                <div class="analysis-state" id="analysisState">当前为通用分析</div>
+                <div class="ai-summary" id="diagnosisSummary"></div>
+                <div class="device-result" id="deviceResult"></div>
+                <section id="appExperience" hidden>
+                    <div class="ai-section-heading">
+                        <span class="ai-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 19v2m8-2v2m-5-9 3 2-3 2z"/></svg></span>
+                        <strong>应用体验</strong><span>按本次网络估算</span>
+                    </div>
+                    <div class="ai-app-grid" id="appExperienceGrid"></div>
+                </section>
+                <section id="aiAdvice" hidden>
+                    <div class="ai-section-heading">
+                        <span class="ai-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a7 7 0 0 0-4.5 12.36c.8.68 1.25 1.48 1.38 2.4h6.24c.13-.92.58-1.72 1.38-2.4A7 7 0 0 0 12 3Z"/><path d="M9 21h6m-5-3v-2m4 2v-2"/></svg></span>
+                        <strong>改善建议</strong>
+                    </div>
+                    <div class="ai-advice-card" id="aiAdviceContent"></div>
+                </section>
+                <div class="ai-section-heading">
+                    <span class="ai-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V5m0 14h17M8 15l3-4 3 2 5-6"/><circle cx="19" cy="7" r="1"/></svg></span>
+                    <strong>检测数据</strong><span>来自本次检测</span>
+                </div>
+                <div class="ai-metric-grid" id="analysisPoints"></div>
+                <p class="ai-disclaimer" id="prototypeNote">分析基于已有网络检测数据；上传设备照片后可补充型号与年限判断。</p>
+            </section>
+        </main>
     </div>
 
     <script>
@@ -540,6 +1344,10 @@
 
         let searchKeyword = '';
         let allReports = [];
+        let currentReportId = null;
+        let photoObjectUrl = '';
+        let analysisTimer = null;
+        let detailHistoryPushed = false;
 
         // 模拟数据 - 绑定用户及其报告
         const mockData = {
@@ -559,7 +1367,7 @@
                             status: 'good',
                             statusText: '优秀',
                             wifi: { ssid: 'ChinaNet-5G', band: '5', signal: -48, rate: 1200, noise: '较少' },
-                            device: { vendor: '华为', model: 'P50 Pro', gateway: '华为', wifi6Phone: '支持', wifi6Gateway: '支持' },
+                            device: { vendor: '华为', model: 'P50 Pro', gateway: '华为', wifi6Phone: '支持', wifi6Gateway: '支持', gatewayAgeYears: 3 },
                             quality: { up: '4.68', down: '4.68', innerDelay: '4', outerDelay: '10' }
                         },
                         {
@@ -570,7 +1378,7 @@
                             status: 'warning',
                             statusText: '一般',
                             wifi: { ssid: 'ChinaNet-5G', band: '2.4', signal: -72, rate: 300, noise: '中等' },
-                            device: { vendor: '华为', model: 'P50 Pro', gateway: '华为', wifi6Phone: '支持', wifi6Gateway: '不支持' },
+                            device: { vendor: '华为', model: 'P50 Pro', gateway: '华为', wifi6Phone: '支持', wifi6Gateway: '不支持', gatewayAgeYears: 3 },
                             quality: { up: '2.10', down: '3.15', innerDelay: '15', outerDelay: '28' }
                         }
                     ]
@@ -710,6 +1518,12 @@
 
             // 绑定搜索事件
             $('searchInput').addEventListener('input', handleSearch);
+            $('routerPhotoInput').addEventListener('change', handlePhotoSelected);
+            window.addEventListener('popstate', () => {
+                currentReportId = history.state && history.state.routerReportId ? history.state.routerReportId : null;
+                if (!currentReportId) detailHistoryPushed = false;
+                renderScreen();
+            });
         }
 
         // 收集所有报告
@@ -789,7 +1603,7 @@
                                 <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
                             </svg>
                         </div>
-                        <div class="empty-text">${searchKeyword ? '未找到匹配的報告' : '暂无报告记录'}</div>
+                        <div class="empty-text">${searchKeyword ? '未找到匹配的报告' : '暂无报告记录'}</div>
                         <div class="empty-hint">${searchKeyword ? '尝试其他手机号搜索' : '用户报告将在测速后显示'}</div>
                     </div>
                 `;
@@ -823,46 +1637,229 @@
             container.innerHTML = html;
         }
 
-        // 截取地址（去掉省市区）
-        function truncateAddress(address) {
-            return address.replace(/^[^区]+区/, '');
-        }
-
         // 渲染单个报告
         function renderReportItem(report) {
             const typeIcon = getTypeIcon(report.type);
-            const statusClass = report.status;
+            const assessment = getConsumerAssessment(report);
 
             return `
-                <div class="report-item" onclick="toggleReport(this)">
-                    <div class="report-header">
-                        <div class="report-type-icon ${report.type}">
+                <article class="report-item" id="report-${report.id}">
+                    <button class="report-header" type="button" onclick="toggleReport(this.closest('.report-item'))" aria-expanded="false" aria-controls="report-detail-${report.id}">
+                        <span class="report-type-icon ${report.type}">
                             ${typeIcon}
-                        </div>
-                        <div class="report-info">
-                            <div class="report-title-row">
-                                <div class="report-title">${report.userPhone}</div>
-                                <div class="report-date">${report.date}</div>
-                            </div>
-                            <div class="report-meta">
-                                <span>${truncateAddress(report.userAddress)}</span>
-                            </div>
-                        </div>
+                        </span>
+                        <span class="report-info">
+                            <span class="report-title-row">
+                                <span class="report-title">${report.type === 'wifi' ? '上网体验报告' : report.title}</span>
+                                <span class="report-date">${report.date}</span>
+                            </span>
+                            <span class="report-meta">
+                                <span>${report.userPhone}</span>
+                                <span aria-hidden="true">·</span>
+                                <span>${assessment.headline}</span>
+                            </span>
+                        </span>
                         <svg class="expand-icon" viewBox="0 0 24 24">
                             <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
                         </svg>
-                    </div>
-                    <div class="report-detail">
+                    </button>
+                    <div class="report-detail" id="report-detail-${report.id}" aria-hidden="true">
                         <div class="report-detail-content">
-                            <div class="detail-sections">
-                                ${renderWifiSection(report)}
-                                ${renderDeviceSection(report)}
-                                ${renderQualitySection(report)}
-                            </div>
+                            ${renderConsumerReport(report, assessment)}
                         </div>
                     </div>
-                </div>
+                </article>
             `;
+        }
+
+        function getConsumerAssessment(report) {
+            const signal = Number(report.wifi.signal);
+            const download = Number.parseFloat(report.quality.down);
+            const outsideDelay = Number.parseInt(report.quality.outerDelay, 10);
+            const signalResult = signal > -60
+                ? { title: '家里多数地方信号不错', tag: '覆盖不错', icon: '⌂', detail: '路由器附近和常用位置，上网通常比较顺。' }
+                : signal > -73
+                    ? { title: '隔墙或走远后可能变慢', tag: '有些遮挡', icon: '⌂', detail: '路由器离得远时，视频加载可能会慢一些。' }
+                    : { title: '远一点的房间容易卡', tag: '覆盖偏弱', icon: '⌂', detail: '距离和墙壁可能正在影响家里的 Wi‑Fi 体验。' };
+            const speedResult = download >= 8
+                ? { title: '看高清视频基本流畅', tag: '日常够用', icon: '▷', detail: '日常刷视频、聊天和浏览网页整体够用。' }
+                : download >= 4
+                    ? { title: '日常上网没问题', tag: '基本顺畅', icon: '▷', detail: '一两台设备使用时体验尚可，多人同时用会更吃力。' }
+                    : { title: '多人同时用时可能会卡', tag: '需要留意', icon: '▷', detail: '同时看视频或下载时，可能会感觉响应变慢。' };
+            const stableResult = outsideDelay <= 12 && report.wifi.noise !== '严重'
+                ? { title: '连接状态比较稳定', tag: '较稳定', icon: '◉', detail: '这次检测中没有明显的卡顿迹象。' }
+                : outsideDelay < 35
+                    ? { title: '偶尔可能会有小波动', tag: '偶有波动', icon: '◉', detail: '视频通话或游戏时，偶尔可能会感觉不够跟手。' }
+                    : { title: '视频通话和游戏易受影响', tag: '波动较明显', icon: '◉', detail: '连接不够稳定时，可能出现延迟或短暂卡顿。' };
+            const score = Math.round(((signalResult.tag === '覆盖不错' ? 9 : signalResult.tag === '有些遮挡' ? 7 : 5)
+                + (speedResult.tag === '日常够用' ? 9 : speedResult.tag === '基本顺畅' ? 7 : 5)
+                + (stableResult.tag === '较稳定' ? 9 : stableResult.tag === '偶有波动' ? 7 : 5)) / 3 * 10) / 10;
+            const headline = score >= 8 ? '整体体验不错' : score >= 6.5 ? '日常够用，仍有提升空间' : '有些地方需要改善';
+            const advice = signal <= -73
+                ? '把路由器放在家中间、离地高一点的位置，尽量不要关在柜子里。'
+                : report.wifi.noise === '严重' || outsideDelay >= 35
+                    ? '先重启路由器，并把它移到开阔位置；如果经常卡，再检查设备摆放或联系网络服务人员。'
+                    : report.device.wifi6Gateway === '不支持'
+                        ? '路由器周围尽量保持通风、无遮挡；如果家里设备多且常卡，可以考虑更新设备。'
+                        : '将路由器放在开阔处，减少墙壁和大型电器的遮挡。';
+
+            return { score: score.toFixed(1), headline, experiences: [signalResult, speedResult, stableResult], advice };
+        }
+
+        function getRouterDiagnosis(report) {
+            const signal = Number(report.wifi.signal);
+            const download = Number.parseFloat(report.quality.down);
+            const outsideDelay = Number.parseInt(report.quality.outerDelay, 10);
+
+            let status = '可继续使用';
+            let title = '可继续使用';
+            let reason = '暂无明显瓶颈';
+            if (report.wifi.noise === '严重' || outsideDelay >= 35) {
+                status = '需排查';
+                title = '先检查路由器状态';
+                reason = '干扰 / 固件';
+            } else if (signal <= -73 || download < 4) {
+                status = '先优化';
+                title = '先调整摆放位置';
+                reason = '距离 / 遮挡';
+            } else if (report.device.wifi6Gateway === '不支持') {
+                status = '可换代';
+                title = '多设备家庭可考虑更新';
+                reason = '未支持 Wi‑Fi 6';
+            }
+
+            const nextStep = signal <= -73
+                ? '移到家中间、放高一些，再测一次。'
+                : report.wifi.noise === '严重' || outsideDelay >= 35
+                    ? '重启并检查固件更新。'
+                    : report.device.wifi6Gateway === '不支持'
+                        ? '多人同时卡顿时，再考虑更新设备。'
+                        : '保持通风无遮挡，定期更新固件。';
+
+            const cause = report.wifi.noise === '严重' || outsideDelay >= 35
+                ? '干扰 / 固件'
+                : signal <= -73 || download < 4
+                    ? '距离 / 遮挡'
+                    : report.device.wifi6Gateway === '不支持'
+                        ? 'Wi‑Fi 6 能力'
+                        : '表现稳定';
+
+            const wifi6Support = report.device.wifi6Gateway === '支持' ? '支持' : '未支持';
+            const rawAgeYears = report.device.gatewayAgeYears;
+            const parsedAgeYears = rawAgeYears === undefined || rawAgeYears === null || rawAgeYears === '' ? null : Number(rawAgeYears);
+            const ageYears = parsedAgeYears !== null && Number.isFinite(parsedAgeYears) ? parsedAgeYears : null;
+            const ageStage = ageYears === null ? '待确认' : ageYears < 3 ? '稳定期' : ageYears < 5 ? '开始衰减' : '老化明显';
+
+            return {
+                status, title, reason, nextStep, wifi6Support, cause, ageYears, ageStage
+            };
+        }
+
+        function renderConsumerReport(report, assessment) {
+            const diagnosis = getRouterDiagnosis(report);
+            const historyTrend = getHistoricalTrend(report);
+            const wifi = report.wifi;
+            const quality = report.quality;
+            const signal = Number(wifi.signal);
+            const download = Number.parseFloat(quality.down);
+            const delay = Number.parseInt(quality.outerDelay, 10);
+            const signalText = signal > -60 ? '强' : signal > -73 ? '一般' : '偏弱';
+            const speedText = download >= 8 ? '流畅' : download >= 4 ? '够用' : '偏慢';
+            const stableText = delay <= 12 && wifi.noise !== '严重' ? '稳定' : delay < 35 ? '偶波动' : '不稳定';
+            const signalWidth = signal > -60 ? 88 : signal > -73 ? 58 : 28;
+            const speedWidth = download >= 8 ? 88 : download >= 4 ? 58 : 30;
+            const stableWidth = delay <= 12 && wifi.noise !== '严重' ? 88 : delay < 35 ? 58 : 28;
+            const connectionTitle = stableText === '不稳定' ? '连接有波动' : assessment.score >= 8 ? '网络连接顺畅' : assessment.score >= 6.5 ? '网络基本正常' : '网络体验偏弱';
+            return `
+                <section class="network-status" aria-label="本次网络连接状态">
+                    <div class="network-status-head">
+                        <div>
+                            <div class="network-eyebrow">本次网络状态</div>
+                            <h3 class="network-verdict">${connectionTitle}</h3>
+                        </div>
+                        <div class="network-score"><strong>${assessment.score}</strong><span>/10</span></div>
+                    </div>
+                    <div class="network-meters">
+                        <div class="network-meter">
+                            <div class="network-meter-head"><span>信号</span><strong>${signalText}</strong></div>
+                            <div class="network-track"><div class="network-fill ${signalWidth < 40 ? 'low' : signalWidth < 70 ? 'medium' : ''}" style="width:${signalWidth}%"></div></div>
+                        </div>
+                        <div class="network-meter">
+                            <div class="network-meter-head"><span>上网</span><strong>${speedText}</strong></div>
+                            <div class="network-track"><div class="network-fill ${speedWidth < 40 ? 'low' : speedWidth < 70 ? 'medium' : ''}" style="width:${speedWidth}%"></div></div>
+                        </div>
+                        <div class="network-meter">
+                            <div class="network-meter-head"><span>稳定</span><strong>${stableText}</strong></div>
+                            <div class="network-track"><div class="network-fill ${stableWidth < 40 ? 'low' : stableWidth < 70 ? 'medium' : ''}" style="width:${stableWidth}%"></div></div>
+                        </div>
+                    </div>
+                    <div class="network-status-foot">${historyTrend ? historyTrend.headline : '本次检测结果'}</div>
+                </section>
+
+                <section class="router-diagnosis" aria-label="路由器诊断报告">
+                    <div class="router-hero">
+                        <div class="router-device-art" aria-hidden="true">
+                            <svg viewBox="0 0 48 48"><path d="M10 7h3v15h-3zM35 7h3v15h-3zM7 23h34a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V26a3 3 0 0 1 3-3zm1 5v8h32v-8H8zm4 3a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2zm6 0a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2zM18 17c3.3-3.3 8.7-3.3 12 0l-2.1 2.1a5.5 5.5 0 0 0-7.8 0L18 17zm-4.3-4.2c5.7-5.7 14.9-5.7 20.6 0l-2.1 2.1a11.6 11.6 0 0 0-16.4 0l-2.1-2.1z"/></svg>
+                        </div>
+                        <div>
+                            <div class="diagnosis-kicker">路由器质量分析</div>
+                            <h3 class="diagnosis-title">${diagnosis.title}</h3>
+                            <div class="diagnosis-cause">${diagnosis.cause}</div>
+                        </div>
+                    </div>
+
+                    <div class="router-facts">
+                        <div class="router-fact"><span>识别品牌</span><strong>${report.device.gateway}</strong></div>
+                        <div class="router-fact"><span>Wi‑Fi 6</span><strong>${diagnosis.wifi6Support}</strong></div>
+                        <div class="router-fact"><span>型号</span><strong>待识别</strong></div>
+                    </div>
+
+                    <section class="router-age-panel" aria-label="路由器使用年限参考">
+                        <div class="comparison-heading"><strong>使用年限参考</strong><span>常见体验变化</span></div>
+                        <div class="age-stages">
+                            <div class="age-stage good"><strong>1年内</strong><span class="age-stage-state">稳定期</span><span class="age-stage-label">多数家庭体验稳定</span></div>
+                            <div class="age-stage warning"><strong>3年左右</strong><span class="age-stage-state">开始衰减</span><span class="age-stage-label">多设备时易变慢</span></div>
+                            <div class="age-stage risk"><strong>5年左右</strong><span class="age-stage-state">老化风险</span><span class="age-stage-label">延迟和干扰更明显</span></div>
+                        </div>
+                        <p class="age-reference-note">年限仅作参考，实际体验也与型号、环境和使用情况有关。</p>
+                    </section>
+
+                </section>
+
+                <section class="photo-prompt" aria-label="获取更准确的路由器诊断">
+                    <div class="photo-prompt-title">生成更完整的路由器诊断</div>
+                    <div class="photo-prompt-copy">上传路由器照片，AI结合设备信息与本次检测数据，分析应用体验、改善建议和详细指标</div>
+                    <button class="action-button" type="button" onclick="openRouterDetail('${report.id}', event)">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h3l1.4-2h8.2l1.4 2h2.5A1.5 1.5 0 0 1 22 9v9a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 2 18V9a1.5 1.5 0 0 1 1.5-1.5Z"/><circle cx="12" cy="13" r="3.5"/></svg> AI智能报告
+                    </button>
+                </section>
+            `;
+        }
+
+        function getHistoricalTrend(report) {
+            const reportTime = new Date(report.date).getTime();
+            const previous = allReports
+                .filter(item => item.userId === report.userId && item.id !== report.id)
+                .filter(item => new Date(item.date).getTime() < reportTime)
+                .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+            if (!previous) return null;
+
+            const currentSpeed = Number.parseFloat(report.quality.down);
+            const previousSpeed = Number.parseFloat(previous.quality.down);
+            if (!Number.isFinite(currentSpeed) || !Number.isFinite(previousSpeed) || previousSpeed === 0) return null;
+
+            const changePercent = Math.round((currentSpeed - previousSpeed) / previousSpeed * 100);
+            const headline = Math.abs(changePercent) < 5
+                ? '和上次差不多'
+                : changePercent > 0
+                    ? `比上次快约 ${changePercent}%`
+                    : `比上次慢约 ${Math.abs(changePercent)}%`;
+            const detail = changePercent > 5
+                ? '本次连接表现比上次好，说明位置或当时的网络环境也会影响结果。'
+                : changePercent < -5
+                    ? '最近一次表现变弱，但一次检测不足以判断路由器老化；建议调整摆放后再测一次。'
+                    : '单次波动不明显，可以结合摆放、设备数量和后续检测继续观察。';
+            return { headline, detail };
         }
 
         // 获取类型图标
@@ -875,114 +1872,6 @@
             return icons[type] || icons.speed;
         }
 
-        // 渲染WiFi信息区块
-        function renderWifiSection(report) {
-            const w = report.wifi;
-            const status = w.signal > -60 ? 'good' : (w.signal > -75 ? 'warning' : 'error');
-            const statusText = status === 'good' ? '正常' : (status === 'warning' ? '一般' : '较差');
-
-            return `
-                <div class="detail-section">
-                    <div class="section-header">
-                        <div class="section-title">WiFi信息</div>
-                        <div class="section-status ${status}">${statusText}</div>
-                    </div>
-                    <div class="section-grid">
-                        <div class="metric-item">
-                            <div class="metric-label">速率</div>
-                            <div class="metric-value">${w.rate}<span class="unit">Mbps</span></div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">频段</div>
-                            <div class="metric-value">${w.band}<span class="unit">GHz</span></div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">信号</div>
-                            <div class="metric-value">${w.signal}<span class="unit">dBm</span></div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">WiFi名称</div>
-                            <div class="metric-value" style="font-size:11px">${w.ssid}</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">干扰</div>
-                            <div class="metric-value" style="font-size:11px">${w.noise}</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // 渲染设备信息区块
-        function renderDeviceSection(report) {
-            const d = report.device;
-            return `
-                <div class="detail-section">
-                    <div class="section-header">
-                        <div class="section-title">设备信息</div>
-                    </div>
-                    <div class="section-grid">
-                        <div class="metric-item">
-                            <div class="metric-label">手机厂家</div>
-                            <div class="metric-value" style="font-size:11px">${d.vendor}</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">手机型号</div>
-                            <div class="metric-value" style="font-size:11px">${d.model}</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">网关厂家</div>
-                            <div class="metric-value" style="font-size:11px">${d.gateway}</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">手机WiFi6</div>
-                            <div class="metric-value" style="font-size:11px">${d.wifi6Phone}</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">网关WiFi6</div>
-                            <div class="metric-value" style="font-size:11px">${d.wifi6Gateway}</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // 渲染网络质量区块
-        function renderQualitySection(report) {
-            const q = report.quality;
-            const innerDelay = parseInt(q.innerDelay);
-            const outerDelay = parseInt(q.outerDelay);
-            const innerStatus = innerDelay < 10 ? 'good' : (innerDelay < 30 ? 'warning' : 'error');
-            const innerText = innerStatus === 'good' ? '优秀' : (innerStatus === 'warning' ? '一般' : '较差');
-
-            return `
-                <div class="detail-section">
-                    <div class="section-header">
-                        <div class="section-title">网络质量</div>
-                        <div class="section-status ${innerStatus}">${innerText}</div>
-                    </div>
-                    <div class="section-grid">
-                        <div class="metric-item">
-                            <div class="metric-label">上行</div>
-                            <div class="metric-value">${q.up}<span class="unit">MB/s</span></div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">下行</div>
-                            <div class="metric-value">${q.down}<span class="unit">MB/s</span></div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">内网延迟</div>
-                            <div class="metric-value">${q.innerDelay}<span class="unit">ms</span></div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">外网延迟</div>
-                            <div class="metric-value">${q.outerDelay}<span class="unit">ms</span></div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
         // 切换报告展开
         function toggleReport(element) {
             const wasExpanded = element.classList.contains('expanded');
@@ -991,11 +1880,198 @@
             document.querySelectorAll('.report-item.expanded').forEach(item => {
                 if (item !== element) {
                     item.classList.remove('expanded');
+                    item.querySelector('.report-header').setAttribute('aria-expanded', 'false');
+                    item.querySelector('.report-detail').setAttribute('aria-hidden', 'true');
                 }
             });
 
             // 切换当前报告
             element.classList.toggle('expanded', !wasExpanded);
+            element.querySelector('.report-header').setAttribute('aria-expanded', String(!wasExpanded));
+            element.querySelector('.report-detail').setAttribute('aria-hidden', String(wasExpanded));
+        }
+
+        function openRouterDetail(reportId, event) {
+            if (event) event.stopPropagation();
+            if (currentReportId !== reportId) {
+                if (analysisTimer) clearTimeout(analysisTimer);
+                if (photoObjectUrl) URL.revokeObjectURL(photoObjectUrl);
+                photoObjectUrl = '';
+                $('photoPreview').removeAttribute('src');
+                $('photoPreviewWrap').classList.remove('visible');
+                $('uploadTrigger').hidden = false;
+                $('routerPhotoInput').value = '';
+            }
+            currentReportId = reportId;
+            detailHistoryPushed = false;
+            try {
+                history.pushState({ ...(history.state || {}), routerReportId: reportId }, '', '#router-analysis');
+                detailHistoryPushed = true;
+            } catch (error) {
+                // file:// 等原型预览环境可能不允许更改浏览器历史；页面内返回仍可用。
+            }
+            renderScreen();
+        }
+
+        function handleBack() {
+            if (currentReportId) {
+                if (detailHistoryPushed) {
+                    history.back();
+                } else {
+                    currentReportId = null;
+                    renderScreen();
+                }
+                return;
+            }
+            history.back();
+        }
+
+        function renderScreen() {
+            const isDetail = Boolean(currentReportId);
+            $('mainContent').hidden = isDetail;
+            $('searchSection').hidden = isDetail;
+            $('routerDetailPage').hidden = !isDetail;
+            $('headerTitle').textContent = isDetail ? 'AI智能报告' : '用户报告';
+            $('headerCount').hidden = isDetail;
+
+            if (isDetail) {
+                const report = allReports.find(item => item.id === currentReportId);
+                if (!report) {
+                    currentReportId = null;
+                    renderScreen();
+                    return;
+                }
+                renderDetailedAnalysis(report, false);
+            }
+        }
+
+        function renderDetailedAnalysis(report, withPhoto) {
+            const profileReport = {
+                ...report,
+                device: { ...report.device, gatewayAgeYears: withPhoto ? report.device.gatewayAgeYears : undefined }
+            };
+            const diagnosis = getRouterDiagnosis(profileReport);
+            const assessment = getConsumerAssessment(report);
+            const historyTrend = getHistoricalTrend(report);
+            const signal = Number(report.wifi.signal);
+            const download = Number.parseFloat(report.quality.down);
+            const upload = Number.parseFloat(report.quality.up);
+            const innerDelay = Number.parseInt(report.quality.innerDelay, 10);
+            const outerDelay = Number.parseInt(report.quality.outerDelay, 10);
+            const signalText = signal > -60 ? '信号较强' : signal > -73 ? '信号一般' : '信号偏弱';
+            const speedText = download >= 8 ? '日常使用顺畅' : download >= 4 ? '日常使用够用' : '多人同时使用易受影响';
+            const delayText = outerDelay <= 12 ? '响应快' : outerDelay < 35 ? '偶有延迟' : '延迟较明显';
+
+            $('analysisCaption').textContent = withPhoto ? '已结合设备信息与本次网络检测' : '根据本次网络数据初步判断，上传照片后可补充设备分析';
+            $('analysisState').textContent = withPhoto ? '识别完成 · 原型示意' : '网络数据已就绪';
+            $('analysisState').className = `analysis-state${withPhoto ? ' ready' : ''}`;
+            $('deviceResult').classList.toggle('visible', withPhoto);
+            $('appExperience').hidden = !withPhoto;
+            $('aiAdvice').hidden = !withPhoto;
+
+            $('diagnosisSummary').innerHTML = `
+                <span class="ai-summary-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 11h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2Z"/><path d="M7 11V7m10 4V7M8 8a5.7 5.7 0 0 1 8 0M5 15h.01M9 15h.01"/></svg></span>
+                <div class="ai-summary-copy">
+                    <strong>${diagnosis.title}</strong>
+                    <span>${withPhoto ? `识别到${report.device.gateway}路由器；${diagnosis.reason === '距离 / 遮挡' ? '摆放距离可能影响信号。' : diagnosis.reason === '干扰 / 固件' ? '干扰或设备状态可能造成波动。' : diagnosis.wifi6Support === '未支持' ? '多设备使用时可关注设备承载能力。' : '本次数据未见明显连接瓶颈。'}` : diagnosis.reason === '距离 / 遮挡' ? '距离或墙体遮挡可能影响信号，先结合检测数据查看。' : diagnosis.reason === '干扰 / 固件' ? '连接波动较明显，可先查看干扰和响应数据。' : diagnosis.wifi6Support === '未支持' ? '多设备家庭可进一步评估路由器承载能力。' : '本次数据未见明显连接瓶颈，可继续观察。'}</span>
+                    ${withPhoto ? `<div class="age-stages" aria-label="路由器年限参考">
+                        <div class="age-stage good ${diagnosis.ageYears !== null && diagnosis.ageYears < 3 ? 'active' : ''}"><strong>1年内</strong><span class="age-stage-state">稳定期</span></div>
+                        <div class="age-stage warning ${diagnosis.ageYears !== null && diagnosis.ageYears >= 3 && diagnosis.ageYears < 5 ? 'active' : ''}"><strong>3年左右</strong><span class="age-stage-state">开始衰减</span></div>
+                        <div class="age-stage risk ${diagnosis.ageYears !== null && diagnosis.ageYears >= 5 ? 'active' : ''}"><strong>5年左右</strong><span class="age-stage-state">老化风险</span></div>
+                    </div><span>使用年限仅作参考，实际体验因型号和环境而异。</span>` : ''}
+                </div>
+            `;
+
+            if (withPhoto) {
+                $('deviceResult').innerHTML = `
+                    <h4><span class="ai-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 11h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2Z"/><path d="M7 11V7m10 4V7M8 8a5.7 5.7 0 0 1 8 0M5 15h.01M9 15h.01"/></svg></span>设备识别 <span class="demo-label">原型示意</span></h4>
+                    <p><strong>${report.device.gateway}</strong> · Wi‑Fi 6 ${diagnosis.wifi6Support} · 型号待确认</p>
+                `;
+            } else {
+                $('deviceResult').innerHTML = '';
+            }
+
+            const apps = [
+                { name: '聊天网页', state: assessment.score >= 8 ? '流畅' : '可用', tone: assessment.score >= 8 ? '' : 'medium', icon: '<svg viewBox="0 0 24 24"><path d="M4 5.5h16v11H9l-5 3v-14Z"/><path d="M8 10h8m-8 3h5"/></svg>' },
+                { name: '刷短视频', state: download >= 8 ? '流畅' : download >= 4 ? '基本顺' : '容易卡', tone: download >= 8 ? '' : download >= 4 ? 'medium' : 'low', icon: '<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="m10 9 5 3-5 3z"/></svg>' },
+                { name: '看高清视频', state: download >= 12 ? '流畅' : download >= 8 ? '基本顺' : '容易卡', tone: download >= 12 ? '' : download >= 8 ? 'medium' : 'low', icon: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 19v2m8-2v2m-5-9 3 2-3 2z"/></svg>' },
+                { name: '手机游戏', state: outerDelay <= 12 ? '跟手' : outerDelay < 35 ? '偶有延迟' : '延迟明显', tone: outerDelay <= 12 ? '' : outerDelay < 35 ? 'medium' : 'low', icon: '<svg viewBox="0 0 24 24"><path d="M7 9h10a4 4 0 0 1 3.8 5l-1 3.2a2 2 0 0 1-3.2.9L14 16h-4l-2.6 2.1a2 2 0 0 1-3.2-.9L3.2 14A4 4 0 0 1 7 9Z"/><path d="M7 12v4m-2-2h4m7-1h.01m2 2h.01"/></svg>' },
+                { name: '多设备同时用', state: diagnosis.wifi6Support === '支持' && download >= 8 ? '压力较小' : '压力较大', tone: diagnosis.wifi6Support === '支持' && download >= 8 ? '' : 'medium', icon: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="13" height="10" rx="1.5"/><path d="M7 18h5m-2-4v4m7-8h5v9h-5z"/></svg>' }
+            ];
+            $('appExperienceGrid').innerHTML = apps.map(app => `<div class="ai-app-card">${app.icon}<strong>${app.name}</strong><span class="ai-app-state ${app.tone}">${app.state}</span></div>`).join('');
+
+            $('aiAdviceContent').innerHTML = `
+                <span class="ai-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a7 7 0 0 0-4.5 12.36c.8.68 1.25 1.48 1.38 2.4h6.24c.13-.92.58-1.72 1.38-2.4A7 7 0 0 0 12 3Z"/><path d="M9 21h6m-5-3v-2m4 2v-2"/></svg></span>
+                <div><strong>先试试这个</strong><p>${diagnosis.nextStep}${report.wifi.noise === '严重' ? ' 同时尽量远离微波炉等可能产生干扰的电器。' : ''}</p></div>
+            `;
+
+            const metricIcon = '<svg viewBox="0 0 24 24"><path d="M4 19V5m0 14h17M8 15l3-4 3 2 5-6"/><circle cx="19" cy="7" r="1"/></svg>';
+            const metric = (label, value, hint, wide = false) => `<div class="ai-metric${wide ? ' ai-metric-wide' : ''}"><div class="ai-metric-top"><span>${label}</span>${metricIcon}</div><strong>${value}</strong><small>${hint}</small></div>`;
+            $('analysisPoints').innerHTML = [
+                metric('Wi‑Fi 信号', `${report.wifi.signal} dBm`, signalText),
+                metric('下载速度', `${report.quality.down} MB/s`, speedText),
+                metric('上传速度', `${report.quality.up} MB/s`, '文件发送与视频通话上行表现'),
+                metric('网络响应', `${outerDelay} ms`, delayText),
+                metric('路由器响应', `${innerDelay} ms`, '设备到路由器的响应时间'),
+                metric('干扰情况', report.wifi.noise, '周边无线信号影响'),
+                metric('连接频段', `${report.wifi.band} GHz`, report.wifi.band === '5' ? '速度更快，隔墙能力较弱' : '覆盖较广，周边干扰可能更多'),
+                metric('Wi‑Fi 6', diagnosis.wifi6Support, withPhoto ? '来自设备识别结果' : '上传照片后可进一步确认'),
+                metric('较上次变化', historyTrend ? historyTrend.headline : '暂无历史数据', historyTrend ? historyTrend.detail : '后续检测后可查看变化趋势', true)
+            ].join('');
+            $('prototypeNote').textContent = withPhoto
+                ? '照片识别结果为原型演示；使用年限是常见体验参考，不代表固定衰减规律。'
+                : '上传路由器照片后，原型将模拟识别设备并补充应用体验与建议。';
+        }
+
+        function handlePhotoSelected(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                setUploadError('请选择 JPG、PNG 等图片文件。');
+                event.target.value = '';
+                return;
+            }
+            if (file.size > 10 * 1024 * 1024) {
+                setUploadError('图片太大了，请选择 10 MB 以内的照片。');
+                event.target.value = '';
+                return;
+            }
+
+            if (photoObjectUrl) URL.revokeObjectURL(photoObjectUrl);
+            photoObjectUrl = URL.createObjectURL(file);
+            $('photoPreview').src = photoObjectUrl;
+            $('photoPreviewWrap').classList.add('visible');
+            $('uploadTrigger').hidden = true;
+            $('photoStatus').textContent = '照片已添加，正在开始分析…';
+            const report = allReports.find(item => item.id === currentReportId);
+            if (report) renderDetailedAnalysis(report, false);
+            $('analysisState').textContent = '正在匹配设备和本次网络表现…';
+            $('analysisState').className = 'analysis-state processing';
+
+            if (analysisTimer) clearTimeout(analysisTimer);
+            analysisTimer = setTimeout(() => {
+                const currentReport = allReports.find(item => item.id === currentReportId);
+                if (!currentReport) return;
+                $('photoStatus').textContent = '已结合本次网络记录完成分析';
+                renderDetailedAnalysis(currentReport, true);
+            }, 900);
+            event.target.value = '';
+        }
+
+        function setUploadError(message) {
+            if (analysisTimer) clearTimeout(analysisTimer);
+            const report = allReports.find(item => item.id === currentReportId);
+            if (report) renderDetailedAnalysis(report, false);
+            $('analysisState').textContent = message;
+            $('analysisState').className = 'analysis-state error';
+            if (photoObjectUrl) {
+                URL.revokeObjectURL(photoObjectUrl);
+                photoObjectUrl = '';
+            }
+            $('photoPreview').removeAttribute('src');
+            $('photoPreviewWrap').classList.remove('visible');
+            $('uploadTrigger').hidden = false;
         }
 
         // 搜索处理
