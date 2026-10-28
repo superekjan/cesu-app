@@ -1342,20 +1342,20 @@
                     导出报告
                 </span>
             </div>
-            <div class="modal-desc">按整改实际进度自动预选报告类型，可调整；整改措施将随PDF报告一同导出。</div>
+            <div class="modal-desc">按整改实际进度自动预选报告类型，可调整；已设计类型选择整改措施后将自动生成预期改善效果。</div>
             <div class="accept-options" id="acceptOptions">
                 <div class="accept-option" data-type="已设计" onclick="selectAcceptType('已设计')">
                     <div class="accept-radio"></div>
                     <div class="accept-body">
                         <div class="accept-name">已设计</div>
-                        <div class="accept-desc">仅完成整改方案设计、尚未实施，报告呈现预期改善效果</div>
+                        <div class="accept-desc">装维尚未实施整改、仅完成方案设计，选择整改措施后自动生成预期达到的效果，并附升级建议</div>
                     </div>
                 </div>
                 <div class="accept-option" data-type="部分优化" onclick="selectAcceptType('部分优化')">
                     <div class="accept-radio"></div>
                     <div class="accept-body">
                         <div class="accept-name">部分优化</div>
-                        <div class="accept-desc">部分点位已整改、其余待实施，报告分别呈现实测与预期改善</div>
+                        <div class="accept-desc">部分点位已整改、其余待整改，报告呈现实测改善并附升级建议</div>
                     </div>
                 </div>
                 <div class="accept-option" data-type="已优化" onclick="selectAcceptType('已优化')">
@@ -1371,8 +1371,8 @@
             <label class="field-label req">整改措施</label>
             <div class="modal-tags" id="acceptTags"></div>
             <textarea class="modal-textarea" id="acceptRectifyInput" placeholder="例如：将客厅AP移至电视柜顶层，并在卧室新增1个Mesh子节点覆盖"></textarea>
-            <label class="field-label" id="acceptExpectLabel" style="display:none;">预期改善效果（装维填写，选填）</label>
-            <textarea class="modal-textarea" id="acceptExpectInput" style="display:none;" placeholder="例如：整改后客厅、卧室信号预计提升至 -60 dBm 以上，可满足4K追剧与视频通话"></textarea>
+            <label class="field-label" id="acceptExpectLabel" style="display:none;">预期改善效果（选择措施自动生成，可修改）</label>
+            <textarea class="modal-textarea" id="acceptExpectInput" style="display:none;" placeholder="选择上方整改措施后自动生成对应的预期效果，也可在此手动修改"></textarea>
             <div class="modal-actions">
                 <button class="modal-btn secondary" onclick="closeAcceptTypeModal()">取消</button>
                 <button class="modal-btn primary" onclick="confirmAcceptExport()">导出报告</button>
@@ -3355,9 +3355,30 @@ function renderRectifyTags() {
     document.getElementById('rectifyTags').innerHTML = rectifyTagsHTML('rectifyInput');
 }
 
+// 整改措施 → 预期整改效果（选择措施后自动生成，装维可再修改）
+const RECTIFY_EXPECT = {
+    '更换光猫': '更换千兆光猫后，消除光衰与设备瓶颈，预计全屋下载速率提升 30%~50%，弱信号点位信号强度提升约 6~10 dBm。',
+    '更换路由器': '更换 WiFi 6 千兆路由器后，覆盖与并发能力增强，预计弱信号区域信号提升约 8~12 dBm，下载速率提升 40% 以上。',
+    '更换网线': '更换为超五类/六类网线后，链路损耗降低，预计有线端速率恢复至签约带宽，WiFi 弱区下载速率提升约 20%~30%。',
+    '增加路由器': '新增路由器组网后，补充覆盖盲区，预计新增覆盖区域信号提升约 10~15 dBm，实现全屋无死角覆盖。',
+    '加装FTTR': '加装 FTTR 全屋光纤后，光纤直达每个房间，预计弱信号点位全部消除，全屋信号合格覆盖率提升至 95% 以上。',
+    '更换入户光纤': '更换入户光纤后，入户光功率恢复正常，预计整体带宽与时延明显改善，弱信号点位下载速率提升 50% 以上。',
+    '调整路由器位置': '将路由器调整至居中、开阔位置后，信号遮挡减少，预计弱信号点位信号提升约 6~10 dBm，下载速率提升 25%~35%。'
+};
+
 function renderAcceptRectifyTags() {
     const box = document.getElementById('acceptTags');
-    if (box) box.innerHTML = rectifyTagsHTML('acceptRectifyInput');
+    if (box) box.innerHTML = RECTIFY_TAGS.map(t => `<div class="modal-tag" onclick="pickAcceptTag('${t}')">${t}</div>`).join('');
+}
+
+// 选择整改措施：追加到整改措施框；仅已设计场景同步自动生成对应的预期改善效果
+function pickAcceptTag(t) {
+    pickRectifyTag(t, 'acceptRectifyInput');
+    if (pendingExportType !== '已设计' || !RECTIFY_EXPECT[t]) return;
+    const ta = document.getElementById('acceptExpectInput');
+    const cur = ta.value.trim();
+    if (cur.includes(RECTIFY_EXPECT[t])) return;
+    ta.value = cur ? cur.replace(/[；;，,\s]+$/, '') + '；' + RECTIFY_EXPECT[t] : RECTIFY_EXPECT[t];
 }
 
 // 快捷标签点击后追加到输入框（分号分隔，避免重复）
@@ -3475,12 +3496,13 @@ function buildSinglePDFReportHTML(rec, acceptType, rectifyText, expectText) {
     const healthy = isRecordHealthy(rec);
     const abn = rec.abnormalPoints || [];
     const sts = rec.speedTests || [];
-    // 三种整改场景：已优化=全部完成（实测）｜已设计=仅方案（预期）｜部分优化=部分完成（实测+预期）
+    // 三种整改场景：已优化=全部完成（实测）｜部分优化=部分完成（实测+待整改）｜已设计=仅方案（仅现状+推荐）
     const mode = healthy ? '' : (acceptType === '已优化' ? 'done' : acceptType === '部分优化' ? 'partial' : 'plan');
     const accept = healthy ? '' : (mode === 'done' ? '已优化' : mode === 'partial' ? '部分优化' : '已设计');
     const rectify = healthy ? '' : (rectifyText || rec.rectification || '').trim();
-    // 预期改善效果：由装维人员填写，用于「已设计 / 部分优化」场景的预期说明
-    const expect = (expectText || '').trim();
+    // 明细表展示「整改前 → 整改后」实测数据；已设计报告无整改数据，表格仅保留现场值
+    const showAfter = mode !== 'plan';
+    const beforeHd = mode === 'plan' ? '现场值' : '整改前';
     const donePts = abn.filter(p => p.recheck);
     const pendPts = abn.filter(p => !p.recheck);
     const rcSig = p => p.recheck ? p.recheck.avg : null;
@@ -3489,24 +3511,15 @@ function buildSinglePDFReportHTML(rec, acceptType, rectifyText, expectText) {
         const v = arr.filter(x => x != null && !isNaN(x));
         return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : 0;
     };
-    // 预期增益：优先取已整改点位的实测平均增益，无实测时按经验值 +10 dBm 估算
-    const gains = donePts.map(p => p.recheck.avg - p.signal);
-    const gain = gains.length ? Math.round(gains.reduce((a, b) => a + b, 0) / gains.length) : 10;
-    const projSig = p => Math.max(p.signal + 4, Math.min(-30, p.signal + gain));
-    const estSpd = sig => Math.round(60 * Math.max(0.12, 1 - Math.min(80, (-sig - 30)) / 80) * 100) / 100;
-    // 导语叙事：分别说明「做了什么 / 计划做什么」，以及实测或预期的改善情况
+    // 导语叙事：已优化说明整改完成情况，部分优化说明已整改与待整改点位（已设计不做预测表述）
     let narr = '';
     if (mode === 'done') {
         narr = `经落实「<b class="hl-mid">${escHtml(rectify)}</b>」整改措施，${abn.length} 个异常点位均已复检，平均信号由 <b class="hl-bad">${avgOf(abn.map(p => p.signal))} dBm</b> 提升至 <b class="hl-good">${avgOf(abn.map(rcSig))} dBm</b>，实际改善明细如下：`;
-    } else if (mode === 'plan') {
-        narr = `拟实施整改措施「<b class="hl-mid">${escHtml(rectify)}</b>」，覆盖 ${abn.length} 个异常点位，预计平均信号由 <b class="hl-bad">${avgOf(abn.map(p => p.signal))} dBm</b> 提升至 <b class="hl-good">${avgOf(abn.map(projSig))} dBm</b>`;
-        if (expect) narr += `。预期改善效果：${escHtml(expect)}`;
-        narr += '。预期改善明细如下：';
     } else if (mode === 'partial') {
         const segs = [];
         if (donePts.length) segs.push(`已完成「${escHtml(tagList(donePts))}」共 ${donePts.length} 个点位的整改，实测平均信号由 <b class="hl-bad">${avgOf(donePts.map(p => p.signal))} dBm</b> 提升至 <b class="hl-good">${avgOf(donePts.map(rcSig))} dBm</b>`);
-        if (pendPts.length) segs.push(`${donePts.length ? '剩余' : '待实施'}「${escHtml(tagList(pendPts))}」共 ${pendPts.length} 个点位拟实施「<b class="hl-mid">${escHtml(rectify)}</b>」，预计平均信号可由 <b class="hl-bad">${avgOf(pendPts.map(p => p.signal))} dBm</b> 提升至 <b class="hl-good">${avgOf(pendPts.map(projSig))} dBm</b>`);
-        narr = segs.join('；') + (expect ? `。预期改善效果：${escHtml(expect)}` : '') + '。明细如下：';
+        if (pendPts.length) segs.push(`${donePts.length ? '剩余' : '待整改'}「${escHtml(tagList(pendPts))}」共 ${pendPts.length} 个点位待整改，建议实施「<b class="hl-mid">${escHtml(rectify)}</b>」`);
+        narr = segs.join('；') + '。明细如下：';
     }
 
     // 异常点与测速明细：对比「整改前 → 整改后」的信号与下载速率，其余指标不展示
@@ -3514,30 +3527,33 @@ function buildSinglePDFReportHTML(rec, acceptType, rectifyText, expectText) {
     const dSpd = v => v == null ? '—' : Number(v).toFixed(2) + ' MB/s';
     // 整改后数值着色：对比整改前变好为绿、变差为橙，无对比或缺失时保持默认黑色
     const cmpCls = (before, after) => (before == null || after == null) ? '' : (after > before ? 'ok' : (after < before ? 'warn' : ''));
-    let hasEst = false;
     const detailRows = abn.map(pp => {
         const rc = pp.recheck;
         const beforeSpd = pp.speed ? pp.speed.download : null;
-        let afterSig = null, afterSpd = null, est = false;
-        if (rc) { afterSig = rc.avg; afterSpd = rc.speed ? rc.speed.download : null; }
-        // 已复检点位取实测值，待整改点位（已设计/部分优化）取方案预期值
-        else if (mode !== 'done') { afterSig = projSig(pp); afterSpd = estSpd(afterSig); est = true; hasEst = true; }
-        const mark = est ? '<sup>*</sup>' : '';
+        let afterCells = '';
+        if (showAfter) {
+            if (rc) {
+                // 已复检点位：显示实测值
+                const afterSpd = rc.speed ? rc.speed.download : null;
+                afterCells = `<td class="${cmpCls(pp.signal, rc.avg)}">${dSig(rc.avg)}</td><td class="${cmpCls(beforeSpd, afterSpd)}">${dSpd(afterSpd)}</td>`;
+            } else {
+                // 未整改点位：不展示预测值
+                afterCells = '<td class="warn">待整改</td><td>—</td>';
+            }
+        }
         return `<tr>
             <td>${escHtml(pp.tag)}</td>
             <td class="bad">异常点</td>
             <td>${dSig(pp.signal)}</td>
             <td>${dSpd(beforeSpd)}</td>
-            <td class="${cmpCls(pp.signal, afterSig)}">${dSig(afterSig)}${mark}</td>
-            <td class="${cmpCls(beforeSpd, afterSpd)}">${dSpd(afterSpd)}${mark}</td>
+            ${afterCells}
         </tr>`;
     }).concat(sts.filter(t => !t.abnormal).map(t => `<tr>
             <td>${escHtml((t.tag || '未标记').trim())}</td>
             <td class="speed">测速点</td>
             <td>${dSig(t.signal)}</td>
             <td>${dSpd(t.download)}</td>
-            <td>—</td>
-            <td>—</td>
+            ${showAfter ? '<td>—</td><td>—</td>' : ''}
         </tr>`)).join('');
 
     // 无异常点报告：以「测速点位明细 + 达标结论框」替代整改前后对比表
@@ -3550,15 +3566,16 @@ function buildSinglePDFReportHTML(rec, acceptType, rectifyText, expectText) {
     const avgTxt = s.avg != null ? s.avg + ' dBm' : '—';
     const minTxt = s.min != null ? s.min + ' dBm' : '—';
     const rateTxt = (s.qualifiedRate != null ? s.qualifiedRate : 100) + '%';
-    // 表头按实际数据标注：同时存在实测与预期时合并展示（已优化场景不产生预期值）
-    const measCnt = abn.filter(p => p.recheck).length, estCnt = mode === 'done' ? 0 : abn.length - measCnt;
-    const afterHd = measCnt && estCnt ? '整改后 / 预期' : estCnt ? '预期改善' : '整改后实测';
-    // 部分优化：底部追加「推荐升级方案」模块，说明剩余异常点并推荐 FTTR 等全屋方案
+    // 已设计 / 部分优化：底部追加「推荐升级方案」模块，推荐 FTTR 等全屋方案；已优化为整改已完成，不再推荐
     const removedPct = abn.length ? Math.round(donePts.length / abn.length * 100) : 0;
-    const promo = mode === 'partial' ? `
+    // 已设计报告尚未实施整改，不使用「已消除」口径
+    const promoLead = (mode === 'plan' || !donePts.length)
+        ? `本次共 <b>${abn.length}</b> 个异常点位待整改，此类点位多受墙体遮挡、距离过远等因素影响，常规调整难以彻底覆盖。`
+        : `本次整改已消除约 <b>${removedPct}%</b> 的异常点位，剩余 <b>${pendPts.length}</b> 个点位受墙体遮挡、距离过远等因素影响，常规调整难以彻底覆盖。`;
+    const promo = mode !== 'done' ? `
         <div class="pr-promo">
             <div class="pr-promo-top"><span class="pr-promo-tag">推荐方案</span><span class="pr-promo-name">FTTR 全屋光纤组网</span></div>
-            <div class="pr-promo-txt">本次整改已消除约 <b>${removedPct}%</b> 的异常点位，剩余 <b>${pendPts.length}</b> 个点位受墙体遮挡、距离过远等因素影响，常规调整难以彻底覆盖。建议升级 FTTR 全屋光纤组网：光纤直达每个房间，主、从光猫星型互联，从根本解决穿墙衰减与远距离弱覆盖问题，实现异常点位全部消除。</div>
+            <div class="pr-promo-txt">${promoLead}建议升级 FTTR 全屋光纤组网：光纤直达每个房间，主、从光猫星型互联，从根本解决穿墙衰减与远距离弱覆盖问题，实现异常点位全部消除。</div>
             <div class="pr-promo-stat"><span class="pr-promo-num">90%</span><span class="pr-promo-desc">的家庭升级 FTTR 后，全屋信号合格覆盖率提升至 <b>95%</b> 以上，弱信号点位基本消除，4K 追剧、视频通话、网课全程流畅无卡顿。</span></div>
             <div class="pr-promo-cta">详询您的网络服务专员，预约 FTTR 全屋光纤升级</div>
         </div>` : '';
@@ -3579,13 +3596,12 @@ function buildSinglePDFReportHTML(rec, acceptType, rectifyText, expectText) {
             <tr>
                 <th rowspan="2">检测点</th>
                 <th rowspan="2">类型</th>
-                <th colspan="2">整改前</th>
-                <th colspan="2">${afterHd}</th>
+                <th colspan="2">${beforeHd}</th>
+                ${showAfter ? '<th colspan="2">整改后</th>' : ''}
             </tr>
-            <tr><th>信号</th><th>下载</th><th>信号</th><th>下载</th></tr>
-            ${detailRows || '<tr><td colspan="6">本次巡检未发现异常点，也未进行实时测速</td></tr>'}
-        </table>
-        ${hasEst ? '<div class="pr-note">带 <sup>*</sup> 的数值为按整改方案推算的预期值，实际以整改后复检数据为准。</div>' : ''}`;
+            <tr><th>信号</th><th>下载</th>${showAfter ? '<th>信号</th><th>下载</th>' : ''}</tr>
+            ${detailRows || `<tr><td colspan="${showAfter ? 6 : 4}">本次巡检未发现异常点，也未进行实时测速</td></tr>`}
+        </table>`;
 
     return `
     <div class="pdf-report">
@@ -3646,8 +3662,8 @@ function selectAcceptType(type) {
     document.querySelectorAll('#acceptOptions .accept-option').forEach(el => {
         el.classList.toggle('active', el.dataset.type === type);
     });
-    // 「预期改善效果」仅已设计 / 部分优化场景需要，由装维人员填写；已优化为已完成实测，无需填写
-    const showExpect = type !== '已优化';
+    // 「预期改善效果」仅已设计场景需要（装维未实施、仅有方案），由选措施自动生成并可修改
+    const showExpect = type === '已设计';
     const lb = document.getElementById('acceptExpectLabel');
     const ip = document.getElementById('acceptExpectInput');
     if (lb) lb.style.display = showExpect ? '' : 'none';
