@@ -5,15 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>历史报告</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --bg-primary: #131524;
-            --bg-secondary: #131524;
             --bg-card: rgba(38, 41, 58, 0.65);
             --bg-card-hover: rgba(46, 49, 69, 0.75);
             --accent-blue: #5b8def;
@@ -21,1147 +16,2076 @@
             --accent-cyan: #4ecdc4;
             --accent-green: #5dbe8d;
             --accent-orange: #f4a261;
-            --accent-purple: #9b8bf4;
             --text-primary: #e8eaf0;
             --text-secondary: #9aa3b2;
             --text-tertiary: #6b7280;
             --border-subtle: rgba(91, 141, 239, 0.15);
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
         .container {
             max-width: 480px;
             margin: 0 auto;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
 
-        /* 头部 */
+        [hidden] { display: none !important; }
+
+        /* ========== 头部 ========== */
         .header {
-            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(13, 17, 23, 0) 100%);
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-subtle);
             position: sticky;
             top: 0;
-            z-index: 10;
+            z-index: 30;
+            padding: 14px 18px 12px;
+            background: rgba(19, 21, 36, 0.94);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
         }
 
         .header-top {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            min-height: 36px;
         }
 
         .back-btn {
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
+            width: 34px;
+            height: 34px;
+            border: 0;
             border-radius: 50%;
-            transition: background 0.2s ease;
-        }
-
-        .back-btn:hover {
+            display: grid;
+            place-items: center;
             background: rgba(255, 255, 255, 0.05);
-        }
-
-        .back-btn svg {
-            width: 24px;
-            height: 24px;
-            fill: var(--text-primary);
-        }
-
-        .header-title {
-            font-size: 17px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .header-subtitle {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-left: auto;
-        }
-
-        /* 主内容 */
-        .main-content {
-            flex: 1;
-            padding: 12px 16px;
-            overflow-y: auto;
-        }
-
-        /* 报告列表 */
-        .report-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .report-item {
-            background: var(--bg-card);
-            border-radius: 12px;
-            border: 1px solid var(--border-subtle);
-            overflow: hidden;
-            transition: all 0.2s ease;
-        }
-
-        .report-item:hover {
-            border-color: rgba(91, 141, 239, 0.3);
-        }
-
-        .report-item.expanded {
-            border-color: rgba(91, 141, 239, 0.4);
-        }
-
-        /* 报告头部 - 始终显示 */
-        .report-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 16px;
             cursor: pointer;
             transition: background 0.2s ease;
         }
 
-        .report-header:hover {
-            background: rgba(255, 255, 255, 0.02);
+        .back-btn:hover { background: rgba(255, 255, 255, 0.09); }
+
+        .back-btn svg { width: 22px; height: 22px; fill: var(--text-primary); }
+
+        .header-title { font-size: 17px; font-weight: 700; letter-spacing: 0.3px; }
+
+        .header-count {
+            margin-left: auto;
+            padding: 3px 9px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            font-size: 10.5px;
+            color: var(--text-secondary);
+        }
+
+        /* ========== 列表 ========== */
+        .main-content { padding: 16px 16px 32px; }
+
+        .page-intro { margin-bottom: 16px; }
+        .page-intro h1 { font-size: 21px; font-weight: 800; letter-spacing: 0.5px; }
+        .page-intro p {
+            margin-top: 6px;
+            font-size: 11.5px;
+            line-height: 1.65;
+            color: var(--text-secondary);
+        }
+
+        .report-card {
+            margin-bottom: 10px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            background: var(--bg-card);
+            overflow: hidden;
+            transition: border-color 0.22s ease, background 0.22s ease;
+        }
+
+        .report-card.expanded {
+            border-color: rgba(91, 141, 239, 0.42);
+            background: linear-gradient(180deg, rgba(47, 54, 82, 0.85), rgba(34, 38, 56, 0.8));
+        }
+
+        .report-toggle {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            width: 100%;
+            padding: 14px;
+            border: 0;
+            background: transparent;
+            color: inherit;
+            font: inherit;
+            text-align: left;
+            cursor: pointer;
         }
 
         .report-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            background: rgba(91, 141, 239, 0.15);
+            flex: 0 0 auto;
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border-radius: 11px;
+            background: rgba(91, 141, 239, 0.16);
         }
 
-        .report-icon svg {
-            width: 22px;
-            height: 22px;
-            fill: var(--accent-blue);
-        }
+        .report-icon svg { width: 21px; height: 21px; fill: var(--accent-blue-light); }
 
-        .report-info {
-            flex: 1;
-            min-width: 0;
-        }
+        .report-main { flex: 1; min-width: 0; }
 
         .report-title {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-primary);
-            margin-bottom: 3px;
+            display: block;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .report-sub {
+            display: block;
+            margin-top: 3px;
+            font-size: 10.5px;
+            color: var(--text-secondary);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .report-meta {
-            font-size: 12px;
-            color: var(--text-tertiary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .report-status {
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: 500;
-        }
-
-        .report-status.good {
-            background: rgba(16, 185, 129, 0.15);
-            color: #10b981;
-        }
-
-        .report-status.warning {
-            background: rgba(245, 158, 11, 0.15);
-            color: #f59e0b;
-        }
-
-        .report-status.error {
-            background: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
-        }
-
-        .expand-icon {
-            width: 20px;
-            height: 20px;
+        .report-chevron {
+            flex: 0 0 auto;
+            width: 18px;
+            height: 18px;
             fill: var(--text-tertiary);
-            transition: transform 0.2s ease;
-            flex-shrink: 0;
+            transition: transform 0.22s ease;
         }
 
-        .report-item.expanded .expand-icon {
-            transform: rotate(180deg);
-        }
+        .report-card.expanded .report-chevron { transform: rotate(180deg); }
 
-        /* 报告详情 - 展开显示 */
-        .report-detail {
+        .report-expand {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease;
+            transition: max-height 0.32s ease;
         }
 
-        .report-item.expanded .report-detail {
-            max-height: 600px;
-        }
+        .report-card.expanded .report-expand { max-height: 820px; }
 
-        .report-detail-content {
-            padding: 0 16px 16px 16px;
+        .expand-inner {
+            padding: 2px 14px 14px;
             border-top: 1px solid var(--border-subtle);
         }
 
-        /* 紧凑预览式数据展示 */
-        .detail-sections {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding: 8px 0;
+        /* ========== 评级标签 ========== */
+        .rating {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 9.5px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
         }
 
-        .detail-section {
-            background: rgba(38, 41, 58, 0.4);
-            border-radius: 8px;
-            padding: 10px 12px;
-            border: 1px solid var(--border-subtle);
-        }
+        .rating.excellent { background: rgba(78, 205, 196, 0.16); color: #6fe3d8; }
+        .rating.good { background: rgba(91, 141, 239, 0.2); color: #9dbcf9; }
+        .rating.fair { background: rgba(244, 200, 104, 0.16); color: #f4c868; }
+        .rating.poor { background: rgba(244, 119, 119, 0.16); color: #f89b9b; }
 
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
+        .tone-excellent { color: #6fe3d8 !important; }
+        .tone-good { color: #9dbcf9 !important; }
+        .tone-fair { color: #f4c868 !important; }
+        .tone-poor { color: #f89b9b !important; }
 
-        .section-title {
-            font-size: 12px;
-            font-weight: 500;
+        /* ========== 展开预览 ========== */
+        .expand-verdict { padding: 12px 0 2px; }
+        .expand-verdict strong { font-size: 13px; color: #fff; }
+        .expand-verdict span {
+            display: block;
+            margin-top: 4px;
+            font-size: 10.5px;
+            line-height: 1.65;
             color: var(--text-secondary);
-            letter-spacing: 0.5px;
         }
 
-        .section-status {
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: 500;
-        }
-
-        .section-status.good {
-            background: rgba(93, 190, 141, 0.15);
-            color: var(--accent-green);
-        }
-
-        .section-status.warning {
-            background: rgba(244, 162, 97, 0.15);
-            color: var(--accent-orange);
-        }
-
-        .section-grid {
+        .meter-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
+            margin-top: 10px;
         }
 
-        .metric-item {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
+        .meter {
+            padding: 9px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .metric-label {
-            font-size: 10px;
-            color: var(--text-tertiary);
-        }
-
-        .metric-value {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-primary);
+        .meter-head {
             display: flex;
             align-items: baseline;
-            gap: 2px;
+            justify-content: space-between;
+            gap: 4px;
+            font-size: 9.5px;
+            color: var(--text-secondary);
         }
 
-        .metric-value .unit {
+        .meter-head strong { font-size: 10px; font-weight: 700; color: #fff; }
+
+        .meter-track {
+            height: 5px;
+            margin-top: 7px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.09);
+            overflow: hidden;
+        }
+
+        .meter-fill { display: block; height: 100%; border-radius: inherit; }
+        .meter-fill.excellent { background: #4ecdc4; }
+        .meter-fill.good { background: #7ca6f3; }
+        .meter-fill.fair { background: #f4c868; }
+        .meter-fill.poor { background: #f89090; }
+
+        .expand-fact { margin-top: 10px; }
+        .expand-fact-label {
             font-size: 9px;
-            color: var(--text-tertiary);
-            font-weight: 400;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--accent-cyan);
+        }
+        .expand-fact p {
+            margin-top: 3px;
+            font-size: 10.5px;
+            line-height: 1.65;
+            color: var(--text-secondary);
         }
 
-        /* 操作按钮 */
-        .detail-actions {
-            display: flex;
-            gap: 10px;
-            padding-top: 12px;
-            border-top: 1px solid var(--border-subtle);
-        }
+        .expand-actions { display: flex; gap: 8px; margin-top: 12px; }
 
-        .detail-btn {
-            flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 13px;
+        /* ========== 按钮 ========== */
+        .btn {
+            padding: 10px 12px;
+            border: 0;
+            border-radius: 10px;
+            font: inherit;
+            font-size: 12px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: center;
+            transition: transform 0.15s ease, opacity 0.15s ease;
         }
 
-        .detail-btn.primary {
-            background: linear-gradient(270deg, #00c6ff 0%, #0072ff 100%);
-            border: none;
+        .btn:active { transform: scale(0.985); }
+
+        .btn.primary {
+            flex: 1;
+            background: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%);
             color: #fff;
         }
 
-        .detail-btn.primary:hover {
-            opacity: 0.9;
-        }
-
-        .detail-btn.secondary {
+        .btn.ghost {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border-subtle);
             color: var(--text-secondary);
         }
 
-        .detail-btn.secondary:hover {
-            background: rgba(255, 255, 255, 0.08);
+        .btn.danger {
+            background: rgba(244, 119, 119, 0.08);
+            border: 1px solid rgba(244, 119, 119, 0.22);
+            color: #f89b9b;
         }
 
-        /* 空状态 */
+        .btn.block { width: 100%; }
+
+        .link-btn {
+            margin-top: 10px;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            color: #8ecbff;
+            font: inherit;
+            font-size: 10.5px;
+            cursor: pointer;
+        }
+
+        /* ========== 详情页 ========== */
+        .detail-page { padding: 14px 16px 30px; }
+
+        .detail-meta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-bottom: 12px;
+            font-size: 10.5px;
+            color: var(--text-secondary);
+        }
+
+        .detail-meta .dot {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: #4a5270;
+        }
+
+        .detail-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 4px;
+            margin-bottom: 14px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .detail-tab {
+            flex: 1;
+            padding: 9px;
+            border: 0;
+            border-radius: 9px;
+            background: transparent;
+            color: var(--text-secondary);
+            font: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .detail-tab.active {
+            background: rgba(91, 141, 239, 0.22);
+            color: #fff;
+            box-shadow: inset 0 0 0 1px rgba(124, 166, 243, 0.35);
+        }
+
+        .summary-card {
+            position: relative;
+            overflow: hidden;
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(91, 141, 239, 0.28);
+            background:
+                radial-gradient(120% 100% at 100% 0%, rgba(78, 205, 196, 0.16), transparent 60%),
+                linear-gradient(160deg, rgba(45, 62, 110, 0.78), rgba(30, 34, 52, 0.72));
+        }
+
+        .summary-top { display: flex; align-items: flex-start; gap: 12px; }
+
+        .summary-grade {
+            flex: 0 0 auto;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.06);
+            text-align: center;
+        }
+
+        .summary-grade b {
+            display: block;
+            font-size: 21px;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-grade span {
+            display: block;
+            margin-top: 5px;
+            font-size: 8.5px;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+        }
+
+        .summary-copy h2 { font-size: 15px; font-weight: 700; line-height: 1.5; color: #fff; }
+        .summary-copy p {
+            margin-top: 5px;
+            font-size: 10.5px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .kpi {
+            padding: 11px;
+            border-radius: 11px;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: rgba(9, 14, 30, 0.35);
+        }
+
+        .kpi > span { display: block; font-size: 9px; color: var(--text-secondary); }
+
+        .kpi strong {
+            display: block;
+            margin-top: 4px;
+            font-size: 19px;
+            font-weight: 800;
+            line-height: 1.1;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+
+        .kpi strong small { margin-left: 2px; font-size: 9px; font-weight: 500; color: var(--text-secondary); }
+
+        .kpi .rating { margin-top: 6px; }
+
+        /* ========== 通用区块 ========== */
+        .section { margin-top: 20px; }
+
+        .section-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 9px;
+            padding: 0 2px;
+        }
+
+        .section-head h3 { font-size: 13.5px; font-weight: 700; color: #fff; }
+        .section-head span { font-size: 9.5px; color: var(--text-secondary); }
+
+        /* ========== 对比 ========== */
+        .cmp-card {
+            padding: 14px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            background: var(--bg-card);
+        }
+
+        .cmp-row + .cmp-row {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .cmp-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .cmp-bar { display: flex; align-items: center; gap: 8px; }
+        .cmp-bar + .cmp-bar { margin-top: 6px; }
+
+        .cmp-k { flex: 0 0 40px; font-size: 9px; color: var(--text-tertiary); }
+
+        .cmp-track {
+            flex: 1;
+            height: 7px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+        }
+
+        .cmp-fill { display: block; height: 100%; border-radius: inherit; background: var(--accent-blue); }
+        .cmp-fill.excellent { background: #4ecdc4; }
+        .cmp-fill.good { background: #7ca6f3; }
+        .cmp-fill.fair { background: #f4c868; }
+        .cmp-fill.poor { background: #f89090; }
+        .cmp-fill.ref { background: rgba(78, 205, 196, 0.45); }
+
+        .cmp-v {
+            flex: 0 0 auto;
+            min-width: 62px;
+            text-align: right;
+            font-size: 9.5px;
+            color: var(--text-secondary);
+            font-style: normal;
+        }
+
+        /* ========== 六大场景 ========== */
+        .scene-list { display: flex; flex-direction: column; gap: 8px; }
+
+        .scene-row {
+            display: grid;
+            grid-template-columns: 30px minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 8px 10px;
+            padding: 11px 12px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 11px;
+            background: var(--bg-card);
+        }
+
+        .scene-ico {
+            width: 30px;
+            height: 30px;
+            display: grid;
+            place-items: center;
+            border-radius: 9px;
+            background: rgba(91, 141, 239, 0.12);
+        }
+
+        .scene-ico svg { width: 16px; height: 16px; fill: none; stroke: var(--accent-blue-light); stroke-width: 1.7; }
+
+        .scene-name { font-size: 11.5px; font-weight: 600; color: #fff; }
+        .scene-note { margin-top: 2px; font-size: 9px; color: var(--text-secondary); }
+
+        .scene-bar {
+            grid-column: 1 / -1;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.07);
+            overflow: hidden;
+        }
+
+        .scene-bar i { display: block; height: 100%; border-radius: inherit; background: var(--accent-cyan); }
+        .scene-bar i.excellent { background: #4ecdc4; }
+        .scene-bar i.good { background: #7ca6f3; }
+        .scene-bar i.fair { background: #f4c868; }
+        .scene-bar i.poor { background: #f89090; }
+
+        /* ========== 原因 ========== */
+        .reason-item {
+            display: flex;
+            gap: 10px;
+            padding: 12px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 11px;
+            background: var(--bg-card);
+        }
+
+        .reason-item + .reason-item { margin-top: 8px; }
+
+        .reason-n {
+            flex: 0 0 auto;
+            width: 22px;
+            height: 22px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4ecdc4, #5b8def);
+            color: #08111f;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .reason-item b { display: block; font-size: 11.5px; color: #fff; }
+        .reason-item p { margin-top: 3px; font-size: 10px; line-height: 1.7; color: var(--text-secondary); }
+
+        /* ========== 路由器 ========== */
+        .router-card {
+            padding: 14px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            background: var(--bg-card);
+        }
+
+        .router-hero { display: flex; align-items: center; gap: 12px; }
+
+        .router-art {
+            flex: 0 0 auto;
+            width: 44px;
+            height: 44px;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(78, 205, 196, 0.2);
+            border-radius: 12px;
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .router-art svg { width: 24px; height: 24px; fill: none; stroke: var(--accent-cyan); stroke-width: 1.6; }
+
+        .router-name { font-size: 13px; font-weight: 700; color: #fff; }
+        .router-meta { margin-top: 3px; font-size: 10px; color: var(--text-secondary); }
+
+        .router-facts {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 7px;
+            margin-top: 12px;
+        }
+
+        .router-fact { padding: 9px; border-radius: 9px; background: rgba(255, 255, 255, 0.04); }
+        .router-fact span { display: block; font-size: 8.5px; color: var(--text-tertiary); }
+        .router-fact strong { display: block; margin-top: 3px; font-size: 11px; color: #fff; }
+
+        .router-note {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 9px;
+            font-size: 9.5px;
+            line-height: 1.7;
+        }
+
+        .router-note.warn {
+            border: 1px solid rgba(244, 162, 97, 0.18);
+            background: rgba(244, 162, 97, 0.1);
+            color: #f0b98c;
+        }
+
+        .router-note.ok {
+            border: 1px solid rgba(78, 205, 196, 0.16);
+            background: rgba(78, 205, 196, 0.08);
+            color: #8fdcd5;
+        }
+
+        /* ========== 预计改善 ========== */
+        .after-card {
+            padding: 4px 14px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            background: var(--bg-card);
+        }
+
+        .after-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 11px 0;
+            font-size: 9.5px;
+        }
+
+        .after-row + .after-row { border-top: 1px solid rgba(255, 255, 255, 0.05); }
+        .after-k { flex: 1; font-size: 10.5px; font-weight: 600; color: #fff; }
+        .after-now { color: var(--text-tertiary); }
+        .after-arrow { color: var(--accent-cyan); }
+        .after-next { font-weight: 600; color: #6fe3d8; }
+
+        /* ========== 建议 ========== */
+        .step-list { display: flex; flex-direction: column; gap: 8px; }
+
+        .step {
+            padding: 12px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 11px;
+            background: linear-gradient(135deg, rgba(91, 141, 239, 0.1), rgba(78, 205, 196, 0.04));
+        }
+
+        .step-tag { display: inline-block; font-size: 8.5px; font-weight: 700; letter-spacing: 0.8px; color: var(--accent-cyan); }
+        .step b { display: block; margin-top: 4px; font-size: 11.5px; color: #fff; }
+        .step p { margin-top: 3px; font-size: 10px; line-height: 1.7; color: var(--text-secondary); }
+
+        /* ========== 检测数据 ========== */
+        .data-section { margin-top: 16px; }
+
+        .data-card {
+            padding: 14px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            background: var(--bg-card);
+        }
+
+        .stat-grid { display: grid; gap: 8px; }
+        .stat-grid.two { grid-template-columns: 1fr 1fr; }
+        .stat-grid.three { grid-template-columns: repeat(3, 1fr); }
+
+        .stat-tile { padding: 10px; border-radius: 10px; background: rgba(255, 255, 255, 0.04); }
+        .stat-tile span { display: block; font-size: 8.5px; color: var(--text-tertiary); }
+
+        .stat-tile strong {
+            display: block;
+            margin-top: 5px;
+            font-size: 17px;
+            font-weight: 800;
+            line-height: 1.1;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+
+        .stat-tile strong small { margin-left: 2px; font-size: 8.5px; font-weight: 500; color: var(--text-secondary); }
+        .stat-tile i { display: block; margin-top: 4px; font-size: 8.5px; font-style: normal; color: var(--text-secondary); }
+
+        .kv-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+
+        .kv {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 6px;
+            padding: 7px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 9.5px;
+        }
+
+        .kv span { flex: 0 0 auto; color: var(--text-tertiary); }
+        .kv b {
+            min-width: 0;
+            font-weight: 600;
+            color: #fff;
+            text-align: right;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .scale-track {
+            position: relative;
+            height: 9px;
+            border-radius: 5px;
+            background: linear-gradient(90deg, #ef4444 0%, #f59e0b 48%, #4ecdc4 100%);
+        }
+
+        .scale-pin {
+            position: absolute;
+            top: 50%;
+            width: 4px;
+            height: 18px;
+            border-radius: 2px;
+            background: #fff;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 0 2px #131524;
+        }
+
+        .scale-legend {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 7px;
+            font-size: 8.5px;
+            color: var(--text-tertiary);
+        }
+
+        .speed-bars { display: grid; gap: 8px; margin-top: 10px; }
+        .speed-row { display: flex; align-items: center; gap: 9px; font-size: 9.5px; color: var(--text-secondary); }
+        .speed-track { flex: 1; height: 8px; border-radius: 4px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
+        .speed-fill { display: block; height: 100%; border-radius: inherit; background: #4ecdc4; }
+        .speed-fill.mid { background: #f4c868; }
+        .speed-fill.low { background: #f89090; }
+        .speed-fill.plan { background: rgba(124, 166, 243, 0.5); }
+
+        .viz-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+        .viz-number { font-size: 26px; font-weight: 800; line-height: 1; color: #fff; letter-spacing: -0.5px; }
+        .viz-number small { margin-left: 3px; font-size: 10px; font-weight: 500; color: var(--text-secondary); }
+
+        .explain-box {
+            margin-top: 16px;
+            padding: 0 13px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .explain-box summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            color: #a9c6e5;
+            font-size: 10.5px;
+            cursor: pointer;
+            list-style: none;
+        }
+
+        .explain-box summary::-webkit-details-marker { display: none; }
+        .explain-box summary::after { content: "+"; color: #7f93ad; font-size: 14px; }
+        .explain-box[open] summary::after { content: "-"; }
+
+        .explain-body { padding: 0 0 12px; font-size: 10px; line-height: 1.75; color: var(--text-secondary); }
+        .explain-body p + p { margin-top: 7px; }
+        .explain-body strong { font-weight: 600; color: #cfe2f7; }
+
+        .detail-actions { display: flex; gap: 8px; margin-top: 22px; }
+
+        .disclaimer {
+            margin-top: 14px;
+            padding: 0 2px;
+            font-size: 9.5px;
+            line-height: 1.65;
+            color: var(--text-tertiary);
+        }
+
+        /* ========== 拍照识别弹层 ========== */
+        .sheet-mask {
+            position: fixed;
+            inset: 0;
+            z-index: 70;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            background: rgba(2, 7, 18, 0.66);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+
+        .sheet {
+            width: 100%;
+            max-width: 480px;
+            max-height: 92vh;
+            overflow-y: auto;
+            padding: 16px 18px 26px;
+            border-top: 1px solid rgba(78, 205, 196, 0.28);
+            border-radius: 20px 20px 0 0;
+            background: linear-gradient(180deg, #1a1f35 0%, #121526 100%);
+            box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.45);
+            animation: sheet-up 0.26s ease;
+        }
+
+        @keyframes sheet-up {
+            from { transform: translateY(24px); opacity: 0.5; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .sheet-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .sheet-head h3 { font-size: 16px; font-weight: 700; color: #f4f8ff; }
+
+        .sheet-close {
+            width: 32px;
+            height: 32px;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            color: #bcd3ec;
+            font-size: 20px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .sheet-lead { font-size: 10.5px; line-height: 1.7; color: #93a9c4; }
+
+        .label-demo {
+            margin: 12px 0;
+            padding: 14px 16px;
+            border: 1px solid #dbe6f2;
+            border-radius: 12px;
+            background: #f7f9fc;
+            color: #20364f;
+        }
+
+        .label-demo-brand { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #54708e; }
+        .label-demo-model { margin-top: 2px; font-size: 22px; font-weight: 700; color: #173454; }
+        .label-demo-line { margin-top: 4px; font-size: 10px; color: #6b7e94; }
+
+        .label-demo-code {
+            display: block;
+            height: 16px;
+            margin-top: 10px;
+            background: repeating-linear-gradient(90deg, #20364f 0 2px, transparent 2px 5px);
+            opacity: 0.75;
+        }
+
+        .shoot-tips { margin: 0 0 12px 16px; font-size: 10.5px; line-height: 1.75; color: #93a9c4; }
+        .shoot-tips li + li { margin-top: 3px; }
+
+        .sheet-link {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            border: 0;
+            background: transparent;
+            color: #8ecbff;
+            font: inherit;
+            font-size: 10.5px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .privacy-note { margin-top: 10px; font-size: 9px; text-align: center; color: #6f8198; }
+
+        .sheet-photo {
+            width: 100%;
+            max-height: 170px;
+            margin-bottom: 12px;
+            object-fit: cover;
+            border-radius: 10px;
+            background: #0b0e1c;
+        }
+
+        .recognizing { padding: 12px 4px 4px; text-align: center; }
+
+        .scan-ring {
+            width: 54px;
+            height: 54px;
+            margin: 0 auto 12px;
+            border: 3px solid rgba(78, 205, 196, 0.2);
+            border-top-color: #4ecdc4;
+            border-radius: 50%;
+            animation: scan-spin 0.8s linear infinite;
+        }
+
+        @keyframes scan-spin { to { transform: rotate(360deg); } }
+
+        .recognizing h4 { font-size: 15px; font-weight: 700; color: #f4f8ff; }
+        .recognizing p { margin-top: 4px; font-size: 10.5px; color: #93a9c4; }
+
+        .scan-steps { display: grid; gap: 7px; margin-top: 14px; padding: 0; list-style: none; text-align: left; }
+        .scan-steps li { padding: 8px 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.05); font-size: 10.5px; color: #7f93ad; }
+        .scan-steps li.done { color: #77d3a4; }
+        .scan-steps li.active { background: rgba(78, 205, 196, 0.12); color: #9fe8e2; }
+
+        .recognized-head {
+            padding: 13px;
+            border-radius: 11px;
+            background: rgba(78, 205, 196, 0.08);
+            border: 1px solid rgba(78, 205, 196, 0.18);
+            text-align: center;
+        }
+
+        .recognized-head h4 { margin-top: 7px; font-size: 18px; color: #fff; }
+        .recognized-head p { margin-top: 4px; font-size: 10.5px; line-height: 1.6; color: #9fc7c3; }
+
+        .sheet-actions { display: grid; gap: 8px; margin-top: 13px; }
+
+        /* ========== 提示与空状态 ========== */
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 34px;
+            z-index: 90;
+            padding: 10px 16px;
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            border-radius: 20px;
+            background: rgba(18, 24, 40, 0.96);
+            color: #dcecff;
+            font-size: 11px;
+            opacity: 0;
+            transform: translate(-50%, 10px);
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
         .empty-state {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 80px 20px;
+            padding: 72px 20px;
             text-align: center;
         }
 
-        .empty-icon {
-            width: 64px;
-            height: 64px;
-            margin-bottom: 16px;
-            fill: var(--text-tertiary);
-        }
-
-        .empty-text {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-        }
+        .empty-state svg { width: 56px; height: 56px; margin-bottom: 14px; fill: var(--text-tertiary); }
+        .empty-state p { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
 
         .empty-btn {
-            padding: 12px 32px;
-            background: linear-gradient(270deg, #00c6ff 0%, #0072ff 100%);
-            border: none;
-            border-radius: 24px;
-            font-size: 14px;
+            padding: 11px 28px;
+            border: 0;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%);
             color: #fff;
-            font-weight: 500;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
 
-        .empty-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 114, 255, 0.3);
-        }
-
-        /* 底部安全区域 */
-        .safe-area-bottom {
-            height: 20px;
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- SVG渐变定义 -->
-        <svg width="0" height="0" style="position: absolute;">
-            <defs>
-                <linearGradient id="iconGradient" x1="0%" y1="100%" x2="0%" y2="0%">
-                    <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
-                </linearGradient>
-            </defs>
-        </svg>
-
-        <!-- 头部 -->
         <header class="header">
             <div class="header-top">
-                <div class="back-btn" onclick="history.back()">
+                <button class="back-btn" id="backButton" type="button" onclick="handleBack()" aria-label="返回">
                     <svg viewBox="0 0 24 24">
                         <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
                     </svg>
-                </div>
-                <div class="header-title">历史报告</div>
-                <div class="header-subtitle">共 6 份报告</div>
+                </button>
+                <div class="header-title" id="headerTitle">历史报告</div>
+                <div class="header-count" id="headerCount">共 6 份</div>
             </div>
         </header>
 
-        <!-- 主内容 -->
-        <main class="main-content">
-            <div class="report-list">
-                <!-- 报告1 -->
-                <div class="report-item" onclick="toggleReport(this)">
-                    <div class="report-header">
-                        <div class="report-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                            </svg>
-                        </div>
-                        <div class="report-info">
-                            <div class="report-title">网络测速报告</div>
-                            <div class="report-meta">
-                                <span>2024-03-20 14:30</span>
-                                <span class="report-status good">优秀</span>
-                            </div>
-                        </div>
-                        <svg class="expand-icon" viewBox="0 0 24 24">
-                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
-                        </svg>
-                    </div>
-                    <div class="report-detail">
-                        <div class="report-detail-content">
-                            <div class="detail-sections">
-                                <!-- WiFi信息 -->
-                                <div class="detail-section">
-                                    <div class="section-header">
-                                        <div class="section-title">WiFi信息</div>
-                                        <div class="section-status good">正常</div>
-                                    </div>
-                                    <div class="section-grid">
-                                        <div class="metric-item">
-                                            <div class="metric-label">速率</div>
-                                            <div class="metric-value">1200<span class="unit">Mbps</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">频段</div>
-                                            <div class="metric-value">5<span class="unit">GHz</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">连接数</div>
-                                            <div class="metric-value">2</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">WiFi名称</div>
-                                            <div class="metric-value">ChinaNet-5G</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">信号</div>
-                                            <div class="metric-value">-50<span class="unit">dBm</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">干扰</div>
-                                            <div class="metric-value">较少</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 设备信息 -->
-                                <div class="detail-section">
-                                    <div class="section-header">
-                                        <div class="section-title">设备信息</div>
-                                    </div>
-                                    <div class="section-grid">
-                                        <div class="metric-item">
-                                            <div class="metric-label">手机厂家</div>
-                                            <div class="metric-value">华为</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">手机型号</div>
-                                            <div class="metric-value">P50 Pro</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">网关厂家</div>
-                                            <div class="metric-value">华为</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">手机WiFi6</div>
-                                            <div class="metric-value">支持</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">网关WiFi6</div>
-                                            <div class="metric-value">支持</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 内网质量 -->
-                                <div class="detail-section">
-                                    <div class="section-header">
-                                        <div class="section-title">内网质量</div>
-                                        <div class="section-status good">优秀</div>
-                                    </div>
-                                    <div class="section-grid">
-                                        <div class="metric-item">
-                                            <div class="metric-label">上行</div>
-                                            <div class="metric-value">4.68<span class="unit">MB/s</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">下行</div>
-                                            <div class="metric-value">4.68<span class="unit">MB/s</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">内网时延</div>
-                                            <div class="metric-value">4<span class="unit">ms</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">外网时延</div>
-                                            <div class="metric-value">10<span class="unit">ms</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="detail-actions">
-                                <button class="detail-btn primary" onclick="event.stopPropagation();shareReport(1)">分享报告</button>
-                                <button class="detail-btn secondary" onclick="event.stopPropagation();deleteReport(1)">删除</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 报告2 -->
-                <div class="report-item" onclick="toggleReport(this)">
-                    <div class="report-header">
-                        <div class="report-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                            </svg>
-                        </div>
-                        <div class="report-info">
-                            <div class="report-title">网络测速报告</div>
-                            <div class="report-meta">
-                                <span>2024-03-19 10:15</span>
-                                <span class="report-status warning">一般</span>
-                            </div>
-                        </div>
-                        <svg class="expand-icon" viewBox="0 0 24 24">
-                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
-                        </svg>
-                    </div>
-                    <div class="report-detail">
-                        <div class="report-detail-content">
-                            <div class="detail-sections">
-                                <!-- WiFi信息 -->
-                                <div class="detail-section">
-                                    <div class="section-header">
-                                        <div class="section-title">WiFi信息</div>
-                                        <div class="section-status warning">一般</div>
-                                    </div>
-                                    <div class="section-grid">
-                                        <div class="metric-item">
-                                            <div class="metric-label">速率</div>
-                                            <div class="metric-value">866<span class="unit">Mbps</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">频段</div>
-                                            <div class="metric-value">2.4<span class="unit">GHz</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">连接数</div>
-                                            <div class="metric-value">3</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">WiFi名称</div>
-                                            <div class="metric-value">TP-LINK_5G</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">信号</div>
-                                            <div class="metric-value">-65<span class="unit">dBm</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">干扰</div>
-                                            <div class="metric-value">3个</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 设备信息 -->
-                                <div class="detail-section">
-                                    <div class="section-header">
-                                        <div class="section-title">设备信息</div>
-                                    </div>
-                                    <div class="section-grid">
-                                        <div class="metric-item">
-                                            <div class="metric-label">手机厂家</div>
-                                            <div class="metric-value">小米</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">手机型号</div>
-                                            <div class="metric-value">Mi 12</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">网关厂家</div>
-                                            <div class="metric-value">TP-LINK</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">手机WiFi6</div>
-                                            <div class="metric-value">支持</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">网关WiFi6</div>
-                                            <div class="metric-value">不支持</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 内网质量 -->
-                                <div class="detail-section">
-                                    <div class="section-header">
-                                        <div class="section-title">内网质量</div>
-                                        <div class="section-status warning">一般</div>
-                                    </div>
-                                    <div class="section-grid">
-                                        <div class="metric-item">
-                                            <div class="metric-label">上行</div>
-                                            <div class="metric-value">1.5<span class="unit">MB/s</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">下行</div>
-                                            <div class="metric-value">2.6<span class="unit">MB/s</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">内网时延</div>
-                                            <div class="metric-value">8<span class="unit">ms</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">外网时延</div>
-                                            <div class="metric-value">25<span class="unit">ms</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="detail-actions">
-                                <button class="detail-btn primary" onclick="event.stopPropagation();shareReport(2)">分享报告</button>
-                                <button class="detail-btn secondary" onclick="event.stopPropagation();deleteReport(2)">删除</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 报告3 -->
-                <div class="report-item" onclick="toggleReport(this)">
-                    <div class="report-header">
-                        <div class="report-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                            </svg>
-                        </div>
-                        <div class="report-info">
-                            <div class="report-title">网络测速报告</div>
-                            <div class="report-meta">
-                                <span>2024-03-18 16:45</span>
-                                <span class="report-status error">较差</span>
-                            </div>
-                        </div>
-                        <svg class="expand-icon" viewBox="0 0 24 24">
-                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
-                        </svg>
-                    </div>
-                    <div class="report-detail">
-                        <div class="report-detail-content">
-                            <div class="detail-sections">
-                                <!-- WiFi信息 -->
-                                <div class="detail-section">
-                                    <div class="section-header">
-                                        <div class="section-title">WiFi信息</div>
-                                        <div class="section-status warning">较差</div>
-                                    </div>
-                                    <div class="section-grid">
-                                        <div class="metric-item">
-                                            <div class="metric-label">速率</div>
-                                            <div class="metric-value">300<span class="unit">Mbps</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">频段</div>
-                                            <div class="metric-value">2.4<span class="unit">GHz</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">连接数</div>
-                                            <div class="metric-value">5</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">WiFi名称</div>
-                                            <div class="metric-value">MERCURY_2.4G</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">信号</div>
-                                            <div class="metric-value">-78<span class="unit">dBm</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">干扰</div>
-                                            <div class="metric-value">8个</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 设备信息 -->
-                                <div class="detail-section">
-                                    <div class="section-header">
-                                        <div class="section-title">设备信息</div>
-                                    </div>
-                                    <div class="section-grid">
-                                        <div class="metric-item">
-                                            <div class="metric-label">手机厂家</div>
-                                            <div class="metric-value">OPPO</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">手机型号</div>
-                                            <div class="metric-value">Reno 8</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">网关厂家</div>
-                                            <div class="metric-value">水星</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">手机WiFi6</div>
-                                            <div class="metric-value">不支持</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">网关WiFi6</div>
-                                            <div class="metric-value">不支持</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 内网质量 -->
-                                <div class="detail-section">
-                                    <div class="section-header">
-                                        <div class="section-title">内网质量</div>
-                                        <div class="section-status warning">较差</div>
-                                    </div>
-                                    <div class="section-grid">
-                                        <div class="metric-item">
-                                            <div class="metric-label">上行</div>
-                                            <div class="metric-value">0.3<span class="unit">MB/s</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">下行</div>
-                                            <div class="metric-value">0.5<span class="unit">MB/s</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">内网时延</div>
-                                            <div class="metric-value">20<span class="unit">ms</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">外网时延</div>
-                                            <div class="metric-value">85<span class="unit">ms</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="detail-actions">
-                                <button class="detail-btn primary" onclick="event.stopPropagation();shareReport(3)">分享报告</button>
-                                <button class="detail-btn secondary" onclick="event.stopPropagation();deleteReport(3)">删除</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 报告4 -->
-                <div class="report-item" onclick="toggleReport(this)">
-                    <div class="report-header">
-                        <div class="report-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                            </svg>
-                        </div>
-                        <div class="report-info">
-                            <div class="report-title">网络测速报告</div>
-                            <div class="report-meta">
-                                <span>2024-03-15 09:20</span>
-                                <span class="report-status good">良好</span>
-                            </div>
-                        </div>
-                        <svg class="expand-icon" viewBox="0 0 24 24">
-                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
-                        </svg>
-                    </div>
-                    <div class="report-detail">
-                        <div class="report-detail-content">
-                            <div class="detail-sections">
-                                <!-- WiFi信息 -->
-                                <div class="detail-section">
-                                    <div class="section-header">
-                                        <div class="section-title">WiFi信息</div>
-                                        <div class="section-status good">正常</div>
-                                    </div>
-                                    <div class="section-grid">
-                                        <div class="metric-item">
-                                            <div class="metric-label">速率</div>
-                                            <div class="metric-value">1000<span class="unit">Mbps</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">频段</div>
-                                            <div class="metric-value">5<span class="unit">GHz</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">连接数</div>
-                                            <div class="metric-value">1</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">WiFi名称</div>
-                                            <div class="metric-value">NETGEAR_5G</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">信号</div>
-                                            <div class="metric-value">-55<span class="unit">dBm</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">干扰</div>
-                                            <div class="metric-value">1个</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 设备信息 -->
-                                <div class="detail-section">
-                                    <div class="section-header">
-                                        <div class="section-title">设备信息</div>
-                                    </div>
-                                    <div class="section-grid">
-                                        <div class="metric-item">
-                                            <div class="metric-label">手机厂家</div>
-                                            <div class="metric-value">苹果</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">手机型号</div>
-                                            <div class="metric-value">iPhone 14</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">网关厂家</div>
-                                            <div class="metric-value">NETGEAR</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">手机WiFi6</div>
-                                            <div class="metric-value">支持</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">网关WiFi6</div>
-                                            <div class="metric-value">支持</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 内网质量 -->
-                                <div class="detail-section">
-                                    <div class="section-header">
-                                        <div class="section-title">内网质量</div>
-                                        <div class="section-status good">良好</div>
-                                    </div>
-                                    <div class="section-grid">
-                                        <div class="metric-item">
-                                            <div class="metric-label">上行</div>
-                                            <div class="metric-value">1.9<span class="unit">MB/s</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">下行</div>
-                                            <div class="metric-value">4.5<span class="unit">MB/s</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">内网时延</div>
-                                            <div class="metric-value">6<span class="unit">ms</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">外网时延</div>
-                                            <div class="metric-value">15<span class="unit">ms</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="detail-actions">
-                                <button class="detail-btn primary" onclick="event.stopPropagation();shareReport(4)">分享报告</button>
-                                <button class="detail-btn secondary" onclick="event.stopPropagation();deleteReport(4)">删除</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 报告5 -->
-                <div class="report-item" onclick="toggleReport(this)">
-                    <div class="report-header">
-                        <div class="report-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                            </svg>
-                        </div>
-                        <div class="report-info">
-                            <div class="report-title">网络测速报告</div>
-                            <div class="report-meta">
-                                <span>2024-03-12 20:00</span>
-                                <span class="report-status good">优秀</span>
-                            </div>
-                        </div>
-                        <svg class="expand-icon" viewBox="0 0 24 24">
-                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
-                        </svg>
-                    </div>
-                    <div class="report-detail">
-                        <div class="report-detail-content">
-                            <div class="detail-sections">
-                                <!-- WiFi信息 -->
-                                <div class="detail-section">
-                                    <div class="section-header">
-                                        <div class="section-title">WiFi信息</div>
-                                        <div class="section-status good">正常</div>
-                                    </div>
-                                    <div class="section-grid">
-                                        <div class="metric-item">
-                                            <div class="metric-label">速率</div>
-                                            <div class="metric-value">2400<span class="unit">Mbps</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">频段</div>
-                                            <div class="metric-value">5<span class="unit">GHz</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">连接数</div>
-                                            <div class="metric-value">1</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">WiFi名称</div>
-                                            <div class="metric-value">Xiaomi_5G</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">信号</div>
-                                            <div class="metric-value">-42<span class="unit">dBm</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">干扰</div>
-                                            <div class="metric-value">无</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 设备信息 -->
-                                <div class="detail-section">
-                                    <div class="section-header">
-                                        <div class="section-title">设备信息</div>
-                                    </div>
-                                    <div class="section-grid">
-                                        <div class="metric-item">
-                                            <div class="metric-label">手机厂家</div>
-                                            <div class="metric-value">小米</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">手机型号</div>
-                                            <div class="metric-value">13 Ultra</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">网关厂家</div>
-                                            <div class="metric-value">小米</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">手机WiFi6</div>
-                                            <div class="metric-value">支持</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">网关WiFi6</div>
-                                            <div class="metric-value">支持</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 内网质量 -->
-                                <div class="detail-section">
-                                    <div class="section-header">
-                                        <div class="section-title">内网质量</div>
-                                        <div class="section-status good">优秀</div>
-                                    </div>
-                                    <div class="section-grid">
-                                        <div class="metric-item">
-                                            <div class="metric-label">上行</div>
-                                            <div class="metric-value">2.1<span class="unit">MB/s</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">下行</div>
-                                            <div class="metric-value">5.2<span class="unit">MB/s</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">内网时延</div>
-                                            <div class="metric-value">3<span class="unit">ms</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">外网时延</div>
-                                            <div class="metric-value">8<span class="unit">ms</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="detail-actions">
-                                <button class="detail-btn primary" onclick="event.stopPropagation();shareReport(5)">分享报告</button>
-                                <button class="detail-btn secondary" onclick="event.stopPropagation();deleteReport(5)">删除</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 报告6 -->
-                <div class="report-item" onclick="toggleReport(this)">
-                    <div class="report-header">
-                        <div class="report-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                            </svg>
-                        </div>
-                        <div class="report-info">
-                            <div class="report-title">网络测速报告</div>
-                            <div class="report-meta">
-                                <span>2024-03-10 11:30</span>
-                                <span class="report-status good">优秀</span>
-                            </div>
-                        </div>
-                        <svg class="expand-icon" viewBox="0 0 24 24">
-                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
-                        </svg>
-                    </div>
-                    <div class="report-detail">
-                        <div class="report-detail-content">
-                            <div class="detail-sections">
-                                <!-- WiFi信息 -->
-                                <div class="detail-section">
-                                    <div class="section-header">
-                                        <div class="section-title">WiFi信息</div>
-                                        <div class="section-status good">正常</div>
-                                    </div>
-                                    <div class="section-grid">
-                                        <div class="metric-item">
-                                            <div class="metric-label">速率</div>
-                                            <div class="metric-value">1200<span class="unit">Mbps</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">频段</div>
-                                            <div class="metric-value">5<span class="unit">GHz</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">连接数</div>
-                                            <div class="metric-value">2</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">WiFi名称</div>
-                                            <div class="metric-value">ASUS_5G</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">信号</div>
-                                            <div class="metric-value">-48<span class="unit">dBm</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">干扰</div>
-                                            <div class="metric-value">2个</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 设备信息 -->
-                                <div class="detail-section">
-                                    <div class="section-header">
-                                        <div class="section-title">设备信息</div>
-                                    </div>
-                                    <div class="section-grid">
-                                        <div class="metric-item">
-                                            <div class="metric-label">手机厂家</div>
-                                            <div class="metric-value">vivo</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">手机型号</div>
-                                            <div class="metric-value">X90 Pro</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">网关厂家</div>
-                                            <div class="metric-value">华硕</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">手机WiFi6</div>
-                                            <div class="metric-value">支持</div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">网关WiFi6</div>
-                                            <div class="metric-value">支持</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 内网质量 -->
-                                <div class="detail-section">
-                                    <div class="section-header">
-                                        <div class="section-title">内网质量</div>
-                                        <div class="section-status good">良好</div>
-                                    </div>
-                                    <div class="section-grid">
-                                        <div class="metric-item">
-                                            <div class="metric-label">上行</div>
-                                            <div class="metric-value">2.0<span class="unit">MB/s</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">下行</div>
-                                            <div class="metric-value">4.9<span class="unit">MB/s</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">内网时延</div>
-                                            <div class="metric-value">5<span class="unit">ms</span></div>
-                                        </div>
-                                        <div class="metric-item">
-                                            <div class="metric-label">外网时延</div>
-                                            <div class="metric-value">12<span class="unit">ms</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="detail-actions">
-                                <button class="detail-btn primary" onclick="event.stopPropagation();shareReport(6)">分享报告</button>
-                                <button class="detail-btn secondary" onclick="event.stopPropagation();deleteReport(6)">删除</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <main class="main-content" id="listView">
+            <div class="page-intro">
+                <h1>我的网络报告</h1>
+                <p>每次网络诊断都会留一份记录。展开看结论，点进去看完整报告。</p>
             </div>
+            <div id="reportContainer"></div>
+            <div class="empty-state" id="emptyState" hidden>
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm5-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                <p>还没有网络报告，去测一次吧</p>
+                <button class="empty-btn" type="button" onclick="location.href='index.html'">开始网络诊断</button>
+            </div>
+        </main>
 
-            <div class="safe-area-bottom"></div>
+        <main class="detail-page" id="detailView" hidden>
+            <div class="detail-meta" id="detailMeta"></div>
+            <div class="detail-tabs" role="tablist" aria-label="报告内容">
+                <button class="detail-tab active" id="tabBtnInsight" type="button" role="tab" aria-selected="true" onclick="switchDetailTab('insight')">诊断报告</button>
+                <button class="detail-tab" id="tabBtnData" type="button" role="tab" aria-selected="false" onclick="switchDetailTab('data')">检测数据</button>
+            </div>
+            <section id="tabInsight" role="tabpanel" aria-labelledby="tabBtnInsight"></section>
+            <section id="tabData" role="tabpanel" aria-labelledby="tabBtnData" hidden></section>
+            <div class="detail-actions">
+                <button class="btn primary" type="button" onclick="shareReport()">分享报告</button>
+                <button class="btn ghost" type="button" onclick="deleteReport()">删除</button>
+            </div>
+            <p class="disclaimer">报告基于本次家庭网络检测数据生成，用于帮助理解日常上网体验，不作为专业检测结论。路由器上市年限按型号首次上市年份推算，不代表实际使用时长。</p>
         </main>
     </div>
 
+    <div class="sheet-mask" id="photoSheet" hidden onclick="handleSheetMask(event)">
+        <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" onclick="event.stopPropagation()">
+            <div class="sheet-head">
+                <h3 id="sheetTitle">识别路由器</h3>
+                <button class="sheet-close" id="sheetClose" type="button" aria-label="关闭" onclick="closePhotoSheet()">×</button>
+            </div>
+            <div id="sheetBody"></div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
     <script>
-        // 展开/收起报告
-        function toggleReport(element) {
-            // 关闭其他已展开的报告
-            document.querySelectorAll('.report-item.expanded').forEach(item => {
-                if (item !== element) {
-                    item.classList.remove('expanded');
+        const $ = id => document.getElementById(id);
+
+        const ROUTER_CATALOG = {
+            '华为': { brand: '华为', model: 'AX6', releaseYear: 2022, standard: 'Wi-Fi 6', maxRateMbps: 3000, bands: '2.4 GHz + 5 GHz' },
+            'TP-LINK': { brand: 'TP-LINK', model: 'XDR3010', releaseYear: 2021, standard: 'Wi-Fi 6', maxRateMbps: 3000, bands: '2.4 GHz + 5 GHz' },
+            '水星': { brand: '水星', model: 'MW325R', releaseYear: 2015, standard: 'Wi-Fi 4', maxRateMbps: 300, bands: '2.4 GHz' },
+            'NETGEAR': { brand: 'NETGEAR', model: 'RAX40', releaseYear: 2019, standard: 'Wi-Fi 6', maxRateMbps: 3000, bands: '2.4 GHz + 5 GHz' },
+            '小米': { brand: '小米', model: 'AX3000T', releaseYear: 2023, standard: 'Wi-Fi 6', maxRateMbps: 3000, bands: '2.4 GHz + 5 GHz' },
+            '华硕': { brand: '华硕', model: 'RT-AX56U', releaseYear: 2020, standard: 'Wi-Fi 6', maxRateMbps: 1800, bands: '2.4 GHz + 5 GHz' }
+        };
+
+        const REPORTS = [
+            {
+                id: 'r6', no: 'ND-20240320-1430',
+                date: '2024-03-20 14:30', scene: '客厅',
+                wifi: { ssid: 'ChinaNet-5G', signal: -50, band: '5', rate: 1200, noise: '较少', channel: '44 (80MHz)' },
+                quality: { down: 58.6, up: 6.2, inner: 4, outer: 9 },
+                plan: 500, gateway: '华为',
+                phone: { brand: '华为', model: 'P50 Pro', wifi6: '支持' },
+                ip: '192.168.1.26', mac: 'A4:2B:8C:11:03:5E',
+                routerConfirmed: false
+            },
+            {
+                id: 'r5', no: 'ND-20240319-1015',
+                date: '2024-03-19 10:15', scene: '主卧',
+                wifi: { ssid: 'TP-LINK_5G', signal: -65, band: '5', rate: 866, noise: '3个', channel: '149 (80MHz)' },
+                quality: { down: 18.4, up: 3.2, inner: 9, outer: 24 },
+                plan: 300, gateway: 'TP-LINK',
+                phone: { brand: '小米', model: 'Mi 12', wifi6: '支持' },
+                ip: '192.168.0.18', mac: '3C:84:6A:72:19:B0',
+                routerConfirmed: false
+            },
+            {
+                id: 'r4', no: 'ND-20240318-1645',
+                date: '2024-03-18 16:45', scene: '次卧',
+                wifi: { ssid: 'MERCURY_2.4G', signal: -78, band: '2.4', rate: 300, noise: '8个', channel: '6 (20MHz)' },
+                quality: { down: 4.2, up: 1.1, inner: 22, outer: 68 },
+                plan: 200, gateway: '水星',
+                phone: { brand: 'OPPO', model: 'Reno 8', wifi6: '不支持' },
+                ip: '192.168.1.102', mac: '8A:1F:44:9C:22:71',
+                routerConfirmed: false
+            },
+            {
+                id: 'r3', no: 'ND-20240315-0920',
+                date: '2024-03-15 09:20', scene: '书房',
+                wifi: { ssid: 'NETGEAR_5G', signal: -55, band: '5', rate: 1200, noise: '较少', channel: '36 (80MHz)' },
+                quality: { down: 42.5, up: 5.4, inner: 6, outer: 15 },
+                plan: 500, gateway: 'NETGEAR',
+                phone: { brand: '苹果', model: 'iPhone 14', wifi6: '支持' },
+                ip: '192.168.1.31', mac: 'D0:81:7A:33:0C:6F',
+                routerConfirmed: false
+            },
+            {
+                id: 'r2', no: 'ND-20240312-2000',
+                date: '2024-03-12 20:00', scene: '客厅',
+                wifi: { ssid: 'Xiaomi_5G', signal: -42, band: '5', rate: 2400, noise: '无', channel: '44 (160MHz)' },
+                quality: { down: 82.4, up: 9.8, inner: 3, outer: 8 },
+                plan: 1000, gateway: '小米',
+                phone: { brand: '小米', model: '13 Ultra', wifi6: '支持' },
+                ip: '192.168.31.44', mac: 'F4:8C:50:67:2B:1A',
+                routerConfirmed: false
+            },
+            {
+                id: 'r1', no: 'ND-20240310-1130',
+                date: '2024-03-10 11:30', scene: '主卧',
+                wifi: { ssid: 'ASUS_5G', signal: -66, band: '5', rate: 1200, noise: '较少', channel: '157 (80MHz)' },
+                quality: { down: 21.6, up: 4.6, inner: 7, outer: 18 },
+                plan: 200, gateway: '华硕',
+                phone: { brand: 'vivo', model: 'X90 Pro', wifi6: '支持' },
+                ip: '192.168.50.12', mac: '62:3B:11:D8:4A:90',
+                routerConfirmed: false
+            }
+        ];
+
+        const ICONS = {
+            wifi: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>',
+            router: '<svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="9" rx="2"/><path d="M7 17v3m10-3v3M7 11h.01M11 11h.01M15 11h.01"/></svg>',
+            video: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l6 3.5-6 3.5v-7z"/></svg>',
+            game: '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="5"/><path d="M8 12h4m-2-2v4M17 12h.01"/></svg>',
+            meeting: '<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M8 18v2m8-2v2M8 11h.01M12 11h.01M16 11h.01"/></svg>',
+            globe: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3.2 3.6 3.2 14.4 0 18M12 3c-3.2 3.6-3.2 14.4 0 18"/></svg>',
+            home: '<svg viewBox="0 0 24 24"><path d="m4 10 8-7 8 7v10H4z"/><path d="M9 20v-6h6v6"/></svg>',
+            file: '<svg viewBox="0 0 24 24"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 19h16"/></svg>'
+        };
+
+        let currentReportId = null;
+        let currentTab = 'insight';
+        let expandedId = null;
+        let sheetStep = 'guide';
+        let photoPreviewUrl = '';
+        let recognizeTimer = null;
+        let toastTimer = null;
+
+        function getReport(id) {
+            return REPORTS.find(report => report.id === id) || null;
+        }
+
+        function getRouter(report) {
+            return ROUTER_CATALOG[report.gateway] || ROUTER_CATALOG['华为'];
+        }
+
+        function getRouterAge(router) {
+            return Math.max(0, new Date().getFullYear() - router.releaseYear);
+        }
+
+        function formatDateTime(value) {
+            const [date, time] = value.split(' ');
+            const [year, month, day] = date.split('-');
+            return `${year}年${Number(month)}月${Number(day)}日 ${time}`;
+        }
+
+        function formatDate(value) {
+            const [date] = value.split(' ');
+            const [, month, day] = date.split('-');
+            return `${Number(month)}月${Number(day)}日`;
+        }
+
+        function ratingTag(rating) {
+            return `<span class="rating ${rating.tone}">${rating.label}</span>`;
+        }
+
+        const TONE_ORDER = { excellent: 0, good: 1, fair: 2, poor: 3 };
+
+        function worseOf(a, b) {
+            return TONE_ORDER[a.tone] >= TONE_ORDER[b.tone] ? a : b;
+        }
+
+        function signalRating(signal) {
+            if (signal > -55) return { label: '优秀', tone: 'excellent' };
+            if (signal > -65) return { label: '良好', tone: 'good' };
+            if (signal > -75) return { label: '一般', tone: 'fair' };
+            return { label: '较差', tone: 'poor' };
+        }
+
+        function speedRating(ratio) {
+            if (ratio >= 0.8) return { label: '优秀', tone: 'excellent' };
+            if (ratio >= 0.6) return { label: '良好', tone: 'good' };
+            if (ratio >= 0.35) return { label: '一般', tone: 'fair' };
+            return { label: '较差', tone: 'poor' };
+        }
+
+        function stabilityRating(noise, inner, outer) {
+            if (noise === '严重' || noise === '8个' || outer >= 50 || inner >= 20) return { label: '较差', tone: 'poor' };
+            if ((noise === '无' || noise === '较少') && outer <= 18 && inner <= 8) return { label: '优秀', tone: 'excellent' };
+            if (outer <= 35 && inner <= 15) return { label: '良好', tone: 'good' };
+            return { label: '一般', tone: 'fair' };
+        }
+
+        function outerRating(outer) {
+            if (outer <= 15) return { label: '优秀', tone: 'excellent' };
+            if (outer <= 25) return { label: '良好', tone: 'good' };
+            if (outer <= 40) return { label: '一般', tone: 'fair' };
+            return { label: '较差', tone: 'poor' };
+        }
+
+        function downloadRating(down) {
+            if (down >= 20) return { label: '优秀', tone: 'excellent' };
+            if (down >= 8) return { label: '良好', tone: 'good' };
+            if (down >= 3) return { label: '一般', tone: 'fair' };
+            return { label: '较差', tone: 'poor' };
+        }
+
+        function bigDownloadRating(down) {
+            if (down >= 30) return { label: '优秀', tone: 'excellent' };
+            if (down >= 15) return { label: '良好', tone: 'good' };
+            if (down >= 5) return { label: '一般', tone: 'fair' };
+            return { label: '较差', tone: 'poor' };
+        }
+
+        function uploadRating(up) {
+            if (up >= 5) return { label: '优秀', tone: 'excellent' };
+            if (up >= 2) return { label: '良好', tone: 'good' };
+            if (up >= 1) return { label: '一般', tone: 'fair' };
+            return { label: '较差', tone: 'poor' };
+        }
+
+        function toneScore(tone) {
+            if (tone === 'excellent') return 9;
+            if (tone === 'good') return 7;
+            if (tone === 'fair') return 5;
+            return 3;
+        }
+
+        function capability(report) {
+            const router = getRouter(report);
+            const age = getRouterAge(router);
+            if (router.maxRateMbps < report.plan) {
+                return {
+                    tone: 'warn',
+                    label: '能力不足',
+                    note: `这台路由器最高 ${router.maxRateMbps} Mbps，低于 ${report.plan} Mbps 套餐，可能成为网速上限。`
+                };
+            }
+            if (age >= 6) {
+                return {
+                    tone: 'warn',
+                    label: '上市较久',
+                    note: `这台路由器 ${router.releaseYear} 年上市，约 ${age} 年。${router.standard} 在多设备同时用时可能偏吃力。`
+                };
+            }
+            return {
+                tone: 'ok',
+                label: '能力匹配',
+                note: `能力上限 ${router.maxRateMbps} Mbps，高于 ${report.plan} Mbps 套餐，当前不是网速瓶颈。`
+            };
+        }
+
+        function assess(report) {
+            const signal = Number(report.wifi.signal);
+            const band = report.wifi.band;
+            const noise = report.wifi.noise;
+            const rate = Number(report.wifi.rate);
+            const down = Number(report.quality.down);
+            const up = Number(report.quality.up);
+            const inner = Number(report.quality.inner);
+            const outer = Number(report.quality.outer);
+            const plan = Number(report.plan);
+            const downMbps = down * 8;
+            const ratio = downMbps / plan;
+            const router = getRouter(report);
+            const routerAge = getRouterAge(router);
+            const cap = capability(report);
+
+            const signalDim = signalRating(signal);
+            const speedDim = speedRating(ratio);
+            const stabilityDim = stabilityRating(noise, inner, outer);
+            const score = toneScore(signalDim.tone) * 0.35 + toneScore(speedDim.tone) * 0.4 + toneScore(stabilityDim.tone) * 0.25;
+
+            let overall;
+            let verdict;
+            let summary;
+            if (score >= 8.5) {
+                overall = { label: '优秀', tone: 'excellent' };
+                verdict = '网络状态很好';
+                summary = '信号、速度和稳定性都不错，看视频、打游戏和多设备同时用都比较从容。';
+            } else if (score >= 7) {
+                overall = { label: '良好', tone: 'good' };
+                verdict = '日常使用够用';
+                summary = '刷视频、上网基本顺畅，高峰期或隔墙使用时可能偶尔卡顿。';
+            } else if (score >= 5.5) {
+                overall = { label: '一般', tone: 'fair' };
+                verdict = '部分场景会卡';
+                summary = '普通使用还行，看高清视频、打游戏时容易出现缓冲或延迟。';
+            } else {
+                overall = { label: '较差', tone: 'poor' };
+                verdict = '体验偏弱，建议改善';
+                summary = '信号弱、速度慢，视频容易转圈，游戏延迟明显，建议按后面的建议调整。';
+            }
+
+            const scenes = [
+                {
+                    icon: 'video', name: '看视频 / 追剧',
+                    dim: downloadRating(down),
+                    note: downloadRating(down).tone === 'excellent' ? '4K 高清也基本不卡' :
+                        downloadRating(down).tone === 'good' ? '高清视频比较顺畅' :
+                        downloadRating(down).tone === 'fair' ? '高清偶尔缓冲' : '标清也可能转圈'
+                },
+                {
+                    icon: 'game', name: '打游戏 / 看直播',
+                    dim: worseOf(stabilityDim, outerRating(outer)),
+                    note: stabilityDim.tone === 'excellent' ? '延迟低，操作跟手' :
+                        stabilityDim.tone === 'good' ? '多数时候延迟稳定' :
+                        stabilityDim.tone === 'fair' ? '高峰期容易跳延迟' : '延迟明显，容易掉线'
+                },
+                {
+                    icon: 'meeting', name: '视频会议 / 上网课',
+                    dim: worseOf(uploadRating(up), stabilityDim),
+                    note: uploadRating(up).tone === 'excellent' && stabilityDim.tone !== 'poor' ? '画面清晰、声音稳定' :
+                        uploadRating(up).tone === 'poor' ? '上传偏慢，画面容易糊' : '基本顺畅，偶尔卡顿'
+                },
+                {
+                    icon: 'globe', name: '刷网页 / 聊天',
+                    dim: worseOf(outerRating(outer), downloadRating(down)),
+                    note: outerRating(outer).tone === 'excellent' ? '点开就加载，很快' :
+                        outerRating(outer).tone === 'good' ? '打开速度正常' :
+                        outerRating(outer).tone === 'fair' ? '加载稍慢' : '经常转圈等待'
+                },
+                {
+                    icon: 'home', name: '智能家居',
+                    dim: signalDim,
+                    note: signalDim.tone === 'excellent' || signalDim.tone === 'good' ? '设备稳定在线' :
+                        signalDim.tone === 'fair' ? '离得远时可能延迟' : '容易掉线或离线'
+                },
+                {
+                    icon: 'file', name: '下载大文件 / 更新游戏',
+                    dim: bigDownloadRating(down),
+                    note: bigDownloadRating(down).tone === 'excellent' ? '大文件很快下完' :
+                        bigDownloadRating(down).tone === 'good' ? '下载速度不错' :
+                        bigDownloadRating(down).tone === 'fair' ? '下载偏慢' : '下载很慢，需要久等'
                 }
+            ];
+
+            const causes = [];
+            if (signal <= -70) {
+                causes.push({
+                    title: '距离和墙体遮挡',
+                    text: `路由器到${report.scene}之间隔着墙，信号衰减到 ${signal} dBm，这是速度慢的主要原因。`
+                });
+            }
+            if (ratio < 0.65) {
+                causes.push({
+                    title: '网速没有跑满套餐',
+                    text: `下载只达到 ${plan} Mbps 套餐的 ${Math.round(ratio * 100)}%，可能与连接频段、光猫状态或宽带线路有关。`
+                });
+            }
+            if (stabilityDim.tone === 'poor' || stabilityDim.tone === 'fair') {
+                causes.push({
+                    title: noise === '8个' || noise === '严重' ? '周边无线干扰明显' : '网络偶尔波动',
+                    text: `当前使用 ${band} GHz 信道 ${report.wifi.channel}，周边有 ${noise} 干扰，延迟容易升高。`
+                });
+            }
+            if (report.routerConfirmed && cap.tone === 'warn') {
+                causes.push({
+                    title: cap.label === '能力不足' ? '路由器能力不足' : '路由器上市较久',
+                    text: cap.note
+                });
+            }
+            if (!causes.length) {
+                causes.push({
+                    title: '没有明显瓶颈',
+                    text: '信号强度、下载速度和稳定性都在正常范围，保持当前使用方式即可。'
+                });
+            }
+
+            const steps = [];
+            if (signal <= -65) {
+                steps.push({
+                    tag: '先做 · 免费',
+                    title: '把路由器移到更居中的位置',
+                    desc: '放在离常用区域更近、更高的地方，远离墙角、柜子和金属物，通常能提升 5 至 10 dBm。'
+                });
+            } else if (ratio < 0.65) {
+                steps.push({
+                    tag: '先做 · 免费',
+                    title: '重启光猫和路由器，再测一次',
+                    desc: '用网线直连光猫测速，排除线路或光猫问题；如果直连也慢，联系运营商检查宽带。'
+                });
+            } else {
+                steps.push({
+                    tag: '可以保持',
+                    title: '当前摆放和使用方式没问题',
+                    desc: '保持路由器通风、避免遮挡，偶尔重启一次即可。'
+                });
+            }
+            if (band === '2.4') {
+                steps.push({
+                    tag: '再做 · 设置',
+                    title: '优先连接 5GHz Wi-Fi',
+                    desc: '5GHz 速度更快、干扰更少；离路由器较远、穿墙多时再切回 2.4GHz。'
+                });
+            } else if (ratio < 0.8) {
+                steps.push({
+                    tag: '再做 · 设置',
+                    title: '检查是否跑满套餐带宽',
+                    desc: '关闭占用网速的下载任务，靠近路由器再测一次；仍然偏慢时联系运营商排查。'
+                });
+            } else {
+                steps.push({
+                    tag: '再做 · 设置',
+                    title: '更新固件，清理闲置设备',
+                    desc: '更新路由器固件，断开长期不用的设备，减少互相抢网。'
+                });
+            }
+            if (!report.routerConfirmed) {
+                steps.push({
+                    tag: '建议 · 拍照',
+                    title: '拍下路由器底部标签',
+                    desc: '确认型号、上市年份和能力上限，判断它是否跟得上你的宽带套餐。'
+                });
+            } else if (cap.tone === 'warn') {
+                steps.push({
+                    tag: '升级 · 按需',
+                    title: '换一台跑得满套餐的路由器',
+                    desc: '选择 Wi-Fi 6 千兆路由，能更好地释放宽带性能，多设备同时用也更稳。'
+                });
+            } else {
+                steps.push({
+                    tag: '升级 · 暂不需要',
+                    title: '路由器能力够用',
+                    desc: '当前路由器上限高于套餐带宽，先把摆放和设置调整好即可。'
+                });
+            }
+
+            const nextLabel = overall.tone === 'excellent' ? '保持优秀' :
+                overall.tone === 'good' ? '更接近优秀' :
+                overall.tone === 'fair' ? '提升到良好' : '改善到一般';
+
+            const improvements = [
+                ['信号覆盖', signalDim.tone === 'excellent' || signalDim.tone === 'good' ? '覆盖良好' : `${signal} dBm 偏弱`,
+                    signalDim.tone === 'excellent' || signalDim.tone === 'good' ? '保持现状即可' : '居中摆放后更稳'],
+                ['下载速度', `${Math.round(downMbps)} Mbps`,
+                    ratio >= 0.8 ? '已接近套餐' : `接近 ${plan} Mbps`],
+                ['游戏延迟', stabilityDim.tone === 'excellent' || stabilityDim.tone === 'good' ? '延迟稳定' : '容易跳延迟',
+                    stabilityDim.tone === 'excellent' || stabilityDim.tone === 'good' ? '保持稳定' : '波动明显减少'],
+                ['整体体验', overall.label, nextLabel]
+            ];
+
+            return {
+                signal, band, noise, rate, down, up, inner, outer, plan,
+                downMbps, ratio, signalDim, speedDim, stabilityDim,
+                overall, verdict, summary, scenes, causes, steps, improvements,
+                router, routerAge, cap
+            };
+        }
+
+        function meterWidth(tone) {
+            if (tone === 'excellent') return 92;
+            if (tone === 'good') return 74;
+            if (tone === 'fair') return 54;
+            return 32;
+        }
+
+        function renderMeters(a) {
+            const dims = [
+                { label: '信号', dim: a.signalDim },
+                { label: '上网', dim: a.speedDim },
+                { label: '稳定', dim: a.stabilityDim }
+            ];
+            return `<div class="meter-grid">${dims.map(item => `
+                <div class="meter">
+                    <div class="meter-head"><span>${item.label}</span><strong>${item.dim.label}</strong></div>
+                    <div class="meter-track"><i class="meter-fill ${item.dim.tone}" style="width:${meterWidth(item.dim.tone)}%"></i></div>
+                </div>
+            `).join('')}</div>`;
+        }
+
+        function reportCardHTML(report) {
+            const a = assess(report);
+            const expanded = expandedId === report.id;
+            const causeLead = a.causes[0].title === '没有明显瓶颈'
+                ? '没有发现明显瓶颈，网络状态不错。'
+                : `主要影响因素：${a.causes[0].title}`;
+
+            return `
+                <article class="report-card ${expanded ? 'expanded' : ''}">
+                    <button class="report-toggle" type="button" aria-expanded="${expanded}" onclick="toggleReport('${report.id}', this)">
+                        <span class="report-icon" aria-hidden="true">${ICONS.wifi}</span>
+                        <span class="report-main">
+                            <span class="report-title">家庭网络诊断</span>
+                            <span class="report-sub">${formatDate(report.date)} · ${report.scene} · ${a.verdict}</span>
+                        </span>
+                        ${ratingTag(a.overall)}
+                        <svg class="report-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+                    </button>
+                    <div class="report-expand">
+                        <div class="expand-inner">
+                            <div class="expand-verdict">
+                                <strong>${a.verdict}</strong>
+                                <span>${causeLead}</span>
+                            </div>
+                            ${renderMeters(a)}
+                            <div class="expand-fact">
+                                <span class="expand-fact-label">为什么</span>
+                                <p>${a.causes[0].text}</p>
+                            </div>
+                            <div class="expand-actions">
+                                <button class="btn primary" type="button" onclick="openDetail('${report.id}','insight')">查看完整诊断报告</button>
+                                <button class="btn ghost" type="button" onclick="openDetail('${report.id}','data')">检测数据</button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        function renderList() {
+            $('reportContainer').innerHTML = REPORTS.map(reportCardHTML).join('');
+            $('headerCount').textContent = `共 ${REPORTS.length} 份`;
+            $('emptyState').hidden = REPORTS.length > 0;
+            $('headerTitle').textContent = '历史报告';
+        }
+
+        function toggleReport(id, btn) {
+            const card = btn.closest('.report-card');
+            const isOpen = card.classList.contains('expanded');
+
+            document.querySelectorAll('.report-card').forEach(item => {
+                item.classList.remove('expanded');
+                const toggle = item.querySelector('.report-toggle');
+                if (toggle) toggle.setAttribute('aria-expanded', 'false');
             });
-            // 切换当前报告
-            element.classList.toggle('expanded');
-        }
 
-        // 分享报告
-        function shareReport(id) {
-            alert('分享报告 #' + id);
-        }
-
-        // 删除报告
-        function deleteReport(id) {
-            if (confirm('确定要删除这份报告吗？')) {
-                alert('报告 #' + id + ' 已删除');
+            if (!isOpen) {
+                card.classList.add('expanded');
+                btn.setAttribute('aria-expanded', 'true');
+                expandedId = id;
+            } else {
+                expandedId = null;
             }
         }
+
+        function kpiTile(label, value, unit, rating) {
+            return `
+                <div class="kpi">
+                    <span>${label}</span>
+                    <strong>${value}<small>${unit}</small></strong>
+                    ${ratingTag(rating)}
+                </div>
+            `;
+        }
+
+        function cmpRow(name, rating, actual, ref, pct) {
+            return `
+                <div class="cmp-row">
+                    <div class="cmp-head"><span>${name}</span>${ratingTag(rating)}</div>
+                    <div class="cmp-bar">
+                        <span class="cmp-k">你家</span>
+                        <span class="cmp-track"><i class="cmp-fill ${rating.tone}" style="width:${pct}%"></i></span>
+                        <b class="cmp-v">${actual}</b>
+                    </div>
+                    <div class="cmp-bar">
+                        <span class="cmp-k">优质</span>
+                        <span class="cmp-track"><i class="cmp-fill ref" style="width:100%"></i></span>
+                        <b class="cmp-v">${ref}</b>
+                    </div>
+                </div>
+            `;
+        }
+
+        function sceneHTML(scene) {
+            return `
+                <div class="scene-row">
+                    <div class="scene-ico" aria-hidden="true">${ICONS[scene.icon]}</div>
+                    <div>
+                        <div class="scene-name">${scene.name}</div>
+                        <div class="scene-note">${scene.note}</div>
+                    </div>
+                    ${ratingTag(scene.dim)}
+                    <div class="scene-bar"><i class="${scene.dim.tone}" style="width:${meterWidth(scene.dim.tone)}%"></i></div>
+                </div>
+            `;
+        }
+
+        function routerCardHTML(report, a) {
+            const cap = a.cap;
+            if (!report.routerConfirmed) {
+                return `
+                    <div class="router-card">
+                        <div class="router-hero">
+                            <div class="router-art" aria-hidden="true">${ICONS.router}</div>
+                            <div>
+                                <div class="router-name">${report.gateway} 路由器</div>
+                                <div class="router-meta">型号未知，拍标签确认能力与上市年限</div>
+                            </div>
+                        </div>
+                        <div class="router-note ok">很多时候不是宽带不够，而是路由器太旧或能力低于套餐。拍下底部标签即可判断。</div>
+                        <button class="btn primary block" type="button" style="margin-top:10px;" onclick="openPhotoSheet()">拍照识别路由器</button>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="router-card">
+                    <div class="router-hero">
+                        <div class="router-art" aria-hidden="true">${ICONS.router}</div>
+                        <div style="flex:1;min-width:0;">
+                            <div class="router-name">${a.router.brand} ${a.router.model}</div>
+                            <div class="router-meta">${a.router.standard} · ${a.router.releaseYear} 年上市 · 约 ${a.routerAge} 年</div>
+                        </div>
+                        <span class="rating ${cap.tone === 'warn' ? 'fair' : 'excellent'}">${cap.label}</span>
+                    </div>
+                    <div class="router-facts">
+                        <div class="router-fact"><span>标准</span><strong>${a.router.standard}</strong></div>
+                        <div class="router-fact"><span>能力上限</span><strong>${a.router.maxRateMbps} Mbps</strong></div>
+                        <div class="router-fact"><span>宽带套餐</span><strong>${a.plan} Mbps</strong></div>
+                    </div>
+                    <div class="router-note ${cap.tone === 'warn' ? 'warn' : 'ok'}">${cap.note}</div>
+                    <button class="link-btn" type="button" onclick="openPhotoSheet()">重新拍照识别</button>
+                </div>
+            `;
+        }
+
+        function insightHTML(report, a) {
+            const clamp = value => Math.max(4, Math.min(100, value));
+            const signalPct = clamp((a.signal + 90) / 35 * 100);
+            const outerPct = clamp(15 / Math.max(a.outer, 1) * 100);
+            const downPct = clamp(a.ratio * 100);
+
+            return `
+                <div class="summary-card">
+                    <div class="summary-top">
+                        <div class="summary-grade">
+                            <b class="tone-${a.overall.tone}">${a.overall.label}</b>
+                            <span>综合评级</span>
+                        </div>
+                        <div class="summary-copy">
+                            <h2>${a.verdict}</h2>
+                            <p>${a.summary}</p>
+                        </div>
+                    </div>
+                    <div class="kpi-grid">
+                        ${kpiTile('下载速度', Math.round(a.downMbps), 'Mbps', a.speedDim)}
+                        ${kpiTile('上传速度', Math.round(a.up * 8), 'Mbps', uploadRating(a.up))}
+                        ${kpiTile('外网时延', a.outer, 'ms', outerRating(a.outer))}
+                        ${kpiTile('信号强度', a.signal, 'dBm', a.signalDim)}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-head"><h3>你家网络 vs 优质网络</h3><span>同一场景参考</span></div>
+                    <div class="cmp-card">
+                        ${cmpRow('下载速度', a.speedDim, `${Math.round(a.downMbps)} Mbps`, `${a.plan} Mbps`, downPct)}
+                        ${cmpRow('网络时延', outerRating(a.outer), `${a.outer} ms`, '15 ms 以内', outerPct)}
+                        ${cmpRow('信号强度', a.signalDim, `${a.signal} dBm`, '-55 dBm 以上', signalPct)}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-head"><h3>六大日常场景</h3><span>按检测数据推算</span></div>
+                    <div class="scene-list">
+                        ${a.scenes.map(sceneHTML).join('')}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-head"><h3>为什么会有这些表现</h3><span>结合信号与速度</span></div>
+                    ${a.causes.map((cause, index) => `
+                        <div class="reason-item">
+                            <div class="reason-n">${index + 1}</div>
+                            <div>
+                                <b>${cause.title}</b>
+                                <p>${cause.text}</p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="section" id="routerSection">
+                    <div class="section-head"><h3>路由器检查</h3><span>拍照识别型号</span></div>
+                    ${routerCardHTML(report, a)}
+                </div>
+
+                <div class="section">
+                    <div class="section-head"><h3>调整后预计改善</h3><span>按建议操作后的效果</span></div>
+                    <div class="after-card">
+                        ${a.improvements.map(row => `
+                            <div class="after-row">
+                                <span class="after-k">${row[0]}</span>
+                                <span class="after-now">${row[1]}</span>
+                                <span class="after-arrow">→</span>
+                                <span class="after-next">${row[2]}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-head"><h3>建议怎么做</h3><span>从免费的先做</span></div>
+                    <div class="step-list">
+                        ${a.steps.map(step => `
+                            <div class="step">
+                                <span class="step-tag">${step.tag}</span>
+                                <b>${step.title}</b>
+                                <p>${step.desc}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function statTile(label, value, unit, note, noteTone) {
+            return `
+                <div class="stat-tile">
+                    <span>${label}</span>
+                    <strong>${value}<small>${unit}</small></strong>
+                    <i class="${noteTone ? 'tone-' + noteTone : ''}">${note}</i>
+                </div>
+            `;
+        }
+
+        function dataHTML(report, a) {
+            const signalPct = Math.max(2, Math.min(100, (a.signal + 90) / 35 * 100));
+            const planPct = Math.max(3, Math.min(100, a.ratio * 100));
+            const speedFill = a.speedDim.tone === 'fair' ? 'mid' : (a.speedDim.tone === 'poor' ? 'low' : '');
+            const innerRating = a.inner <= 8 ? { label: '优秀', tone: 'excellent' } : (a.inner <= 15 ? { label: '良好', tone: 'good' } : { label: '一般', tone: 'fair' });
+            const routerName = report.routerConfirmed ? `${a.router.brand} ${a.router.model}` : `${report.gateway} 路由器（待识别）`;
+
+            return `
+                <div class="data-section">
+                    <div class="section-head"><h3>WiFi 信息</h3><span>${report.wifi.ssid}</span></div>
+                    <div class="data-card">
+                        <div class="kv-list">
+                            <div class="kv"><span>WiFi 名称</span><b>${report.wifi.ssid}</b></div>
+                            <div class="kv"><span>工作频段</span><b>${a.band} GHz</b></div>
+                            <div class="kv"><span>信道</span><b>${report.wifi.channel}</b></div>
+                            <div class="kv"><span>协商速率</span><b>${a.rate} Mbps</b></div>
+                            <div class="kv"><span>无线干扰</span><b>${a.noise}</b></div>
+                            <div class="kv"><span>测量场景</span><b>${report.scene}</b></div>
+                        </div>
+                        <div style="margin-top:14px;">
+                            <div class="viz-head">
+                                <div class="viz-number">${a.signal}<small>dBm</small></div>
+                                ${ratingTag(a.signalDim)}
+                            </div>
+                            <div class="scale-track"><b class="scale-pin" style="left:${signalPct}%" aria-hidden="true"></b></div>
+                            <div class="scale-legend"><span>-90 弱</span><span>-70 一般</span><span>-50 强</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-section">
+                    <div class="section-head"><h3>网络质量</h3><span>套餐 ${a.plan} Mbps</span></div>
+                    <div class="data-card">
+                        <div class="viz-head">
+                            <div class="viz-number">${a.down.toFixed(1)}<small>MB/s</small></div>
+                            ${ratingTag(a.speedDim)}
+                        </div>
+                        <div class="speed-bars">
+                            <div class="speed-row">
+                                <span>实际</span>
+                                <span class="speed-track"><i class="speed-fill ${speedFill}" style="width:${planPct}%"></i></span>
+                            </div>
+                            <div class="speed-row">
+                                <span>套餐</span>
+                                <span class="speed-track"><i class="speed-fill plan" style="width:100%"></i></span>
+                            </div>
+                        </div>
+                        <div class="stat-grid two" style="margin-top:12px;">
+                            ${statTile('上传速度', a.up.toFixed(1), 'MB/s', uploadRating(a.up).label, uploadRating(a.up).tone)}
+                            ${statTile('约合下载', Math.round(a.downMbps), 'Mbps', `套餐的 ${Math.round(a.ratio * 100)}%`, a.speedDim.tone)}
+                        </div>
+                        <div class="stat-grid two" style="margin-top:8px;">
+                            ${statTile('外网时延', a.outer, 'ms', outerRating(a.outer).label, outerRating(a.outer).tone)}
+                            ${statTile('内网时延', a.inner, 'ms', innerRating.label, innerRating.tone)}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-section">
+                    <div class="section-head"><h3>设备信息</h3><span>本次测量设备</span></div>
+                    <div class="data-card">
+                        <div class="kv-list">
+                            <div class="kv"><span>手机厂家</span><b>${report.phone.brand}</b></div>
+                            <div class="kv"><span>手机型号</span><b>${report.phone.model}</b></div>
+                            <div class="kv"><span>手机 WiFi 6</span><b>${report.phone.wifi6}</b></div>
+                            <div class="kv"><span>网关品牌</span><b>${report.gateway}</b></div>
+                            <div class="kv"><span>路由器型号</span><b>${routerName}</b></div>
+                            <div class="kv"><span>IP 地址</span><b>${report.ip}</b></div>
+                            <div class="kv"><span>MAC 地址</span><b>${report.mac}</b></div>
+                            <div class="kv"><span>报告编号</span><b>${report.no}</b></div>
+                        </div>
+                    </div>
+                </div>
+
+                <details class="explain-box">
+                    <summary>这些数字是什么意思？</summary>
+                    <div class="explain-body">
+                        <p><strong>信号强度</strong>：负数越接近 0 越好。-60 dBm 以上通常比较强，-73 dBm 以下会明显偏弱。</p>
+                        <p><strong>下载 / 上传速度</strong>：MB/s 乘以 8 约等于 Mbps。运营商套餐通常用 Mbps 表示，例如 200 Mbps 约等于 25 MB/s。</p>
+                        <p><strong>网络时延</strong>：外网时延越低，网页和游戏响应越快。超过 35 ms 时，游戏和视频会议可能感觉到延迟。</p>
+                        <p><strong>协商速率</strong>：手机和路由器当前能协商到的最高速度，不等于宽带套餐速度，受距离、频段和干扰影响。</p>
+                        <p><strong>上市年限</strong>：按型号首次上市年份推算，只用来判断设备新旧，不代表你实际使用了多久。</p>
+                    </div>
+                </details>
+            `;
+        }
+
+        function renderDetail() {
+            const report = getReport(currentReportId);
+            if (!report) {
+                showList();
+                return;
+            }
+            const a = assess(report);
+            $('detailMeta').innerHTML = `<span>${formatDateTime(report.date)}</span><i class="dot"></i><span>${report.scene}</span><i class="dot"></i><span>${report.no}</span>`;
+            $('tabInsight').innerHTML = insightHTML(report, a);
+            $('tabData').innerHTML = dataHTML(report, a);
+            $('tabInsight').hidden = currentTab !== 'insight';
+            $('tabData').hidden = currentTab !== 'data';
+            $('tabBtnInsight').classList.toggle('active', currentTab === 'insight');
+            $('tabBtnData').classList.toggle('active', currentTab === 'data');
+            $('tabBtnInsight').setAttribute('aria-selected', String(currentTab === 'insight'));
+            $('tabBtnData').setAttribute('aria-selected', String(currentTab === 'data'));
+        }
+
+        function showDetailView() {
+            $('listView').hidden = true;
+            $('detailView').hidden = false;
+            $('headerTitle').textContent = '网络诊断报告';
+            $('headerCount').textContent = '';
+            renderDetail();
+            window.scrollTo(0, 0);
+        }
+
+        function showList() {
+            $('detailView').hidden = true;
+            $('listView').hidden = false;
+            currentReportId = null;
+            renderList();
+            window.scrollTo(0, 0);
+        }
+
+        function openDetail(id, tab) {
+            currentReportId = id;
+            currentTab = tab || 'insight';
+            showDetailView();
+            try {
+                history.pushState({ reportId: id, tab: currentTab }, '', '#report-' + id);
+            } catch (error) {
+                // file:// 环境下不支持时忽略
+            }
+        }
+
+        function switchDetailTab(tab) {
+            currentTab = tab;
+            $('tabInsight').hidden = tab !== 'insight';
+            $('tabData').hidden = tab !== 'data';
+            $('tabBtnInsight').classList.toggle('active', tab === 'insight');
+            $('tabBtnData').classList.toggle('active', tab === 'data');
+            $('tabBtnInsight').setAttribute('aria-selected', String(tab === 'insight'));
+            $('tabBtnData').setAttribute('aria-selected', String(tab === 'data'));
+            window.scrollTo(0, 0);
+            if (currentReportId) {
+                try {
+                    history.replaceState({ reportId: currentReportId, tab }, '', '#report-' + currentReportId);
+                } catch (error) {
+                    // 忽略
+                }
+            }
+        }
+
+        function shareReport() {
+            const report = getReport(currentReportId);
+            if (!report) return;
+            const text = `我在 ${formatDate(report.date)} 做了家庭网络诊断，综合评级：${assess(report).overall.label}。报告编号 ${report.no}`;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text)
+                    .then(() => toast('报告摘要已复制，可粘贴分享'))
+                    .catch(() => alert(text));
+            } else {
+                alert(text);
+            }
+        }
+
+        function deleteReport() {
+            const report = getReport(currentReportId);
+            if (!report) return;
+            if (!confirm('确定要删除这份报告吗？删除后无法恢复。')) return;
+
+            const index = REPORTS.findIndex(item => item.id === report.id);
+            if (index > -1) REPORTS.splice(index, 1);
+            if (expandedId === report.id) expandedId = null;
+            showList();
+            toast('报告已删除');
+        }
+
+        function openPhotoSheet() {
+            if (!currentReportId) return;
+            sheetStep = 'guide';
+            clearRecognitionTimer();
+            renderSheet();
+            $('photoSheet').hidden = false;
+            setTimeout(() => $('sheetClose').focus(), 30);
+        }
+
+        function closePhotoSheet() {
+            $('photoSheet').hidden = true;
+            clearRecognitionTimer();
+            if (photoPreviewUrl) {
+                URL.revokeObjectURL(photoPreviewUrl);
+                photoPreviewUrl = '';
+            }
+            sheetStep = 'guide';
+        }
+
+        function handleSheetMask(event) {
+            if (event.target.id === 'photoSheet') closePhotoSheet();
+        }
+
+        function clearRecognitionTimer() {
+            if (recognizeTimer) {
+                clearTimeout(recognizeTimer);
+                recognizeTimer = null;
+            }
+        }
+
+        function renderSheet() {
+            if (sheetStep === 'guide') {
+                const report = getReport(currentReportId);
+                const brand = report ? report.gateway : '';
+                const sample = report ? getRouter(report) : ROUTER_CATALOG['华为'];
+                $('sheetBody').innerHTML = `
+                    <p class="sheet-lead">拍下路由器底部或背面的标签，型号通常印在上面。当前识别到网关品牌：${brand}。</p>
+                    <div class="label-demo" aria-hidden="true">
+                        <div class="label-demo-brand">${brand || 'HUAWEI'}</div>
+                        <div class="label-demo-model">${sample.model}</div>
+                        <div class="label-demo-line">${sample.standard} · ${sample.maxRateMbps}Mbps</div>
+                        <span class="label-demo-code"></span>
+                    </div>
+                    <ul class="shoot-tips">
+                        <li>让型号文字清晰、完整地出现在画面里</li>
+                        <li>光线不足时，打开闪光灯或换个角度</li>
+                        <li>也可以拍包装盒，或在路由器管理页查看</li>
+                    </ul>
+                    <input id="routerPhotoInput" type="file" accept="image/*" capture="environment" hidden onchange="handlePhotoSelected(event)">
+                    <button class="btn primary block" type="button" onclick="document.getElementById('routerPhotoInput').click()">拍照识别</button>
+                    <button class="sheet-link" type="button" onclick="simulateRecognition()">没有照片？直接查看识别结果</button>
+                    <p class="privacy-note">照片只用于识别型号，不会保存或上传</p>
+                `;
+                return;
+            }
+
+            if (sheetStep === 'recognizing') {
+                const photo = photoPreviewUrl ? `<img class="sheet-photo" src="${photoPreviewUrl}" alt="路由器标签照片">` : '';
+                $('sheetBody').innerHTML = `
+                    ${photo}
+                    <div class="recognizing">
+                        <div class="scan-ring" aria-hidden="true"></div>
+                        <h4>正在识别路由器</h4>
+                        <p>读取标签型号，并结合本次检测数据</p>
+                        <ul class="scan-steps">
+                            <li class="done">读取标签文字</li>
+                            <li class="active">匹配型号与上市年份</li>
+                            <li>结合网络检测数据</li>
+                        </ul>
+                    </div>
+                `;
+                return;
+            }
+
+            const report = getReport(currentReportId);
+            if (!report) return;
+            const router = getRouter(report);
+            const age = getRouterAge(router);
+            const photo = photoPreviewUrl ? `<img class="sheet-photo" src="${photoPreviewUrl}" alt="路由器标签照片">` : '';
+            $('sheetBody').innerHTML = `
+                ${photo}
+                <div class="recognized-head">
+                    <span class="rating excellent">识别成功</span>
+                    <h4>${router.brand} ${router.model}</h4>
+                    <p>${router.standard} · ${router.releaseYear} 年上市（约 ${age} 年）· 最高 ${router.maxRateMbps} Mbps</p>
+                </div>
+                <p class="sheet-lead" style="margin-top:12px;">识别结果用于判断路由器能力与套餐是否匹配，照片不会保存。</p>
+                <div class="sheet-actions">
+                    <button class="btn primary block" type="button" onclick="confirmRecognition()">确认并更新报告</button>
+                    <button class="btn ghost block" type="button" onclick="retakePhoto()">重新拍摄</button>
+                </div>
+            `;
+        }
+
+        function handlePhotoSelected(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            if (photoPreviewUrl) URL.revokeObjectURL(photoPreviewUrl);
+            photoPreviewUrl = URL.createObjectURL(file);
+            startRecognition();
+        }
+
+        function simulateRecognition() {
+            if (photoPreviewUrl) {
+                URL.revokeObjectURL(photoPreviewUrl);
+                photoPreviewUrl = '';
+            }
+            startRecognition();
+        }
+
+        function startRecognition() {
+            sheetStep = 'recognizing';
+            renderSheet();
+            clearRecognitionTimer();
+            recognizeTimer = setTimeout(() => {
+                sheetStep = 'confirm';
+                renderSheet();
+            }, 1500);
+        }
+
+        function retakePhoto() {
+            if (photoPreviewUrl) {
+                URL.revokeObjectURL(photoPreviewUrl);
+                photoPreviewUrl = '';
+            }
+            clearRecognitionTimer();
+            sheetStep = 'guide';
+            renderSheet();
+        }
+
+        function confirmRecognition() {
+            const report = getReport(currentReportId);
+            if (!report) return;
+            report.routerConfirmed = true;
+            closePhotoSheet();
+            renderDetail();
+            const panel = document.querySelector('.router-card');
+            if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            toast('已识别路由器，报告已更新');
+        }
+
+        function toast(message) {
+            const el = $('toast');
+            el.textContent = message;
+            el.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => el.classList.remove('show'), 1800);
+        }
+
+        function handleBack() {
+            if (!$('photoSheet').hidden) {
+                closePhotoSheet();
+                return;
+            }
+            if (currentReportId) {
+                if (history.state && history.state.reportId) history.back();
+                else showList();
+                return;
+            }
+            if (history.length > 1) history.back();
+            else location.href = 'index.html';
+        }
+
+        function handlePopState(event) {
+            const state = event.state;
+            if (state && state.reportId && getReport(state.reportId)) {
+                currentReportId = state.reportId;
+                currentTab = state.tab || 'insight';
+                if (!$('photoSheet').hidden) closePhotoSheet();
+                showDetailView();
+            } else {
+                showList();
+            }
+        }
+
+        function init() {
+            renderList();
+            window.addEventListener('popstate', handlePopState);
+
+            const match = location.hash.match(/^#report-(\w+)$/);
+            if (match && getReport(match[1])) {
+                currentReportId = match[1];
+                currentTab = 'insight';
+                showDetailView();
+                try {
+                    history.replaceState({ reportId: currentReportId, tab: currentTab }, '', location.hash);
+                } catch (error) {
+                    // 忽略
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+
+
     </script>
 </body>
 </html>
