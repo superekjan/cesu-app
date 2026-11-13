@@ -895,6 +895,7 @@
         .modal {
             background:var(--bg-secondary); border:1px solid var(--border-active);
             border-radius:18px; padding:20px; width:100%; max-width:360px;
+            max-height:calc(100vh - 40px); overflow-y:auto;
             animation:modalIn 0.25s ease;
         }
         @keyframes modalIn { from { transform:scale(0.9); opacity:0; } to { transform:scale(1); opacity:1; } }
@@ -1371,7 +1372,9 @@
             <label class="field-label req">整改措施</label>
             <div class="modal-tags" id="acceptTags"></div>
             <textarea class="modal-textarea" id="acceptRectifyInput" placeholder="例如：将客厅AP移至电视柜顶层，并在卧室新增1个Mesh子节点覆盖"></textarea>
-            <label class="field-label" id="acceptExpectLabel" style="display:none;">预期改善效果（选择措施自动生成，可修改）</label>
+            <label class="field-label">备注<span class="opt">（可填写整改费用金额）</span></label>
+            <input type="text" class="modal-input" id="acceptRemarkInput" placeholder="如：光猫 200 元、水晶头 2 个共 40 元，合计 240 元">
+            <label class="field-label" id="acceptExpectLabel" style="display:none;">预期改善效果<span class="opt">（选择措施自动生成，可修改）</span></label>
             <textarea class="modal-textarea" id="acceptExpectInput" style="display:none;" placeholder="选择上方整改措施后自动生成对应的预期效果，也可在此手动修改"></textarea>
             <div class="modal-actions">
                 <button class="modal-btn secondary" onclick="closeAcceptTypeModal()">取消</button>
@@ -1602,6 +1605,8 @@
         <label class="field-label req">整改措施</label>
         <div class="modal-tags" id="rectifyTags"></div>
         <textarea class="modal-textarea" id="rectifyInput" placeholder="例如：将客厅AP移至电视柜顶层，并在卧室新增1个Mesh子节点覆盖"></textarea>
+        <label class="field-label">备注<span class="opt">（可填写整改费用金额）</span></label>
+        <input type="text" class="modal-input" id="rectifyRemarkInput" placeholder="如：光猫 200 元、水晶头 2 个共 40 元，合计 240 元">
         <div class="modal-actions">
             <button class="modal-btn secondary" onclick="closeRectifyModal()">取消</button>
             <button class="modal-btn primary" onclick="confirmRectifyAndExport()">确认导出</button>
@@ -3344,7 +3349,7 @@ function escHtml(s) {
 }
 
 // ============== 整改措施填写（导出前必填） ==============
-const RECTIFY_TAGS = ['更换光猫','更换路由器','更换网线','增加路由器','加装FTTR','更换入户光纤','调整路由器位置'];
+const RECTIFY_TAGS = ['更换光猫','更换路由器','增加路由器','加装FTTR（更换网线）','调整路由器位置','更换水晶头（更换光纤头）'];
 let pendingExportBtn = null;
 
 function rectifyTagsHTML(targetId) {
@@ -3359,10 +3364,9 @@ function renderRectifyTags() {
 const RECTIFY_EXPECT = {
     '更换光猫': '更换千兆光猫后，消除光衰与设备瓶颈，预计全屋下载速率提升 30%~50%，弱信号点位信号强度提升约 6~10 dBm。',
     '更换路由器': '更换 WiFi 6 千兆路由器后，覆盖与并发能力增强，预计弱信号区域信号提升约 8~12 dBm，下载速率提升 40% 以上。',
-    '更换网线': '更换为超五类/六类网线后，链路损耗降低，预计有线端速率恢复至签约带宽，WiFi 弱区下载速率提升约 20%~30%。',
     '增加路由器': '新增路由器组网后，补充覆盖盲区，预计新增覆盖区域信号提升约 10~15 dBm，实现全屋无死角覆盖。',
-    '加装FTTR': '加装 FTTR 全屋光纤后，光纤直达每个房间，预计弱信号点位全部消除，全屋信号合格覆盖率提升至 95% 以上。',
-    '更换入户光纤': '更换入户光纤后，入户光功率恢复正常，预计整体带宽与时延明显改善，弱信号点位下载速率提升 50% 以上。',
+    '加装FTTR（更换网线）': '加装 FTTR 全屋光纤并更换老化网线后，光纤直达每个房间、链路损耗降低，预计弱信号点位全部消除，全屋信号合格覆盖率提升至 95% 以上。',
+    '更换水晶头（更换光纤头）': '重新制作水晶头或熔接光纤头后，接触不良与光衰问题消除，预计链路速率恢复至签约带宽，丢包与时延明显降低。',
     '调整路由器位置': '将路由器调整至居中、开阔位置后，信号遮挡减少，预计弱信号点位信号提升约 6~10 dBm，下载速率提升 25%~35%。'
 };
 
@@ -3400,6 +3404,7 @@ function exportComparePDF(btn) {
     // 预填上次填写的整改措施与用户信息（保存在整改后记录中）
     document.getElementById('rectifyInput').value = (comparePair.afterRec && comparePair.afterRec.rectification) || '';
     document.getElementById('rectifyUserInput').value = (comparePair.afterRec && comparePair.afterRec.userInfo) || '';
+    document.getElementById('rectifyRemarkInput').value = (comparePair.afterRec && comparePair.afterRec.remark) || '';
     renderRectifyTags();
     document.getElementById('rectifyModal').classList.add('show');
     setTimeout(() => document.getElementById('rectifyInput').focus(), 300);
@@ -3409,11 +3414,13 @@ function confirmRectifyAndExport() {
     const text = document.getElementById('rectifyInput').value.trim();
     if (!text) { showToast('请填写整改措施内容'); document.getElementById('rectifyInput').focus(); return; }
     const userInfo = document.getElementById('rectifyUserInput').value.trim();
+    const remark = document.getElementById('rectifyRemarkInput').value.trim();
     // 保存到整改后记录：再次导出时预填，报告可追溯
     const rec = comparePair.afterRec;
     if (rec) {
         rec.rectification = text;
         rec.userInfo = userInfo;
+        rec.remark = remark;
         const idx = records.findIndex(r => r.id === rec.id);
         if (idx >= 0) { records[idx] = rec; localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
     }
@@ -3653,6 +3660,7 @@ function exportSingleRecordPDF(btn) {
     document.getElementById('acceptRectifyInput').value = currentRecord.rectification || '';
     document.getElementById('acceptExpectInput').value = currentRecord.expectEffect || '';
     document.getElementById('acceptUserInput').value = currentRecord.userInfo || '';
+    document.getElementById('acceptRemarkInput').value = currentRecord.remark || '';
     renderAcceptRectifyTags();
     document.getElementById('acceptTypeModal').classList.add('show');
 }
@@ -3681,10 +3689,12 @@ function confirmAcceptExport() {
     const userInfo = document.getElementById('acceptUserInput').value.trim();
     // 预期改善效果：已设计/部分优化场景由装维填写，随记录保存以便复用
     const expectText = (document.getElementById('acceptExpectInput').value || '').trim();
+    const remark = document.getElementById('acceptRemarkInput').value.trim();
     // 保存到巡检记录：再次导出时预填，报告可追溯
     currentRecord.rectification = text;
     currentRecord.userInfo = userInfo;
     currentRecord.expectEffect = expectText;
+    currentRecord.remark = remark;
     const idx = records.findIndex(r => r.id === currentRecord.id);
     if (idx >= 0) { records[idx] = currentRecord; localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
     closeAcceptTypeModal();
