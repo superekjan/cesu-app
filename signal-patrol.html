@@ -630,18 +630,36 @@
         .pr-concl .pr-concl-h { font-size:12.5px; font-weight:700; color:#15803d; margin-bottom:6px; }
         .pr-concl .pr-concl-t { font-size:12px; color:#475569; line-height:1.9; text-align:justify; }
         .pr-concl .pr-concl-t b { color:#0f172a; }
-        /* 推荐升级方案模块：仅「部分优化」报告底部展示，用于承接 FTTR 等全屋方案推荐 */
-        .pr-promo { margin-top:16px; border:1px solid #cfe3fb; background:#f6faff; border-radius:10px; padding:14px 16px; font-size:12px; color:#475569; }
-        .pr-promo-top { display:flex; align-items:center; gap:8px; }
-        .pr-promo-tag { font-size:10px; font-weight:700; letter-spacing:1px; color:#0284c7; background:#e0f2fe; border:1px solid #bae6fd; padding:1px 8px; border-radius:999px; }
-        .pr-promo-name { font-size:13px; font-weight:700; color:#0f172a; }
-        .pr-promo-txt { margin-top:8px; line-height:1.9; text-align:justify; }
-        .pr-promo-txt b { color:#0f172a; }
-        .pr-promo-stat { display:flex; align-items:baseline; gap:10px; margin-top:10px; background:#fff; border:1px solid #dbeafe; border-radius:8px; padding:9px 12px; }
-        .pr-promo-num { font-size:20px; font-weight:800; color:#0284c7; line-height:1; flex-shrink:0; }
-        .pr-promo-desc { flex:1; line-height:1.7; }
-        .pr-promo-desc b { color:#0284c7; }
-        .pr-promo-cta { margin-top:10px; padding-top:8px; border-top:1px dashed #cfe3fb; text-align:center; font-size:11px; font-weight:700; letter-spacing:0.5px; color:#0284c7; }
+        /* 部分优化：推荐方案与预期效果同构，仅做淡底强调 */
+        .pdf-report.pr-compact { padding:36px 46px; }
+        .pdf-report.pr-compact .pr-head { min-height:70px; padding-bottom:12px; margin-bottom:16px; }
+        .pdf-report.pr-compact .pr-no,
+        .pdf-report.pr-compact .pr-type { margin-top:6px; }
+        .pdf-report.pr-compact .pr-intro { line-height:1.9; margin-bottom:12px; }
+        .pdf-report.pr-compact .pr-metacard { padding:9px 14px; }
+        .pdf-report.pr-compact .pr-meta-row { line-height:1.9; }
+        .pdf-report.pr-compact .pr-h { margin:15px 0 8px; }
+        .pdf-report.pr-compact .pr-table th,
+        .pdf-report.pr-compact .pr-table td { padding:6px 10px; }
+        .pdf-report.pr-compact .pr-rect { margin-top:9px; }
+        .pdf-report.pr-compact .pr-rect-row { padding:8px 12px; line-height:1.8; }
+        .pdf-report.pr-compact .pr-rect-row.is-reco { background:#f7fbff; }
+        .pdf-report.pr-compact .pr-remark { margin-top:9px; padding:8px 12px; line-height:1.7; }
+        .pdf-report.pr-compact .pr-foot { margin-top:14px; }
+        /* 已设计报告：整改措施 + 预期效果 + 备注 */
+        .pr-rect { margin-top:14px; border:1px solid #cfe3fb; border-radius:10px; overflow:hidden; }
+        .pr-rect-row { display:flex; gap:10px; padding:11px 14px; font-size:12px; line-height:1.9; color:#334155; }
+        .pr-rect-row + .pr-rect-row { border-top:1px dashed #dbeafe; }
+        .pr-rect-lb { flex:0 0 62px; font-weight:700; color:#0284c7; }
+        /* 已优化报告：良好上网习惯建议（四栏编号卡） */
+        .pr-tips { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:10px; }
+        .pr-tip { border:1px solid #e2e8f0; border-top:2px solid #38bdf8; border-radius:8px; background:#fbfdff; padding:8px 10px; }
+        .pr-tip i { display:block; font-style:normal; font-size:10px; font-weight:800; letter-spacing:1px; color:#7dd3fc; }
+        .pr-tip b { display:block; margin-top:2px; font-size:11.5px; color:#0f172a; }
+        .pr-tip span { display:block; margin-top:3px; font-size:10.5px; line-height:1.65; color:#64748b; }
+        .pr-rect-txt { flex:1; text-align:justify; }
+        .pr-remark { margin-top:12px; background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:10px 14px; font-size:12px; line-height:1.8; color:#78350f; }
+        .pr-remark b { color:#92400e; }
         .pr-foot { margin-top:30px; padding-top:14px; border-top:1px solid #e2e8f0; font-size:10.5px; color:#94a3b8; line-height:1.8; }
         @page { size:A4; margin:0; }
         @media print {
@@ -1369,13 +1387,18 @@
             </div>
             <label class="field-label">整改用户信息</label>
             <input type="text" class="modal-input" id="acceptUserInput" placeholder="请输入整改用户信息">
-            <label class="field-label req">整改措施</label>
+            <label class="field-label req" id="acceptRectifyLabel">整改措施</label>
             <div class="modal-tags" id="acceptTags"></div>
             <textarea class="modal-textarea" id="acceptRectifyInput" placeholder="例如：将客厅AP移至电视柜顶层，并在卧室新增1个Mesh子节点覆盖"></textarea>
+            <div id="acceptPlanGroup" style="display:none;">
+                <label class="field-label">预期整改措施<span class="opt">（选择措施自动带入）</span></label>
+                <div class="modal-tags" id="acceptPlanTags"></div>
+                <textarea class="modal-textarea" id="acceptPlanInput" oninput="syncPlanExpect()" placeholder="例如：加装FTTR（更换网线），解决剩余点位覆盖不足"></textarea>
+            </div>
+            <label class="field-label" id="acceptExpectLabel" style="display:none;">预期整改效果<span class="opt">（由预期措施联动生成，可修改）</span></label>
+            <textarea class="modal-textarea" id="acceptExpectInput" style="display:none;" placeholder="选择上方预期整改措施后自动生成对应的预期效果，也可在此手动修改"></textarea>
             <label class="field-label">备注<span class="opt">（可填写整改费用金额）</span></label>
             <input type="text" class="modal-input" id="acceptRemarkInput" placeholder="如：光猫 200 元、水晶头 2 个共 40 元，合计 240 元">
-            <label class="field-label" id="acceptExpectLabel" style="display:none;">预期改善效果<span class="opt">（选择措施自动生成，可修改）</span></label>
-            <textarea class="modal-textarea" id="acceptExpectInput" style="display:none;" placeholder="选择上方整改措施后自动生成对应的预期效果，也可在此手动修改"></textarea>
             <div class="modal-actions">
                 <button class="modal-btn secondary" onclick="closeAcceptTypeModal()">取消</button>
                 <button class="modal-btn primary" onclick="confirmAcceptExport()">导出报告</button>
@@ -3362,22 +3385,40 @@ function renderRectifyTags() {
 
 // 整改措施 → 预期整改效果（选择措施后自动生成，装维可再修改）
 const RECTIFY_EXPECT = {
-    '更换光猫': '更换千兆光猫后，消除光衰与设备瓶颈，预计全屋下载速率提升 30%~50%，弱信号点位信号强度提升约 6~10 dBm。',
-    '更换路由器': '更换 WiFi 6 千兆路由器后，覆盖与并发能力增强，预计弱信号区域信号提升约 8~12 dBm，下载速率提升 40% 以上。',
-    '增加路由器': '新增路由器组网后，补充覆盖盲区，预计新增覆盖区域信号提升约 10~15 dBm，实现全屋无死角覆盖。',
-    '加装FTTR（更换网线）': '加装 FTTR 全屋光纤并更换老化网线后，光纤直达每个房间、链路损耗降低，预计弱信号点位全部消除，全屋信号合格覆盖率提升至 95% 以上。',
-    '更换水晶头（更换光纤头）': '重新制作水晶头或熔接光纤头后，接触不良与光衰问题消除，预计链路速率恢复至签约带宽，丢包与时延明显降低。',
-    '调整路由器位置': '将路由器调整至居中、开阔位置后，信号遮挡减少，预计弱信号点位信号提升约 6~10 dBm，下载速率提升 25%~35%。'
+    '更换光猫': '换掉老旧光猫后，网络不容易再被老设备“拖后腿”，上网更稳定，玩游戏、看视频时少卡顿、少掉线。你签约的带宽（比如千兆）能真正跑起来，有线和无线测速都会更接近满速。',
+    '更换路由器': '换成支持 Wi-Fi 6/7 的新路由器后，家里信号覆盖更广，多台设备同时上网也更流畅，不容易互相干扰。原来信号弱的房间，信号会明显变强，下载速度预计提升 40% 以上，手机、电视、平板一起用也不容易卡。',
+    '增加路由器': '通过增加路由器扩展覆盖，把家里原本没信号或信号很差的角落补起来，比如卫生间、阳台、次卧。原来信号盲区也能正常上网，在家里走动时自动切换，不用手动重连。',
+    '加装FTTR（更换网线）': '光纤直接铺到房间，不受传统网线带宽和穿墙衰减的限制。家里每个角落都能体验到千兆以上的速度，信号覆盖更全面，延迟更低，看 8K 视频、连接全屋智能设备都更顺畅。',
+    '更换水晶头（更换光纤头）': '换掉老化、松动或接触不良的水晶头/光纤头，避免接口接触不好导致网速不稳、掉线或时快时慢。换好后，连接更牢靠，网络传输更稳定，能减少因接头问题引起的断网和速率不达标。',
+    '调整路由器位置': '把路由器移到家里更中心、更高的位置，避开承重墙和家电干扰。这样主要活动区域的 Wi-Fi 信号会更强、覆盖更均匀，减少因墙体遮挡造成的信号盲区和网速变慢。'
 };
 
 function renderAcceptRectifyTags() {
     const box = document.getElementById('acceptTags');
     if (box) box.innerHTML = RECTIFY_TAGS.map(t => `<div class="modal-tag" onclick="pickAcceptTag('${t}')">${t}</div>`).join('');
+    const planBox = document.getElementById('acceptPlanTags');
+    if (planBox) planBox.innerHTML = RECTIFY_TAGS.map(t => `<div class="modal-tag" onclick="pickAcceptPlanTag('${t}')">${t}</div>`).join('');
+}
+
+// 预期整改措施：选择后带入，并联动生成预期整改效果
+function pickAcceptPlanTag(t) {
+    pickRectifyTag(t, 'acceptPlanInput');
+    syncPlanExpect();
+}
+
+// 预期整改效果由「预期整改措施」中匹配到的措施联动生成，可再手工修改
+function syncPlanExpect() {
+    const plan = document.getElementById('acceptPlanInput');
+    const ta = document.getElementById('acceptExpectInput');
+    if (!plan || !ta) return;
+    const texts = RECTIFY_TAGS.filter(t => plan.value.includes(t) && RECTIFY_EXPECT[t]).map(t => RECTIFY_EXPECT[t]);
+    if (texts.length) ta.value = texts.join('；');
 }
 
 // 选择整改措施：追加到整改措施框；仅已设计场景同步自动生成对应的预期改善效果
 function pickAcceptTag(t) {
     pickRectifyTag(t, 'acceptRectifyInput');
+    // 已整改措施默认只追加措施名称，不再直接联动预期效果（部分优化由「预期整改措施」驱动）
     if (pendingExportType !== '已设计' || !RECTIFY_EXPECT[t]) return;
     const ta = document.getElementById('acceptExpectInput');
     const cur = ta.value.trim();
@@ -3507,6 +3548,10 @@ function buildSinglePDFReportHTML(rec, acceptType, rectifyText, expectText) {
     const mode = healthy ? '' : (acceptType === '已优化' ? 'done' : acceptType === '部分优化' ? 'partial' : 'plan');
     const accept = healthy ? '' : (mode === 'done' ? '已优化' : mode === 'partial' ? '部分优化' : '已设计');
     const rectify = healthy ? '' : (rectifyText || rec.rectification || '').trim();
+    // 备注：装维填写的费用金额等补充说明，仅在填写后呈现
+    const remark = (rec.remark || '').trim();
+    // 预期整改措施：部分优化中针对剩余点位的计划
+    const expectPlan = (rec.expectPlan || '').trim();
     // 明细表展示「整改前 → 整改后」实测数据；已设计报告无整改数据，表格仅保留现场值
     const showAfter = mode !== 'plan';
     const beforeHd = mode === 'plan' ? '现场值' : '整改前';
@@ -3573,19 +3618,49 @@ function buildSinglePDFReportHTML(rec, acceptType, rectifyText, expectText) {
     const avgTxt = s.avg != null ? s.avg + ' dBm' : '—';
     const minTxt = s.min != null ? s.min + ' dBm' : '—';
     const rateTxt = (s.qualifiedRate != null ? s.qualifiedRate : 100) + '%';
-    // 已设计 / 部分优化：底部追加「推荐升级方案」模块，推荐 FTTR 等全屋方案；已优化为整改已完成，不再推荐
+    // 部分优化：底部追加「推荐升级方案」模块，推荐 FTTR 等全屋方案
     const removedPct = abn.length ? Math.round(donePts.length / abn.length * 100) : 0;
     // 已设计报告尚未实施整改，不使用「已消除」口径
-    const promoLead = (mode === 'plan' || !donePts.length)
+    const promoLead = !donePts.length
         ? `本次共 <b>${abn.length}</b> 个异常点位待整改，此类点位多受墙体遮挡、距离过远等因素影响，常规调整难以彻底覆盖。`
         : `本次整改已消除约 <b>${removedPct}%</b> 的异常点位，剩余 <b>${pendPts.length}</b> 个点位受墙体遮挡、距离过远等因素影响，常规调整难以彻底覆盖。`;
-    const promo = mode !== 'done' ? `
-        <div class="pr-promo">
-            <div class="pr-promo-top"><span class="pr-promo-tag">推荐方案</span><span class="pr-promo-name">FTTR 全屋光纤组网</span></div>
-            <div class="pr-promo-txt">${promoLead}建议升级 FTTR 全屋光纤组网：光纤直达每个房间，主、从光猫星型互联，从根本解决穿墙衰减与远距离弱覆盖问题，实现异常点位全部消除。</div>
-            <div class="pr-promo-stat"><span class="pr-promo-num">90%</span><span class="pr-promo-desc">的家庭升级 FTTR 后，全屋信号合格覆盖率提升至 <b>95%</b> 以上，弱信号点位基本消除，4K 追剧、视频通话、网课全程流畅无卡顿。</span></div>
-            <div class="pr-promo-cta">详询您的网络服务专员，预约 FTTR 全屋光纤升级</div>
+    // 已设计：尚未实施整改，仅呈现「整改措施 + 预期效果 + 备注」，不再推荐 FTTR 方案
+    const planSection = mode === 'plan' ? `
+        <div class="pr-h">整改措施与预期效果</div>
+        <div class="pr-rect">
+            <div class="pr-rect-row"><span class="pr-rect-lb">整改措施</span><div class="pr-rect-txt">${escHtml(rectify)}</div></div>
+            ${expectText ? `<div class="pr-rect-row"><span class="pr-rect-lb">预期效果</span><div class="pr-rect-txt">${escHtml(expectText)}</div></div>` : ''}
         </div>` : '';
+    // 已优化 / 部分优化：呈现「已整改措施 + 解决了哪些异常点」
+    const measureSection = (mode === 'done' || mode === 'partial') ? `
+        <div class="pr-h">已整改措施</div>
+        <div class="pr-rect">
+            <div class="pr-rect-row"><span class="pr-rect-lb">已整改措施</span><div class="pr-rect-txt">${escHtml(rectify)}</div></div>
+            <div class="pr-rect-row"><span class="pr-rect-lb">解决异常点</span><div class="pr-rect-txt">${mode === 'done'
+                ? `全部 ${abn.length} 个异常点位均已复检，实测平均信号由 <b>${avgOf(abn.map(p => p.signal))} dBm</b> 提升至 <b>${avgOf(abn.map(rcSig))} dBm</b>，整改后全屋信号覆盖达标`
+                : (donePts.length
+                    ? `${escHtml(tagList(donePts))} 共 ${donePts.length} 个点位已完成整改，实测平均信号由 <b>${avgOf(donePts.map(p => p.signal))} dBm</b> 提升至 <b>${avgOf(donePts.map(rcSig))} dBm</b>`
+                    : '本次暂无复检完成的异常点位')}</div></div>
+        </div>` : '';
+    // 已优化：整改完成后给出良好上网习惯建议（精简为四条要点）
+    const habitsSection = mode === 'done' ? `
+        <div class="pr-h">良好上网习惯建议</div>
+        <div class="pr-tips">
+            <div class="pr-tip"><i>01</i><b>路由器摆放</b><span>居中、离地 1 米，远离金属与承重墙</span></div>
+            <div class="pr-tip"><i>02</i><b>定期重启</b><span>每周重启一次，保持连接稳定</span></div>
+            <div class="pr-tip"><i>03</i><b>频段选择</b><span>多设备优先连 5G，减少 2.4G 干扰</span></div>
+            <div class="pr-tip"><i>04</i><b>安全防护</b><span>定期改密码，启用 WPA2/WPA3 加密</span></div>
+        </div>` : '';
+    // 部分优化：预期整改措施卡片，内含措施、效果与推荐方案，控制在一页内
+    const partialExpectSection = mode === 'partial' ? `
+        <div class="pr-h">预期整改措施</div>
+        <div class="pr-rect">
+            ${expectPlan ? `<div class="pr-rect-row"><span class="pr-rect-lb">预期措施</span><div class="pr-rect-txt">${escHtml(expectPlan)}</div></div>` : ''}
+            ${expectText ? `<div class="pr-rect-row"><span class="pr-rect-lb">预期效果</span><div class="pr-rect-txt">${escHtml(expectText)}</div></div>` : ''}
+            <div class="pr-rect-row is-reco"><span class="pr-rect-lb">推荐方案</span><div class="pr-rect-txt"><b>FTTR 全屋光纤组网</b>。${promoLead}光纤直达每个房间，主、从光猫星型互联，从根本解决穿墙衰减与远距离弱覆盖，异常点位可全部消除；<b>90%</b> 的家庭升级后全屋信号合格覆盖率提升至 <b>95%</b> 以上，可详询您的网络服务专员预约升级。</div></div>
+        </div>` : '';
+    // 备注（费用金额等）：有内容才呈现
+    const remarkSection = remark ? `<div class="pr-remark"><b>备注：</b>${escHtml(remark)}</div>` : '';
     const detailSection = healthy
         ? `
         <div class="pr-h">${healthyRows ? '巡检结果明细' : '巡检结论'}</div>
@@ -3611,7 +3686,7 @@ function buildSinglePDFReportHTML(rec, acceptType, rectifyText, expectText) {
         </table>`;
 
     return `
-    <div class="pdf-report">
+    <div class="pdf-report${mode === 'partial' ? ' pr-compact' : ''}">
         <div class="pr-head">
             <div class="pr-title">家庭网络巡检报告</div>
             <div class="pr-no">生成日期：${fmtFullTime()}</div>
@@ -3634,7 +3709,12 @@ function buildSinglePDFReportHTML(rec, acceptType, rectifyText, expectText) {
         ])}
 
         ${detailSection}
-        ${promo}
+        ${planSection}
+        ${measureSection}
+        ${mode === 'done' ? remarkSection : ''}
+        ${habitsSection}
+        ${partialExpectSection}
+        ${mode !== 'done' ? remarkSection : ''}
 
         <div class="pr-foot">本报告由WiFi信号巡检APP基于巡检采样数据自动生成，数据仅反映检测时段内的信号状况，可作为组网优化的参考依据。如有疑问，请联系您的网络服务专员。</div>
     </div>`;
@@ -3658,6 +3738,7 @@ function exportSingleRecordPDF(btn) {
     selectAcceptType(doneN === 0 ? '已设计' : (doneN === pts.length ? '已优化' : '部分优化'));
     // 预填上次填写的整改措施、预期改善效果与用户信息，便于再次导出时复用
     document.getElementById('acceptRectifyInput').value = currentRecord.rectification || '';
+    document.getElementById('acceptPlanInput').value = currentRecord.expectPlan || '';
     document.getElementById('acceptExpectInput').value = currentRecord.expectEffect || '';
     document.getElementById('acceptUserInput').value = currentRecord.userInfo || '';
     document.getElementById('acceptRemarkInput').value = currentRecord.remark || '';
@@ -3670,12 +3751,18 @@ function selectAcceptType(type) {
     document.querySelectorAll('#acceptOptions .accept-option').forEach(el => {
         el.classList.toggle('active', el.dataset.type === type);
     });
-    // 「预期改善效果」仅已设计场景需要（装维未实施、仅有方案），由选措施自动生成并可修改
-    const showExpect = type === '已设计';
+    // 「预期整改效果」用于已设计（方案）与部分优化（剩余点位）场景
+    const showExpect = type !== '已优化';
     const lb = document.getElementById('acceptExpectLabel');
     const ip = document.getElementById('acceptExpectInput');
     if (lb) lb.style.display = showExpect ? '' : 'none';
     if (ip) ip.style.display = showExpect ? '' : 'none';
+    // 部分优化：整改措施改为已整改措施，并展开「预期整改措施」模块
+    const isPartial = type === '部分优化';
+    const rl = document.getElementById('acceptRectifyLabel');
+    if (rl) rl.textContent = isPartial ? '已整改措施' : '整改措施';
+    const planGroup = document.getElementById('acceptPlanGroup');
+    if (planGroup) planGroup.style.display = isPartial ? '' : 'none';
 }
 
 function closeAcceptTypeModal() {
@@ -3687,12 +3774,14 @@ function confirmAcceptExport() {
     const text = document.getElementById('acceptRectifyInput').value.trim();
     if (!text) { showToast('请填写整改措施内容'); document.getElementById('acceptRectifyInput').focus(); return; }
     const userInfo = document.getElementById('acceptUserInput').value.trim();
-    // 预期改善效果：已设计/部分优化场景由装维填写，随记录保存以便复用
+    // 预期整改措施与预期整改效果：部分优化由措施联动生成，随记录保存以便复用
+    const expectPlan = (document.getElementById('acceptPlanInput').value || '').trim();
     const expectText = (document.getElementById('acceptExpectInput').value || '').trim();
     const remark = document.getElementById('acceptRemarkInput').value.trim();
     // 保存到巡检记录：再次导出时预填，报告可追溯
     currentRecord.rectification = text;
     currentRecord.userInfo = userInfo;
+    currentRecord.expectPlan = expectPlan;
     currentRecord.expectEffect = expectText;
     currentRecord.remark = remark;
     const idx = records.findIndex(r => r.id === currentRecord.id);
