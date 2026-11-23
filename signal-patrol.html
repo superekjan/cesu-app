@@ -3622,16 +3622,16 @@ function buildSinglePDFReportHTML(rec, acceptType, rectifyText, expectText) {
     const rateTxt = (s.qualifiedRate != null ? s.qualifiedRate : 100) + '%';
     // 已设计：尚未实施整改，仅呈现「整改措施 + 预期效果 + 备注」
     const planSection = mode === 'plan' ? `
-        <div class="pr-h">整改措施与预期效果</div>
+        <div class="pr-h">推荐方案</div>
         <div class="pr-rect">
-            <div class="pr-rect-row"><span class="pr-rect-lb">整改措施</span><div class="pr-rect-txt">${escHtml(rectify)}</div></div>
+            <div class="pr-rect-row"><span class="pr-rect-lb">推荐措施</span><div class="pr-rect-txt">${escHtml(rectify)}</div></div>
             ${expectText ? `<div class="pr-rect-row"><span class="pr-rect-lb">预期效果</span><div class="pr-rect-txt">${escHtml(expectText)}</div></div>` : ''}
         </div>` : '';
     // 已优化 / 部分优化：呈现「整改措施 + 整改效果」
     const measureSection = (mode === 'done' || mode === 'partial') ? `
-        <div class="pr-h">${mode === 'done' ? '已实施方案' : '已整改措施'}</div>
+        <div class="pr-h">已实施方案</div>
         <div class="pr-rect">
-            <div class="pr-rect-row"><span class="pr-rect-lb">${mode === 'done' ? '整改措施' : '已整改措施'}</span><div class="pr-rect-txt">${escHtml(rectify)}</div></div>
+            <div class="pr-rect-row"><span class="pr-rect-lb">整改措施</span><div class="pr-rect-txt">${escHtml(rectify)}</div></div>
             <div class="pr-rect-row"><span class="pr-rect-lb">整改效果</span><div class="pr-rect-txt">${mode === 'done'
                 ? `全部 ${abn.length} 个异常点位均已复检，实测平均信号由 <b>${avgOf(abn.map(p => p.signal))} dBm</b> 提升至 <b>${avgOf(abn.map(rcSig))} dBm</b>，整改后全屋信号覆盖达标`
                 : (donePts.length
@@ -3659,11 +3659,11 @@ function buildSinglePDFReportHTML(rec, acceptType, rectifyText, expectText) {
                 <b>安全防护</b><span>定期改密码，启用 WPA3 加密</span>
             </div>
         </div>` : '';
-    // 部分优化：整改措施卡片，呈现后续整改计划与预期效果
+    // 部分优化：推荐方案卡片，呈现后续推荐措施与预期效果
     const partialExpectSection = (mode === 'partial' && (expectPlan || expectText)) ? `
-        <div class="pr-h">整改措施</div>
+        <div class="pr-h">推荐方案</div>
         <div class="pr-rect">
-            ${expectPlan ? `<div class="pr-rect-row"><span class="pr-rect-lb">推荐方案</span><div class="pr-rect-txt">${escHtml(expectPlan)}</div></div>` : ''}
+            ${expectPlan ? `<div class="pr-rect-row"><span class="pr-rect-lb">推荐措施</span><div class="pr-rect-txt">${escHtml(expectPlan)}</div></div>` : ''}
             ${expectText ? `<div class="pr-rect-row"><span class="pr-rect-lb">预期效果</span><div class="pr-rect-txt">${escHtml(expectText)}</div></div>` : ''}
         </div>` : '';
     // 备注（费用金额等）：有内容才呈现
