@@ -610,6 +610,7 @@
         .pr-meta-sep { margin:0 7px; }
 
         .pr-h { font-size:15px; font-weight:700; color:#0f172a; margin:22px 0 12px; padding-left:9px; border-left:4px solid #0284c7; }
+        .pr-h.pr-h-green { border-left-color:#10b981; }
         .pr-table { width:100%; border-collapse:collapse; font-size:12px; }
         .pr-table th { background:#eff6ff; color:#1e40af; font-weight:700; }
         .pr-table th, .pr-table td { border:1px solid #e2e8f0; padding:8px 10px; text-align:center; }
@@ -643,7 +644,6 @@
         .pdf-report.pr-compact .pr-table td { padding:6px 10px; }
         .pdf-report.pr-compact .pr-rect { margin-top:9px; }
         .pdf-report.pr-compact .pr-rect-row { padding:8px 12px; line-height:1.8; }
-        .pdf-report.pr-compact .pr-rect-row.is-reco { background:#f7fbff; }
         .pdf-report.pr-compact .pr-remark { margin-top:9px; padding:8px 12px; line-height:1.7; }
         .pdf-report.pr-compact .pr-foot { margin-top:14px; }
         /* 已设计报告：整改措施 + 预期效果 + 备注 */
@@ -651,12 +651,14 @@
         .pr-rect-row { display:flex; gap:10px; padding:11px 14px; font-size:12px; line-height:1.9; color:#334155; }
         .pr-rect-row + .pr-rect-row { border-top:1px dashed #dbeafe; }
         .pr-rect-lb { flex:0 0 62px; font-weight:700; color:#0284c7; }
-        /* 已优化报告：良好上网习惯建议（四栏编号卡） */
-        .pr-tips { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:10px; }
-        .pr-tip { border:1px solid #e2e8f0; border-top:2px solid #38bdf8; border-radius:8px; background:#fbfdff; padding:8px 10px; }
-        .pr-tip i { display:block; font-style:normal; font-size:10px; font-weight:800; letter-spacing:1px; color:#7dd3fc; }
-        .pr-tip b { display:block; margin-top:2px; font-size:11.5px; color:#0f172a; }
-        .pr-tip span { display:block; margin-top:3px; font-size:10.5px; line-height:1.65; color:#64748b; }
+        /* 已优化报告：良好上网习惯建议（绿色健康风一体化四栏卡） */
+        .pr-tips { display:grid; grid-template-columns:repeat(4,1fr); margin-top:10px; border:1px solid #d9efe2; border-radius:12px; background:linear-gradient(180deg,#f2fbf6 0%,#fff 72%); overflow:hidden; }
+        .pr-tip { padding:13px 10px 14px; text-align:center; }
+        .pr-tip + .pr-tip { border-left:1px solid #e8f5ee; }
+        .pr-tip-ic { width:34px; height:34px; margin:0 auto; display:grid; place-items:center; border-radius:50%; background:#e6f7ee; box-shadow:0 0 0 4px #f4fbf7; }
+        .pr-tip-ic svg { width:18px; height:18px; fill:none; stroke:#10b981; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+        .pr-tip b { display:block; margin-top:8px; font-size:11.5px; color:#0f172a; }
+        .pr-tip span { display:block; margin-top:3px; font-size:10.5px; line-height:1.6; color:#5f7a6c; }
         .pr-rect-txt { flex:1; text-align:justify; }
         .pr-remark { margin-top:12px; background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:10px 14px; font-size:12px; line-height:1.8; color:#78350f; }
         .pr-remark b { color:#92400e; }
@@ -3618,25 +3620,19 @@ function buildSinglePDFReportHTML(rec, acceptType, rectifyText, expectText) {
     const avgTxt = s.avg != null ? s.avg + ' dBm' : '—';
     const minTxt = s.min != null ? s.min + ' dBm' : '—';
     const rateTxt = (s.qualifiedRate != null ? s.qualifiedRate : 100) + '%';
-    // 部分优化：底部追加「推荐升级方案」模块，推荐 FTTR 等全屋方案
-    const removedPct = abn.length ? Math.round(donePts.length / abn.length * 100) : 0;
-    // 已设计报告尚未实施整改，不使用「已消除」口径
-    const promoLead = !donePts.length
-        ? `本次共 <b>${abn.length}</b> 个异常点位待整改，此类点位多受墙体遮挡、距离过远等因素影响，常规调整难以彻底覆盖。`
-        : `本次整改已消除约 <b>${removedPct}%</b> 的异常点位，剩余 <b>${pendPts.length}</b> 个点位受墙体遮挡、距离过远等因素影响，常规调整难以彻底覆盖。`;
-    // 已设计：尚未实施整改，仅呈现「整改措施 + 预期效果 + 备注」，不再推荐 FTTR 方案
+    // 已设计：尚未实施整改，仅呈现「整改措施 + 预期效果 + 备注」
     const planSection = mode === 'plan' ? `
         <div class="pr-h">整改措施与预期效果</div>
         <div class="pr-rect">
             <div class="pr-rect-row"><span class="pr-rect-lb">整改措施</span><div class="pr-rect-txt">${escHtml(rectify)}</div></div>
             ${expectText ? `<div class="pr-rect-row"><span class="pr-rect-lb">预期效果</span><div class="pr-rect-txt">${escHtml(expectText)}</div></div>` : ''}
         </div>` : '';
-    // 已优化 / 部分优化：呈现「已整改措施 + 解决了哪些异常点」
+    // 已优化 / 部分优化：呈现「整改措施 + 整改效果」
     const measureSection = (mode === 'done' || mode === 'partial') ? `
-        <div class="pr-h">已整改措施</div>
+        <div class="pr-h">${mode === 'done' ? '已实施方案' : '已整改措施'}</div>
         <div class="pr-rect">
-            <div class="pr-rect-row"><span class="pr-rect-lb">已整改措施</span><div class="pr-rect-txt">${escHtml(rectify)}</div></div>
-            <div class="pr-rect-row"><span class="pr-rect-lb">解决异常点</span><div class="pr-rect-txt">${mode === 'done'
+            <div class="pr-rect-row"><span class="pr-rect-lb">${mode === 'done' ? '整改措施' : '已整改措施'}</span><div class="pr-rect-txt">${escHtml(rectify)}</div></div>
+            <div class="pr-rect-row"><span class="pr-rect-lb">整改效果</span><div class="pr-rect-txt">${mode === 'done'
                 ? `全部 ${abn.length} 个异常点位均已复检，实测平均信号由 <b>${avgOf(abn.map(p => p.signal))} dBm</b> 提升至 <b>${avgOf(abn.map(rcSig))} dBm</b>，整改后全屋信号覆盖达标`
                 : (donePts.length
                     ? `${escHtml(tagList(donePts))} 共 ${donePts.length} 个点位已完成整改，实测平均信号由 <b>${avgOf(donePts.map(p => p.signal))} dBm</b> 提升至 <b>${avgOf(donePts.map(rcSig))} dBm</b>`
@@ -3644,20 +3640,31 @@ function buildSinglePDFReportHTML(rec, acceptType, rectifyText, expectText) {
         </div>` : '';
     // 已优化：整改完成后给出良好上网习惯建议（精简为四条要点）
     const habitsSection = mode === 'done' ? `
-        <div class="pr-h">良好上网习惯建议</div>
+        <div class="pr-h pr-h-green">良好上网习惯建议</div>
         <div class="pr-tips">
-            <div class="pr-tip"><i>01</i><b>路由器摆放</b><span>居中、离地 1 米，远离金属与承重墙</span></div>
-            <div class="pr-tip"><i>02</i><b>定期重启</b><span>每周重启一次，保持连接稳定</span></div>
-            <div class="pr-tip"><i>03</i><b>频段选择</b><span>多设备优先连 5G，减少 2.4G 干扰</span></div>
-            <div class="pr-tip"><i>04</i><b>安全防护</b><span>定期改密码，启用 WPA2/WPA3 加密</span></div>
+            <div class="pr-tip">
+                <div class="pr-tip-ic"><svg viewBox="0 0 24 24"><path d="M3 9a13 13 0 0 1 18 0M6.2 12.6a9 9 0 0 1 11.6 0M9.6 16.2a4.6 4.6 0 0 1 4.8 0"/><circle cx="12" cy="19.2" r="1"/></svg></div>
+                <b>路由器摆放</b><span>居中、离地1米，避开遮挡</span>
+            </div>
+            <div class="pr-tip">
+                <div class="pr-tip-ic"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4v5h-5"/></svg></div>
+                <b>定期重启</b><span>每周重启一次，保持连接稳定</span>
+            </div>
+            <div class="pr-tip">
+                <div class="pr-tip-ic"><svg viewBox="0 0 24 24"><path d="M4.5 19V5M9.5 19v-6.5M14.5 19V9M19.5 19v-4"/></svg></div>
+                <b>频段选择</b><span>多设备优先连 5G，避开干扰</span>
+            </div>
+            <div class="pr-tip">
+                <div class="pr-tip-ic"><svg viewBox="0 0 24 24"><path d="M12 3.6 19 6.5v5.2c0 4.2-2.9 7.2-7 8.7-4.1-1.5-7-4.5-7-8.7V6.5l7-2.9z"/><path d="m9.3 12.1 2 2 3.4-3.9"/></svg></div>
+                <b>安全防护</b><span>定期改密码，启用 WPA3 加密</span>
+            </div>
         </div>` : '';
-    // 部分优化：预期整改措施卡片，内含措施、效果与推荐方案，控制在一页内
-    const partialExpectSection = mode === 'partial' ? `
-        <div class="pr-h">预期整改措施</div>
+    // 部分优化：整改措施卡片，呈现后续整改计划与预期效果
+    const partialExpectSection = (mode === 'partial' && (expectPlan || expectText)) ? `
+        <div class="pr-h">整改措施</div>
         <div class="pr-rect">
-            ${expectPlan ? `<div class="pr-rect-row"><span class="pr-rect-lb">预期措施</span><div class="pr-rect-txt">${escHtml(expectPlan)}</div></div>` : ''}
+            ${expectPlan ? `<div class="pr-rect-row"><span class="pr-rect-lb">推荐方案</span><div class="pr-rect-txt">${escHtml(expectPlan)}</div></div>` : ''}
             ${expectText ? `<div class="pr-rect-row"><span class="pr-rect-lb">预期效果</span><div class="pr-rect-txt">${escHtml(expectText)}</div></div>` : ''}
-            <div class="pr-rect-row is-reco"><span class="pr-rect-lb">推荐方案</span><div class="pr-rect-txt"><b>FTTR 全屋光纤组网</b>。${promoLead}光纤直达每个房间，主、从光猫星型互联，从根本解决穿墙衰减与远距离弱覆盖，异常点位可全部消除；<b>90%</b> 的家庭升级后全屋信号合格覆盖率提升至 <b>95%</b> 以上，可详询您的网络服务专员预约升级。</div></div>
         </div>` : '';
     // 备注（费用金额等）：有内容才呈现
     const remarkSection = remark ? `<div class="pr-remark"><b>备注：</b>${escHtml(remark)}</div>` : '';
