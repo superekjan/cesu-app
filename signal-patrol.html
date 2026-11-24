@@ -954,9 +954,13 @@
         .modal-tag {
             background:rgba(56,189,248,0.1); border:1px solid var(--border-subtle);
             color:var(--accent-cyan); padding:6px 12px; border-radius:16px;
-            font-size:12px; cursor:pointer;
+            font-size:12px; cursor:pointer; transition:background 0.15s, color 0.15s, border-color 0.15s;
         }
         .modal-tag:active { transform:scale(0.95); }
+        .modal-tag.on {
+            background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));
+            border-color:var(--accent-cyan); color:#fff; font-weight:600;
+        }
         .modal-actions { display:flex; gap:10px; }
         .modal-btn {
             flex:1; padding:12px; border-radius:10px; font-size:14px;
@@ -1363,13 +1367,13 @@
                     导出报告
                 </span>
             </div>
-            <div class="modal-desc">按整改实际进度自动预选报告类型，可调整；已设计类型选择整改措施后将自动生成预期改善效果。</div>
+            <div class="modal-desc">按整改实际进度自动预选报告类型，可调整；不同报告类型对应不同的填写项。</div>
             <div class="accept-options" id="acceptOptions">
                 <div class="accept-option" data-type="已设计" onclick="selectAcceptType('已设计')">
                     <div class="accept-radio"></div>
                     <div class="accept-body">
                         <div class="accept-name">已设计</div>
-                        <div class="accept-desc">装维尚未实施整改、仅完成方案设计，选择整改措施后自动生成预期达到的效果，并附升级建议</div>
+                        <div class="accept-desc">装维尚未实施整改、仅完成方案设计，选择推荐措施后自动生成预期效果，并附升级建议</div>
                     </div>
                 </div>
                 <div class="accept-option" data-type="部分优化" onclick="selectAcceptType('部分优化')">
@@ -1390,15 +1394,21 @@
             <label class="field-label">整改用户信息</label>
             <input type="text" class="modal-input" id="acceptUserInput" placeholder="请输入整改用户信息">
             <label class="field-label req" id="acceptRectifyLabel">整改措施</label>
-            <div class="modal-tags" id="acceptTags"></div>
-            <textarea class="modal-textarea" id="acceptRectifyInput" placeholder="例如：将客厅AP移至电视柜顶层，并在卧室新增1个Mesh子节点覆盖"></textarea>
+            <div class="modal-tags" id="acceptRectifyTags"></div>
+            <input type="hidden" id="acceptRectifyInput">
+            <input type="text" class="modal-input" id="acceptRectifyOtherInput" style="display:none;margin-bottom:16px;" placeholder="请输入其他措施" oninput="syncAcceptTagField('acceptRectify')">
             <div id="acceptPlanGroup" style="display:none;">
-                <label class="field-label">预期整改措施<span class="opt">（选择措施自动带入）</span></label>
+                <label class="field-label">推荐措施<span class="opt">（点击标签选中，可多选）</span></label>
                 <div class="modal-tags" id="acceptPlanTags"></div>
-                <textarea class="modal-textarea" id="acceptPlanInput" oninput="syncPlanExpect()" placeholder="例如：加装FTTR（更换网线），解决剩余点位覆盖不足"></textarea>
+                <input type="hidden" id="acceptPlanInput">
+                <input type="text" class="modal-input" id="acceptPlanOtherInput" style="display:none;margin-bottom:16px;" placeholder="请输入其他推荐措施" oninput="syncAcceptTagField('acceptPlan')">
             </div>
-            <label class="field-label" id="acceptExpectLabel" style="display:none;">预期整改效果<span class="opt">（由预期措施联动生成，可修改）</span></label>
-            <textarea class="modal-textarea" id="acceptExpectInput" style="display:none;" placeholder="选择上方预期整改措施后自动生成对应的预期效果，也可在此手动修改"></textarea>
+            <label class="field-label" id="acceptExpectLabel" style="display:none;">预期效果<span class="opt">（由推荐措施联动生成，可修改）</span></label>
+            <textarea class="modal-textarea" id="acceptExpectInput" style="display:none;" placeholder="选择上方推荐措施后自动生成对应的预期效果，也可在此手动修改"></textarea>
+            <div id="acceptEffectGroup" style="display:none;">
+                <label class="field-label">整改效果<span class="opt">（依据复检数据自动生成，可修改）</span></label>
+                <textarea class="modal-textarea" id="acceptEffectInput" placeholder="例如：全部 3 个异常点位均已复检，整改后全屋信号覆盖达标"></textarea>
+            </div>
             <label class="field-label">备注<span class="opt">（可填写整改费用金额）</span></label>
             <input type="text" class="modal-input" id="acceptRemarkInput" placeholder="如：光猫 200 元、水晶头 2 个共 40 元，合计 240 元">
             <div class="modal-actions">
@@ -3386,46 +3396,96 @@ function renderRectifyTags() {
 }
 
 // 整改措施 → 预期整改效果（选择措施后自动生成，装维可再修改）
+const EFFECT_PREFIX = '解决现有异常点覆盖问题。';
 const RECTIFY_EXPECT = {
-    '更换光猫': '换掉老旧光猫后，网络不容易再被老设备“拖后腿”，上网更稳定，玩游戏、看视频时少卡顿、少掉线。你签约的带宽（比如千兆）能真正跑起来，有线和无线测速都会更接近满速。',
-    '更换路由器': '换成支持 Wi-Fi 6/7 的新路由器后，家里信号覆盖更广，多台设备同时上网也更流畅，不容易互相干扰。原来信号弱的房间，信号会明显变强，下载速度预计提升 40% 以上，手机、电视、平板一起用也不容易卡。',
-    '增加路由器': '通过增加路由器扩展覆盖，把家里原本没信号或信号很差的角落补起来，比如卫生间、阳台、次卧。原来信号盲区也能正常上网，在家里走动时自动切换，不用手动重连。',
-    '加装FTTR（更换网线）': '光纤直接铺到房间，不受传统网线带宽和穿墙衰减的限制。家里每个角落都能体验到千兆以上的速度，信号覆盖更全面，延迟更低，看 8K 视频、连接全屋智能设备都更顺畅。',
-    '更换水晶头（更换光纤头）': '换掉老化、松动或接触不良的水晶头/光纤头，避免接口接触不好导致网速不稳、掉线或时快时慢。换好后，连接更牢靠，网络传输更稳定，能减少因接头问题引起的断网和速率不达标。',
-    '调整路由器位置': '把路由器移到家里更中心、更高的位置，避开承重墙和家电干扰。这样主要活动区域的 Wi-Fi 信号会更强、覆盖更均匀，减少因墙体遮挡造成的信号盲区和网速变慢。'
+    '更换光猫': EFFECT_PREFIX + '换掉老旧光猫后，网络不容易再被老设备“拖后腿”，上网更稳定，玩游戏、看视频时少卡顿、少掉线。你签约的带宽（比如千兆）能真正跑起来，有线和无线测速都会更接近满速。',
+    '更换路由器': EFFECT_PREFIX + '换成支持 Wi-Fi 6/7 的新路由器后，家里信号覆盖更广，多台设备同时上网也更流畅，不容易互相干扰。原来信号弱的房间，信号会明显变强，下载速度预计提升 40% 以上，手机、电视、平板一起用也不容易卡。',
+    '增加路由器': EFFECT_PREFIX + '通过增加路由器扩展覆盖，把家里原本没信号或信号很差的角落补起来，比如卫生间、阳台、次卧。原来信号盲区也能正常上网，在家里走动时自动切换，不用手动重连。',
+    '加装FTTR（更换网线）': EFFECT_PREFIX + '光纤直接铺到房间，不受传统网线带宽和穿墙衰减的限制。家里每个角落都能体验到千兆以上的速度，信号覆盖更全面，延迟更低，看 8K 视频、连接全屋智能设备都更顺畅。',
+    '更换水晶头（更换光纤头）': EFFECT_PREFIX + '换掉老化、松动或接触不良的水晶头/光纤头，避免接口接触不好导致网速不稳、掉线或时快时慢。换好后，连接更牢靠，网络传输更稳定，能减少因接头问题引起的断网和速率不达标。',
+    '调整路由器位置': EFFECT_PREFIX + '把路由器移到家里更中心、更高的位置，避开承重墙和家电干扰。这样主要活动区域的 Wi-Fi 信号会更强、覆盖更均匀，减少因墙体遮挡造成的信号盲区和网速变慢。'
 };
 
+// 多条措施合并时只保留一次开头语，避免重复堆叠
+function joinEffectTexts(texts) {
+    if (!texts.length) return '';
+    const body = texts.map(t => t.startsWith(EFFECT_PREFIX) ? t.slice(EFFECT_PREFIX.length) : t).join('；');
+    return EFFECT_PREFIX + body;
+}
+
+// 措施标签：点击选中高亮，再点取消；选中「其他」时展开自由输入
+const ACCEPT_TAG_FIELDS = {
+    acceptRectify: { box: 'acceptRectifyTags', otherInput: 'acceptRectifyOtherInput', targetId: 'acceptRectifyInput' },
+    acceptPlan: { box: 'acceptPlanTags', otherInput: 'acceptPlanOtherInput', targetId: 'acceptPlanInput' }
+};
+const OTHER_TAG = '其他';
+
 function renderAcceptRectifyTags() {
-    const box = document.getElementById('acceptTags');
-    if (box) box.innerHTML = RECTIFY_TAGS.map(t => `<div class="modal-tag" onclick="pickAcceptTag('${t}')">${t}</div>`).join('');
-    const planBox = document.getElementById('acceptPlanTags');
-    if (planBox) planBox.innerHTML = RECTIFY_TAGS.map(t => `<div class="modal-tag" onclick="pickAcceptPlanTag('${t}')">${t}</div>`).join('');
+    Object.keys(ACCEPT_TAG_FIELDS).forEach(key => {
+        const box = document.getElementById(ACCEPT_TAG_FIELDS[key].box);
+        if (!box) return;
+        box.innerHTML = RECTIFY_TAGS.concat(OTHER_TAG).map(t =>
+            `<div class="modal-tag" data-tag="${t}" onclick="toggleAcceptTag('${key}','${t}')">${t}</div>`).join('');
+    });
 }
 
-// 预期整改措施：选择后带入，并联动生成预期整改效果
-function pickAcceptPlanTag(t) {
-    pickRectifyTag(t, 'acceptPlanInput');
-    syncPlanExpect();
+function toggleAcceptTag(key, tag) {
+    const box = document.getElementById(ACCEPT_TAG_FIELDS[key].box);
+    const el = box ? Array.from(box.children).find(c => c.dataset.tag === tag) : null;
+    if (!el) return;
+    el.classList.toggle('on');
+    syncAcceptTagField(key);
 }
 
-// 预期整改效果由「预期整改措施」中匹配到的措施联动生成，可再手工修改
+// 依据选中标签与「其他」自定义内容，合成措施文本
+function syncAcceptTagField(key) {
+    const cfg = ACCEPT_TAG_FIELDS[key];
+    const box = document.getElementById(cfg.box);
+    if (!box) return;
+    const picked = Array.from(box.querySelectorAll('.modal-tag.on')).map(el => el.dataset.tag);
+    const otherOn = picked.includes(OTHER_TAG);
+    const otherInput = document.getElementById(cfg.otherInput);
+    if (otherInput) otherInput.style.display = otherOn ? '' : 'none';
+    const custom = otherOn ? (otherInput.value || '').trim() : '';
+    const names = picked.filter(t => t !== OTHER_TAG);
+    document.getElementById(cfg.targetId).value = names.concat(custom ? [custom] : []).join('；');
+    if (key === 'acceptPlan') syncPlanExpect();
+    if (key === 'acceptRectify' && pendingExportType === '已设计') syncExpectFromRectify();
+}
+
+// 回填已有措施：命中的标签点亮，未命中的文本归入「其他」
+function setAcceptTagField(key, value) {
+    const cfg = ACCEPT_TAG_FIELDS[key];
+    const box = document.getElementById(cfg.box);
+    if (!box) return;
+    const parts = String(value || '').split(/[；;]/).map(s => s.trim()).filter(Boolean);
+    const known = parts.filter(p => RECTIFY_TAGS.includes(p));
+    const custom = parts.filter(p => !RECTIFY_TAGS.includes(p)).join('；');
+    Array.from(box.children).forEach(el => {
+        const t = el.dataset.tag;
+        el.classList.toggle('on', t === OTHER_TAG ? !!custom : known.includes(t));
+    });
+    const otherInput = document.getElementById(cfg.otherInput);
+    if (otherInput) otherInput.value = custom;
+    syncAcceptTagField(key);
+}
+
+// 预期效果由「推荐措施」中匹配到的措施联动生成，可再手工修改
 function syncPlanExpect() {
     const plan = document.getElementById('acceptPlanInput');
     const ta = document.getElementById('acceptExpectInput');
     if (!plan || !ta) return;
     const texts = RECTIFY_TAGS.filter(t => plan.value.includes(t) && RECTIFY_EXPECT[t]).map(t => RECTIFY_EXPECT[t]);
-    if (texts.length) ta.value = texts.join('；');
+    if (texts.length) ta.value = joinEffectTexts(texts);
 }
 
-// 选择整改措施：追加到整改措施框；仅已设计场景同步自动生成对应的预期改善效果
-function pickAcceptTag(t) {
-    pickRectifyTag(t, 'acceptRectifyInput');
-    // 已整改措施默认只追加措施名称，不再直接联动预期效果（部分优化由「预期整改措施」驱动）
-    if (pendingExportType !== '已设计' || !RECTIFY_EXPECT[t]) return;
+// 已设计：推荐措施变化时同步生成预期效果
+function syncExpectFromRectify() {
+    const cur = document.getElementById('acceptRectifyInput');
     const ta = document.getElementById('acceptExpectInput');
-    const cur = ta.value.trim();
-    if (cur.includes(RECTIFY_EXPECT[t])) return;
-    ta.value = cur ? cur.replace(/[；;，,\s]+$/, '') + '；' + RECTIFY_EXPECT[t] : RECTIFY_EXPECT[t];
+    if (!cur || !ta) return;
+    const texts = RECTIFY_TAGS.filter(t => cur.value.includes(t) && RECTIFY_EXPECT[t]).map(t => RECTIFY_EXPECT[t]);
+    if (texts.length) ta.value = joinEffectTexts(texts);
 }
 
 // 快捷标签点击后追加到输入框（分号分隔，避免重复）
@@ -3552,6 +3612,8 @@ function buildSinglePDFReportHTML(rec, acceptType, rectifyText, expectText) {
     const rectify = healthy ? '' : (rectifyText || rec.rectification || '').trim();
     // 备注：装维填写的费用金额等补充说明，仅在填写后呈现
     const remark = (rec.remark || '').trim();
+    // 整改效果：已优化场景由装维确认的文案，未填写时按复检数据自动生成
+    const doneEffectText = (rec.effectText || '').trim();
     // 预期整改措施：部分优化中针对剩余点位的计划
     const expectPlan = (rec.expectPlan || '').trim();
     // 明细表展示「整改前 → 整改后」实测数据；已设计报告无整改数据，表格仅保留现场值
@@ -3633,7 +3695,8 @@ function buildSinglePDFReportHTML(rec, acceptType, rectifyText, expectText) {
         <div class="pr-rect">
             <div class="pr-rect-row"><span class="pr-rect-lb">整改措施</span><div class="pr-rect-txt">${escHtml(rectify)}</div></div>
             <div class="pr-rect-row"><span class="pr-rect-lb">整改效果</span><div class="pr-rect-txt">${mode === 'done'
-                ? `全部 ${abn.length} 个异常点位均已复检，实测平均信号由 <b>${avgOf(abn.map(p => p.signal))} dBm</b> 提升至 <b>${avgOf(abn.map(rcSig))} dBm</b>，整改后全屋信号覆盖达标`
+                ? (doneEffectText ? escHtml(doneEffectText)
+                    : `全部 ${abn.length} 个异常点位均已复检，实测平均信号由 <b>${avgOf(abn.map(p => p.signal))} dBm</b> 提升至 <b>${avgOf(abn.map(rcSig))} dBm</b>，整改后全屋信号覆盖达标`)
                 : (donePts.length
                     ? `${escHtml(tagList(donePts))} 共 ${donePts.length} 个点位已完成整改，实测平均信号由 <b>${avgOf(donePts.map(p => p.signal))} dBm</b> 提升至 <b>${avgOf(donePts.map(rcSig))} dBm</b>`
                     : '本次暂无复检完成的异常点位')}</div></div>
@@ -3731,6 +3794,18 @@ function buildSinglePDFReportHTML(rec, acceptType, rectifyText, expectText) {
 let pendingSingleExportBtn = null;
 let pendingExportType = '已设计';
 
+// 已优化：依据复检数据生成默认整改效果文案（弹窗内可修改）
+function autoDoneEffect(rec) {
+    const abn = rec.abnormalPoints || [];
+    if (!abn.length) return '';
+    const avgOf = arr => {
+        const v = arr.filter(x => x != null && !isNaN(x));
+        return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : 0;
+    };
+    const after = abn.map(p => p.recheck ? p.recheck.avg : null);
+    return `全部 ${abn.length} 个异常点位均已复检，实测平均信号由 ${avgOf(abn.map(p => p.signal))} dBm 提升至 ${avgOf(after)} dBm，整改后全屋信号覆盖达标`;
+}
+
 function exportSingleRecordPDF(btn) {
     if (!currentRecord) { showToast('暂无可导出的巡检记录'); return; }
     pendingSingleExportBtn = btn;
@@ -3743,13 +3818,14 @@ function exportSingleRecordPDF(btn) {
     const pts = currentRecord.abnormalPoints || [];
     const doneN = pts.filter(p => p.recheck).length;
     selectAcceptType(doneN === 0 ? '已设计' : (doneN === pts.length ? '已优化' : '部分优化'));
-    // 预填上次填写的整改措施、预期改善效果与用户信息，便于再次导出时复用
-    document.getElementById('acceptRectifyInput').value = currentRecord.rectification || '';
-    document.getElementById('acceptPlanInput').value = currentRecord.expectPlan || '';
+    // 预填上次填写的措施、预期效果、整改效果与用户信息，便于再次导出时复用
+    renderAcceptRectifyTags();
+    setAcceptTagField('acceptRectify', currentRecord.rectification || '');
+    setAcceptTagField('acceptPlan', currentRecord.expectPlan || '');
     document.getElementById('acceptExpectInput').value = currentRecord.expectEffect || '';
+    document.getElementById('acceptEffectInput').value = currentRecord.effectText || autoDoneEffect(currentRecord);
     document.getElementById('acceptUserInput').value = currentRecord.userInfo || '';
     document.getElementById('acceptRemarkInput').value = currentRecord.remark || '';
-    renderAcceptRectifyTags();
     document.getElementById('acceptTypeModal').classList.add('show');
 }
 
@@ -3758,18 +3834,23 @@ function selectAcceptType(type) {
     document.querySelectorAll('#acceptOptions .accept-option').forEach(el => {
         el.classList.toggle('active', el.dataset.type === type);
     });
-    // 「预期整改效果」用于已设计（方案）与部分优化（剩余点位）场景
-    const showExpect = type !== '已优化';
-    const lb = document.getElementById('acceptExpectLabel');
-    const ip = document.getElementById('acceptExpectInput');
-    if (lb) lb.style.display = showExpect ? '' : 'none';
-    if (ip) ip.style.display = showExpect ? '' : 'none';
-    // 部分优化：整改措施改为已整改措施，并展开「预期整改措施」模块
+    const isPlan = type === '已设计';
     const isPartial = type === '部分优化';
+    const isDone = type === '已优化';
+    // 第一项：已设计为推荐措施，部分优化 / 已优化为已整改措施
     const rl = document.getElementById('acceptRectifyLabel');
-    if (rl) rl.textContent = isPartial ? '已整改措施' : '整改措施';
+    if (rl) rl.textContent = isPlan ? '推荐措施' : '已整改措施';
+    // 推荐措施：仅部分优化（针对剩余点位）需要
     const planGroup = document.getElementById('acceptPlanGroup');
     if (planGroup) planGroup.style.display = isPartial ? '' : 'none';
+    // 预期效果：已设计、部分优化
+    const lb = document.getElementById('acceptExpectLabel');
+    const ip = document.getElementById('acceptExpectInput');
+    if (lb) lb.style.display = (isPlan || isPartial) ? '' : 'none';
+    if (ip) ip.style.display = (isPlan || isPartial) ? '' : 'none';
+    // 整改效果：仅已优化
+    const eg = document.getElementById('acceptEffectGroup');
+    if (eg) eg.style.display = isDone ? '' : 'none';
 }
 
 function closeAcceptTypeModal() {
@@ -3779,17 +3860,23 @@ function closeAcceptTypeModal() {
 function confirmAcceptExport() {
     if (!currentRecord) return;
     const text = document.getElementById('acceptRectifyInput').value.trim();
-    if (!text) { showToast('请填写整改措施内容'); document.getElementById('acceptRectifyInput').focus(); return; }
+    const needLabel = pendingExportType === '已设计' ? '推荐措施' : '已整改措施';
+    if (!text) { showToast('请选择' + needLabel); return; }
     const userInfo = document.getElementById('acceptUserInput').value.trim();
-    // 预期整改措施与预期整改效果：部分优化由措施联动生成，随记录保存以便复用
+    // 推荐措施与预期效果：已设计 / 部分优化场景使用，随记录保存以便复用
     const expectPlan = (document.getElementById('acceptPlanInput').value || '').trim();
     const expectText = (document.getElementById('acceptExpectInput').value || '').trim();
+    // 整改效果：仅已优化场景使用
+    const effectText = pendingExportType === '已优化'
+        ? (document.getElementById('acceptEffectInput').value || '').trim()
+        : currentRecord.effectText;
     const remark = document.getElementById('acceptRemarkInput').value.trim();
     // 保存到巡检记录：再次导出时预填，报告可追溯
     currentRecord.rectification = text;
     currentRecord.userInfo = userInfo;
     currentRecord.expectPlan = expectPlan;
     currentRecord.expectEffect = expectText;
+    currentRecord.effectText = effectText;
     currentRecord.remark = remark;
     const idx = records.findIndex(r => r.id === currentRecord.id);
     if (idx >= 0) { records[idx] = currentRecord; localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
